@@ -28,23 +28,7 @@ const Homepage = () => {
   // if (!user) {
   //   return <Default />
   // }
-  const handleDownload = () => {
-    const url = `http://localhost/api/uploads/1691722998980-325068794.png`
-    const fileName = url.split('/').pop()
-    const xhr = new XMLHttpRequest()
-    xhr.responseType = 'blob'
-    xhr.onload = () => {
-      const a = document.createElement('a')
-      a.href = window.URL.createObjectURL(xhr.response)
-      a.download = fileName!
-      a.style.display = 'none'
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-    }
-    xhr.open('GET', url)
-    xhr.send()
-  }
+
   return (
     <main className="h-screen w-screen bg-black">
       <Header />
@@ -54,7 +38,7 @@ const Homepage = () => {
           alt=""
         />
       </div> */}
-      <div className="flex">
+      <div className="flex h-[calc(100%-56px)]">
         <Slidebar setChannel={setItemChannel} />
 
         <div className="flex-1">

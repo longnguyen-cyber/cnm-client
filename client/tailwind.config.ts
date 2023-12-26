@@ -15,7 +15,17 @@ const config: Config = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      animation: {
+        'fade-down': 'fade-in linear',
+      },
+      keyframes: (theme) => ({
+        'fade-in': {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+      }),
     },
+
     screens: {
       desktop: '2000px',
     },

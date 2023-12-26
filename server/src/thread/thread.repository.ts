@@ -12,12 +12,12 @@ export class ThreadRepository {
     threadToDB: ThreadToDBDto,
     prisma: Tx = this.prisma,
   ): Promise<Res> {
-    console.log(threadToDB);
     const messages = threadToDB.messages;
     let threadId = '';
     let newThread: any;
     let newMsg: any;
     let newFile: any;
+    let react: any;
     if (threadToDB.chatId === undefined || threadToDB.receiveId === null) {
       newThread = await prisma.threads.create({
         data: {
@@ -63,7 +63,16 @@ export class ThreadRepository {
           message: messages.message,
         },
       });
-    } else if (threadToDB.file !== undefined) {
+    } else if (threadToDB.react !== undefined) {
+      react = await prisma.reactions.create({
+        data: {
+          threadId,
+          userId: threadToDB.senderId,
+          react: threadToDB.react.react,
+          quantity: threadToDB.react.quantity,
+        },
+      });
+    } else if (threadToDB.file !== undefined || threadToDB.file !== null) {
       newFile = await prisma.files.create({
         data: {
           ...threadToDB.file,
@@ -94,6 +103,9 @@ export class ThreadRepository {
         },
         files: {
           ...newFile,
+        },
+        reacts: {
+          ...react,
         },
       },
     };
@@ -189,7 +201,16 @@ export class ThreadRepository {
       },
     });
 
-    if (!updateMsg && !updateFile) {
+    const udpateReact = await prisma.reactions.update({
+      where: {
+        threadId: threadId,
+      },
+      data: {
+        ...threadToDB.react,
+      },
+    });
+
+    if (!updateMsg && !updateFile && !udpateReact) {
       return {
         success: false,
         message: 'Update thread failed',
@@ -219,6 +240,9 @@ export class ThreadRepository {
         },
         files: {
           ...updateFile,
+        },
+        reacts: {
+          ...udpateReact,
         },
       },
     };
@@ -269,13 +293,39 @@ export class ThreadRepository {
   async addReact(reactToDB: ReactToDBDto, prisma: Tx = this.prisma) {
     const threadId = reactToDB.threadId;
     const userId = reactToDB.userId;
-    await prisma.reactions.create({
-      data: {
-        threadId: threadId,
-        userId: userId,
-        react: reactToDB.react,
+    const react = await prisma.reactions.findUnique({
+      where: {
+        threadId,
+        userId,
       },
     });
+
+    if (react) {
+      await prisma.reactions.update({
+        where: {
+          threadId: threadId,
+          userId: userId,
+        },
+        data: {
+          quantity: reactToDB.quantity,
+        },
+      });
+
+      return {
+        success: true,
+        message: 'Update react successfully',
+        errors: '',
+      };
+    } else {
+      await prisma.reactions.create({
+        data: {
+          threadId: threadId,
+          userId: userId,
+          react: reactToDB.react,
+          quantity: reactToDB.quantity,
+        },
+      });
+    }
 
     return {
       success: true,

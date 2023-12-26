@@ -49,6 +49,30 @@ export interface IMessage {
   updatedAt?: Date
 }
 
+export interface IFile {
+  id?: string
+  fieldname: string
+  originalname: string
+  encoding: string
+  mimetype: string
+  destination: string
+  filename: string
+  path: string
+  size: number
+  threadId?: string
+  thread?: IThread
+}
+
+export interface IReact {
+  id?: string
+  react: string
+  quantity: number
+  userId?: string
+  user?: IUser
+  threadId?: string
+  thread?: IThread
+}
+
 export interface IUser {
   id: string
   name: string
@@ -76,6 +100,8 @@ export interface IThread {
   channelId?: string
   chatId?: string
   messages: IMessage
+  files?: IFile[]
+  reactions?: IReact[]
   user: IUser
   replys?: IThread[]
 }

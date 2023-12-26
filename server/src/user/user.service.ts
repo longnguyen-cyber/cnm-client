@@ -26,16 +26,13 @@ export class UserService {
 
   async login(
     { email, password }: UserLoginDto,
-    req
+    req,
   ): Promise<ResUserWithTokenDto> {
     const user = await this.checkLoginData(email, password);
     delete user.password;
     const resUser = this.buildUserResponse({
       ...user,
-      avatar: this.commonService.transferImageToUrl(
-        req,
-        user.avatar,
-      ),
+      avatar: this.commonService.transferFileToURL(req, user.avatar),
     });
     const token = this.authService.generateJWT(user.id.toString());
 
@@ -56,7 +53,7 @@ export class UserService {
     const users = await this.userRepository.findAll();
     users.map((user) => {
       delete user.password;
-      user.avatar = this.commonService.transferImageToUrl(req, user.avatar);
+      user.avatar = this.commonService.transferFileToURL(req, user.avatar);
     });
     return users;
   }
@@ -66,7 +63,7 @@ export class UserService {
     delete user.password;
     return {
       ...user,
-      avatar: this.commonService.transferImageToUrl(req, user.avatar),
+      avatar: this.commonService.transferFileToURL(req, user.avatar),
     };
   }
 

@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { CommonService } from 'src/common/common.service';
 import { FileCreateDto } from './dto/fileCreate.dto';
 import { MessageCreateDto } from './dto/messageCreate.dto';
 import { ReactToDBDto } from './dto/relateDB/reactToDB.dto';
 import { ThreadToDBDto } from './dto/relateDB/threadToDB.dto';
 import { ThreadRepository } from './thread.repository';
-import { CommonService } from 'src/common/common.service';
+import { ReactCreateDto } from './dto/reactCreate.dto';
 
 @Injectable()
 export class ThreadService {
@@ -16,6 +17,7 @@ export class ThreadService {
   async createThread(
     messageCreateDto?: MessageCreateDto,
     fileCreateDto?: FileCreateDto,
+    reactCreateDto?: ReactCreateDto,
     senderId?: string,
     receiveId?: string,
     channelId?: string,
@@ -24,6 +26,7 @@ export class ThreadService {
     const threadToDb = this.compareToCreateThread(
       messageCreateDto,
       fileCreateDto,
+      reactCreateDto,
       senderId,
       receiveId,
       channelId,
@@ -31,6 +34,7 @@ export class ThreadService {
     );
     if (fileCreateDto) {
       const limitFileSize = this.limitFileSize(fileCreateDto.size);
+      console.log(limitFileSize);
       if (!limitFileSize) {
         return {
           success: false,
@@ -51,6 +55,7 @@ export class ThreadService {
     threadId: string,
     messageCreateDto?: MessageCreateDto,
     fileCreateDto?: FileCreateDto,
+    reactCreateDto?: ReactCreateDto,
     senderId?: string,
     receiveId?: string,
     channelId?: string,
@@ -59,6 +64,7 @@ export class ThreadService {
     const threadToDb = this.compareToCreateThread(
       messageCreateDto,
       fileCreateDto,
+      reactCreateDto,
       senderId,
       receiveId,
       channelId,
@@ -94,10 +100,12 @@ export class ThreadService {
     senderId?: string,
     messageCreateDto?: MessageCreateDto,
     fileCreateDto?: FileCreateDto,
+    reactCreateDto?: ReactCreateDto,
   ) {
     const thread = this.compareToCreateThread(
       messageCreateDto,
       fileCreateDto,
+      reactCreateDto,
       senderId,
       null,
       null,
@@ -126,8 +134,18 @@ export class ThreadService {
     };
   }
 
-  async addReact(react: string, threadId: string, senderId: string) {
-    const reactToDb = this.compareToCreateReact(react, threadId, senderId);
+  async addReact(
+    react: string,
+    quantity: number,
+    threadId: string,
+    senderId: string,
+  ) {
+    const reactToDb = this.compareToCreateReact(
+      react,
+      quantity,
+      threadId,
+      senderId,
+    );
     const thread = await this.threadRepository.addReact(reactToDb);
     return {
       thread,
@@ -135,7 +153,7 @@ export class ThreadService {
   }
 
   async removeReact(threadId: string, senderId: string) {
-    const reactToDb = this.compareToCreateReact(null, threadId, senderId);
+    const reactToDb = this.compareToCreateReact(null, null, threadId, senderId);
     const thread = await this.threadRepository.removeReact(reactToDb);
     return {
       thread,
@@ -145,7 +163,7 @@ export class ThreadService {
   async getAllThread(type: string, id: string, req) {
     const threads = await this.threadRepository.getAllThread(type, id);
     const newThreads = threads.map((item) => {
-      const newAvatar = this.commonService.transferImageToUrl(
+      const newAvatar = this.commonService.transferFileToURL(
         req,
         item.user?.avatar,
       );
@@ -156,6 +174,7 @@ export class ThreadService {
           return {
             ...file,
             size: this.convertToMB(file.size),
+            path: this.commonService.transferFileToURL(req, file.path),
           };
         }),
         user: {
@@ -170,7 +189,7 @@ export class ThreadService {
               ...rep,
               user: {
                 ...rep.user,
-                avatar: this.commonService.transferImageToUrl(
+                avatar: this.commonService.transferFileToURL(
                   req,
                   rep.user.avatar,
                 ),
@@ -179,6 +198,7 @@ export class ThreadService {
                 return {
                   ...file,
                   size: this.convertToMB(file.size),
+                  path: this.commonService.transferFileToURL(req, file.path),
                 };
               }),
             };
@@ -216,6 +236,7 @@ export class ThreadService {
   private compareToCreateThread(
     messageCreateDto?: MessageCreateDto,
     fileCreateDto?: FileCreateDto,
+    react?: ReactCreateDto,
     senderId?: string,
     receiveId?: string,
     channelId?: string,
@@ -229,6 +250,7 @@ export class ThreadService {
             ...fileCreateDto,
           }
         : null,
+      react,
       senderId,
       receiveId,
       channelId,
@@ -238,12 +260,14 @@ export class ThreadService {
   }
 
   private compareToCreateReact(
-    reactCreateDto?: string,
+    react?: string,
+    quantity?: number,
     threadId?: string,
     userId?: string,
   ): ReactToDBDto {
     return {
-      react: reactCreateDto,
+      react: react,
+      quantity,
       threadId,
       userId,
     };
@@ -271,9 +295,9 @@ export class ThreadService {
   private limitFileSize = (bytes: number) => {
     const fileSize = bytes / 1024 / 1024; // MB
     if (fileSize > 10) {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   };
   transformFile(file) {
     return {
@@ -285,7 +309,7 @@ export class ThreadService {
   transformUser(req, user) {
     return {
       ...user,
-      avatar: this.commonService.transferImageToUrl(req, user.avatar),
+      avatar: this.commonService.transferFileToURL(req, user.avatar),
     };
   }
 

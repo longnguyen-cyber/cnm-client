@@ -6,6 +6,9 @@
   .class_hover_iconInputChat {
     @apply cursor-pointer p-1 text-[1rem] rounded hover:bg-zinc-600;
   }
+  .sidebar {
+    transition: all 0.4s ease-in-out;
+  }
 }
 
 ::-webkit-scrollbar {

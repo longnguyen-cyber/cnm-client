@@ -26,7 +26,7 @@ export class ChatService {
       ...chat,
       user: {
         ...chat.user,
-        avatar: this.commonService.transferImageToUrl(req, chat.user.avatar),
+        avatar: this.commonService.transferFileToURL(req, chat.user.avatar),
       },
     };
   }

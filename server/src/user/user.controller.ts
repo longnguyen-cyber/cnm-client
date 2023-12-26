@@ -35,6 +35,7 @@ import { UserRequestUpdateDto } from './dto/userRequestUpdate.dto';
 import { UserUpdateDto } from './dto/userUpdate.dto';
 import { UserService } from './user.service';
 import { Request } from 'express';
+import slugify from 'slugify';
 
 @ApiTags('users')
 @Controller('users')
@@ -50,11 +51,11 @@ export class UserController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          const filename = `${uniqueSuffix}${ext}`;
-          callback(null, filename);
+          const sanitizedFilename = slugify(file.originalname, {
+            lower: true, // convert to lower case, defaults to `false`
+            strict: true, // strip special characters except replacement, defaults to `false`
+          });
+          callback(null, sanitizedFilename);
         },
       }),
     }),
@@ -81,10 +82,7 @@ export class UserController {
     @Body() userLoginDto: UserLoginDto,
     @Req() request: Request,
   ): Promise<ResUserDto> {
-    const user = await this.userService.login(
-      userLoginDto,
-      request
-    );
+    const user = await this.userService.login(userLoginDto, request);
 
     return {
       success: true,
@@ -100,10 +98,7 @@ export class UserController {
     @Param('id') id: string,
     @Req() request: Request,
   ): Promise<ResUserDto> {
-    const data = await this.userService.getUser(
-      id,
-      request
-    );
+    const data = await this.userService.getUser(id, request);
     return {
       success: true,
       message: 'Get all user success',

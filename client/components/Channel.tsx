@@ -22,11 +22,13 @@ interface IProps {
 }
 function Channel({ channel }: IProps) {
   const session = useStorage()
-  console.log(channel?.id)
 
   const [threadOfChannel, setThreadOfChannel] = useState<IThread[]>([])
-  const { data: threadData, isSuccess: threadSuccess } =
-    useGetThreadByChannelIdQuery(channel?.id!)
+  const {
+    data: threadData,
+    isSuccess: threadSuccess,
+    isFetching,
+  } = useGetThreadByChannelIdQuery(channel?.id!)
 
   useEffect(() => {
     if (threadData && threadSuccess) {
@@ -122,9 +124,6 @@ function Channel({ channel }: IProps) {
     }
   }
 
-  //socket
-  //socket
-
   const send = (value: any) => {
     if (session.getItem('user', 'local')) {
       const user = JSON.parse(session.getItem('user', 'local'))
@@ -144,7 +143,6 @@ function Channel({ channel }: IProps) {
 
   useEffect(() => {
     socket?.on('sendThread', (data: any) => {
-      console.log(data)
       setThreadOfChannel([...threadOfChannel, data])
       messageEndRef.current?.scrollIntoView({ behavior: 'smooth' })
     })
@@ -152,12 +150,12 @@ function Channel({ channel }: IProps) {
 
   //scroll message
 
-  // if (!channel) return <Loading />
+  if (isFetching) return <Loading />
 
   return (
-    <div className="flex flex-row">
+    <div className="flex flex-row h-full">
       {/* content */}
-      <div className="flex flex-col w-full h-[90vh]">
+      <div className="flex flex-col w-full h-[calc(100%-162px)]">
         {/* header thread */}
         <div className="h-12 flex items-center p-4 border-b-2 border-zinc-700">
           <div className="flex items-center justify-between w-full">
@@ -225,7 +223,7 @@ function Channel({ channel }: IProps) {
           </div>
         </div>
         {/* content */}
-        <div className="w-full relative h-[66%] desktop:h-[86%]  overflow-auto">
+        <div className="w-full relative h-full overflow-auto">
           <div className="p-4 flex flex-col items-start w-full">
             <h1 className="text-2xl text-white flex items-center">
               {channel?.isPublic ? (
@@ -277,8 +275,8 @@ function Channel({ channel }: IProps) {
             </div>
           </div>
         </div>
-        <Input isThread={false} send={send} channel={channel} />
       </div>
+      <Input isThread={false} send={send} channel={channel} />
       {/* thread */}
       {showThread.status && (
         <Thread

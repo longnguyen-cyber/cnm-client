@@ -1,6 +1,7 @@
+import data from '@emoji-mart/data'
 import { useGetAllUsersQuery } from '@/redux/api/user'
-import { useformatTime } from '@/utils/hooks'
-import { IThread, IUser } from '@/utils/types'
+import { useStorage, useformatDate, useformatTime } from '@/utils/hooks'
+import { IFile, IReact, IThread, IUser } from '@/utils/types'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import Picker from '@emoji-mart/react'
@@ -12,6 +13,10 @@ import {
   FaRegMessage,
   FaSquareCheck,
 } from 'react-icons/fa6'
+import { handleDownload } from '@/utils/downloadFile'
+import DisplayFile from './DisplayFile'
+import { io } from 'socket.io-client'
+const socket = io('http://localhost:8002')
 
 interface IProps {
   item: IThread
@@ -19,6 +24,7 @@ interface IProps {
 }
 
 const Message = ({ item, onShowThread }: IProps) => {
+  console.log(item)
   const [users, setUsers] = useState<IUser[]>([])
   const { data: userData, isSuccess: userSuccess } = useGetAllUsersQuery()
 
@@ -56,8 +62,50 @@ const Message = ({ item, onShowThread }: IProps) => {
       )
     }
   }
+
+  // const [emojiText, setEmojiText] = useState('')
+  const [isReactOneTime, setIsReactOneTime] = useState(false)
+
+  const [hashEmoji, setHashEmoji] = useState<{ [key: string]: number }>({})
+  useEffect(() => {
+    if (item.reactions && item.reactions.length > 0) {
+      const hash: any = {}
+      item.reactions.map((react: IReact) => {
+        hash[react.react] = react.quantity
+      })
+      setHashEmoji(hash)
+    }
+  }, [])
+  const session = useStorage()
+  const AddEmoji = (e: any) => {
+    const sym = e.unified.split('-')
+    const codesArray: any = []
+    sym.forEach((el: any) => codesArray.push('0x' + el))
+    const emoji = String.fromCodePoint(...codesArray)
+    setHashEmoji((prevHashEmoji) => ({
+      ...prevHashEmoji,
+      [emoji]: prevHashEmoji[emoji] ? prevHashEmoji[emoji] + 1 : 1,
+    }))
+    setIsReactOneTime(true)
+    setShowEmoji(false)
+    const user = JSON.parse(session.getItem('user', 'local'))
+
+    const newMsg = {
+      react: emoji,
+      quantity: hashEmoji[emoji] ? hashEmoji[emoji] + 1 : 1,
+      threadId: item.id,
+      senderId: user.id,
+    }
+    socket?.emit('addReact', newMsg)
+  }
+
+  //when hashEmoji change will send emoji to server
+  useEffect(() => {
+    // socket?.emit('message', { message: value, timestamp: 'kuga' })
+  }, [hashEmoji])
+
   return (
-    <div key={item.id} className="flex space-x-2 items-center">
+    <div key={item.id} className="flex space-x-2 items-start">
       <img
         className="rounded mt-1 h-10 w-10 object-cover"
         // src={users.find((e: IUser) => e.id == item.user.id)?.avatar}
@@ -100,6 +148,10 @@ const Message = ({ item, onShowThread }: IProps) => {
             <div className="relative inline-flex items-center">
               <span className="text-zinc-400 pt-1 pb-1">
                 {item.messages?.message}
+                {item.files &&
+                  item.files.map((file: IFile, index: any) => {
+                    return <DisplayFile key={index} file={file} />
+                  })}
               </span>
             </div>
             <div className={handleHoverShowToolMessage(item.id, 'message')}>
@@ -136,8 +188,8 @@ const Message = ({ item, onShowThread }: IProps) => {
                     theme="dark"
                     emojiSize={20}
                     emojiButtonSize={28}
-                    // onEmojiSelect={AddEmoji}
-                    // data={data}
+                    onEmojiSelect={AddEmoji}
+                    data={data}
                   />
                 </div>
               )}
@@ -181,6 +233,29 @@ const Message = ({ item, onShowThread }: IProps) => {
             </div>
           )}
         </div>
+        {/* <p className=" bottom-0 bg-blue-500 px-2 w-fit rounded-lg">
+          {emojiText}
+        </p> */}
+        {hashEmoji &&
+          Object.keys(hashEmoji).length > 0 &&
+          Object.keys(hashEmoji).map((key: any, index: any) => {
+            return (
+              <span
+                key={index}
+                className=" bottom-0 bg-blue-500 px-2 w-fit rounded-lg mr-1 py-[2px]"
+                onClick={() => {
+                  if (isReactOneTime) {
+                    setHashEmoji((prevHashEmoji) => ({
+                      ...prevHashEmoji,
+                      [key]: prevHashEmoji[key] - 1,
+                    }))
+                  }
+                }}
+              >
+                {key} {hashEmoji[key]}
+              </span>
+            )
+          })}
       </div>
     </div>
   )

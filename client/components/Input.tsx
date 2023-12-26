@@ -3,8 +3,11 @@ import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { useEffect, useRef, useState } from 'react'
 
-import { FaAngleDown, FaAt, FaPaperPlane } from 'react-icons/fa6'
+import { FaAt, FaPaperPlane } from 'react-icons/fa6'
 
+import { useAddFileMutation } from '@/redux/api/thread'
+import { useStorage } from '@/utils/hooks'
+import { IChannel, IUser } from '@/utils/types'
 import {
   AiOutlineBars,
   AiOutlineCode,
@@ -21,10 +24,6 @@ import {
   FaRegFaceSmile,
 } from 'react-icons/fa6'
 import { RiAddLine } from 'react-icons/ri'
-import { IChannel, IUser } from '@/utils/types'
-import { icons } from 'react-icons/lib'
-import { useAddFileMutation } from '@/redux/api/thread'
-import { useStorage } from '@/utils/hooks'
 
 interface Props {
   isThread: boolean
@@ -57,7 +56,6 @@ const Input = ({ isThread, send, channel }: Props) => {
     status: false,
     idMessageReplies: 0,
   })
-  const [text, setText] = useState('')
   const [showEmoji, setShowEmoji] = useState(false)
 
   const AddEmoji = (e: any) => {
@@ -65,9 +63,10 @@ const Input = ({ isThread, send, channel }: Props) => {
     const codesArray: any = []
     sym.forEach((el: any) => codesArray.push('0x' + el))
     const emoji = String.fromCodePoint(...codesArray)
-    setText(text + emoji) // set text
-    setShowEmoji(false) // hide emoji
+    setValue(value + emoji)
+    setShowEmoji(false)
   }
+
   let emojiRef = useRef<any>()
   useEffect(() => {
     let handle = (e: any) => {
@@ -80,34 +79,6 @@ const Input = ({ isThread, send, channel }: Props) => {
       document.removeEventListener('mousedown', handle)
     }
   })
-
-  //socket
-  const icons = [
-    {
-      icon: <FaB />,
-    },
-    {
-      icon: <FaItalic />,
-    },
-    {
-      icon: <AiOutlineUnderline />,
-    },
-    {
-      icon: <AiOutlineLink />,
-    },
-    {
-      icon: <AiOutlineOrderedList />,
-    },
-    {
-      icon: <AiOutlineBars />,
-    },
-    {
-      icon: <FaCode />,
-    },
-    {
-      icon: <AiOutlineCode />,
-    },
-  ]
 
   const [value, setValue] = useState<string>('')
   const [file, setFile] = useState<File>()
@@ -133,7 +104,7 @@ const Input = ({ isThread, send, channel }: Props) => {
 
   return (
     <div
-      className={`  " absolute bottom-0 flex items-center p-4 text-zinc-400 " `}
+      className={`absolute bottom-0 flex items-center p-4 text-zinc-400`}
       style={{
         width: '-webkit-fill-available',
       }}
@@ -182,7 +153,7 @@ const Input = ({ isThread, send, channel }: Props) => {
             }}
             placeholder={`Message ${channel?.name}`}
             value={value}
-            onChange={(e) => {
+            onChange={(e: any) => {
               setValue(e.target.value)
             }}
             onKeyDown={(e) => {
@@ -197,28 +168,43 @@ const Input = ({ isThread, send, channel }: Props) => {
         </div>
         {/* button bottom */}
         <div className="w-full flex items-center justify-between p-1 gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ">
             <div className="class_hover_iconInputChat">
               <div className="rounded-full bg-zinc-700 p-[1px]">
                 <RiAddLine />
               </div>
             </div>
-            {!showEmoji && (
-              <div
-                className="class_hover_iconInputChat"
-                onClick={() => setShowEmoji(!showEmoji)}
-              >
-                <FaRegFaceSmile />
-              </div>
-            )}
-            {showEmoji && (
-              <div
-                className="class_hover_iconInputChat"
-                onClick={() => setShowEmoji(!showEmoji)}
-              >
+            <div
+              className="class_hover_iconInputChat relative flex items-center justify-center"
+              onMouseEnter={() => {
+                setShowEmoji(true)
+              }}
+              onMouseLeave={() => {
+                setShowEmoji(false)
+              }}
+            >
+              {!showEmoji && <FaRegFaceSmile />}
+              {showEmoji && (
                 <FaFaceSmileBeam className="text-yellow-300 rotate-45" />
+              )}
+              <div
+                ref={emojiRef}
+                className=" inline-flex items-center justify-center"
+              >
+                {showEmoji && (
+                  <div className="absolute bottom-0 m-4 p-4">
+                    <Picker
+                      theme="dark"
+                      emojiSize={20}
+                      emojiButtonSize={28}
+                      onEmojiSelect={AddEmoji}
+                      data={data}
+                    />
+                  </div>
+                )}
               </div>
-            )}
+            </div>
+
             <div className="class_hover_iconInputChat">
               <FaAt />
             </div>
@@ -231,22 +217,6 @@ const Input = ({ isThread, send, channel }: Props) => {
             </div>
             <div className="class_hover_iconInputChat">
               <BiMicrophone />
-            </div>
-            <div
-              ref={emojiRef}
-              className="relative inline-flex items-center justify-center"
-            >
-              {showEmoji && (
-                <div className="absolute bottom-5 m-4 p-4">
-                  <Picker
-                    theme="dark"
-                    emojiSize={20}
-                    emojiButtonSize={28}
-                    onEmojiSelect={AddEmoji}
-                    data={data}
-                  />
-                </div>
-              )}
             </div>
           </div>
           {/* button send */}

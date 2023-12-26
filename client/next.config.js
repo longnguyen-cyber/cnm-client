@@ -15,6 +15,11 @@ const nextConfig = {
   env: {
     BASE_URL: process.env.BASE_URL,
   },
+  webpack: (config) => {
+    config.resolve.alias.canvas = false
+
+    return config
+  },
 }
 
 module.exports = nextConfig

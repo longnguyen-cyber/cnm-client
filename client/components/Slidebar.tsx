@@ -124,7 +124,7 @@ const Slidebar = ({ setChannel }: IProps) => {
 
   const [openModalCreateChannel, setOpenModalCreateChannel] = useState(false)
   return (
-    <div className="h-sreen w-[15rem] relative flex flex-col border-r-2 border-zinc-700 text-zinc-400 font-normal">
+    <div className="h-full w-[15rem] relative flex flex-col border-r-2 border-zinc-700 text-zinc-400 font-normal">
       <div className="h-12 border-b-2 border-zinc-700">
         <div className="flex items-center justify-between p-2">
           <div

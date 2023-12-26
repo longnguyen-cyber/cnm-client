@@ -1,5 +1,6 @@
 import { FileCreateDto } from '../fileCreate.dto';
 import { MessageCreateDto } from '../messageCreate.dto';
+import { ReactCreateDto } from '../reactCreate.dto';
 import { ThreadCreateDto } from '../threadCreate.dto';
 
 export class ThreadToDBDto extends ThreadCreateDto {
@@ -9,4 +10,5 @@ export class ThreadToDBDto extends ThreadCreateDto {
   threadId?: string;
   messages: MessageCreateDto;
   file: FileCreateDto;
+  react: ReactCreateDto;
 }

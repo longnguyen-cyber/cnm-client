@@ -622,4 +622,4 @@ function Thread({ onShowThread, idMessageReplies: idMessageReplies }: any) {
   )
 }
 
-export default memo(Thread)
+export default Thread

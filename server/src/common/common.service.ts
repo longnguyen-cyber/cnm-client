@@ -34,7 +34,7 @@ export class CommonService {
     return entity;
   };
 
-  transferImageToUrl(req: any, image: string): string {
+  transferFileToURL(req: any, image: string): string {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     return `${baseUrl}/api/${image}`;
   }

@@ -9,6 +9,7 @@ import { Request } from 'express';
 import { Server } from 'socket.io';
 import { FileCreateDto } from 'src/thread/dto/fileCreate.dto';
 import { MessageCreateDto } from 'src/thread/dto/messageCreate.dto';
+import { ReactCreateDto } from 'src/thread/dto/reactCreate.dto';
 import { ThreadService } from 'src/thread/thread.service';
 @WebSocketGateway(8002, {
   cors: {
@@ -25,6 +26,7 @@ export class AppGateway {
     const {
       messages,
       fileCreateDto,
+      react,
       user,
       receiveId,
       channelId,
@@ -32,23 +34,23 @@ export class AppGateway {
     }: {
       messages?: MessageCreateDto;
       fileCreateDto?: FileCreateDto;
+      react?: ReactCreateDto;
       user?: any;
       receiveId?: string;
       channelId?: string;
       chatId?: string;
     } = data;
+    console.log(data);
     const rs = await this.threadService.createThread(
       messages,
       fileCreateDto,
+      react,
       user.id,
       receiveId,
       channelId,
       chatId,
     );
-    console.log(rs);
     this.server.emit('sendThread', data);
-    // if (rs.success) {
-    // }
   }
 
   @SubscribeMessage('updateThread')
@@ -57,6 +59,7 @@ export class AppGateway {
       threadId,
       messageCreateDto,
       fileCreateDto,
+      reactCreateDto,
       senderId,
       receiveId,
       channelId,
@@ -65,6 +68,7 @@ export class AppGateway {
       threadId: string;
       messageCreateDto?: MessageCreateDto;
       fileCreateDto?: FileCreateDto;
+      reactCreateDto?: ReactCreateDto;
       senderId?: string;
       receiveId?: string;
       channelId?: string;
@@ -74,6 +78,7 @@ export class AppGateway {
       threadId,
       messageCreateDto,
       fileCreateDto,
+      reactCreateDto,
       senderId,
       receiveId,
       channelId,
@@ -96,15 +101,17 @@ export class AppGateway {
   @SubscribeMessage('addReact')
   async handleAddReact(@MessageBody() data: any): Promise<void> {
     const {
-      reactToDb,
+      react,
+      quantity,
       threadId,
       senderId,
     }: {
-      reactToDb: string;
+      react: string;
+      quantity: number;
       threadId: string;
       senderId: string;
     } = data;
-    await this.threadService.addReact(reactToDb, threadId, senderId);
+    await this.threadService.addReact(react, quantity, threadId, senderId);
     this.server.emit('addReact', null);
   }
   @SubscribeMessage('unReact')

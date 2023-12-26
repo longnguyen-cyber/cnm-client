@@ -117,7 +117,8 @@ model messages {
 
 model reactions {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  react     String
+  react     String    @unique
+  quantity  Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?

@@ -24,6 +24,8 @@ import { ResThreadDto } from './dto/resThread.dto';
 import { ThreadRequestCreateDto } from './dto/threadRequestCreate.dto';
 import { ThreadService } from './thread.service';
 import { Request } from 'express';
+import slugify from 'slugify';
+import { ReactCreateDto } from './dto/reactCreate.dto';
 
 @ApiTags('threads')
 @Controller('threads')
@@ -38,13 +40,18 @@ export class ThreadController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, callback) => {
-          callback(null, file.originalname);
+          const sanitizedFilename = slugify(file.originalname, {
+            lower: true, // convert to lower case, defaults to `false`
+            strict: true, // strip special characters except replacement, defaults to `false`
+          });
+          callback(null, sanitizedFilename);
         },
       }),
     }),
   )
   async createThread(
     @Body('messages') messageCreateDto?: MessageCreateDto,
+    @Body('react') reactCreateDto?: ReactCreateDto,
     @Body('senderId') senderId?: string,
     @Body('receiveId') receiveId?: string,
     @Body('channelId') channelId?: string,
@@ -63,12 +70,14 @@ export class ThreadController {
     const rs = await this.threadService.createThread(
       messageCreateDto,
       fileUpload,
+      reactCreateDto,
       senderId,
       receiveId,
       channelId,
       chatId,
     );
     if (!rs) {
+      console.log('error');
       if (file && file.path) {
         unlink(file.path, (err) => {
           if (err) {
@@ -92,11 +101,11 @@ export class ThreadController {
       storage: diskStorage({
         destination: './uploads',
         filename: (_, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          const filename = `${uniqueSuffix}${ext}`;
-          callback(null, filename);
+          const sanitizedFilename = slugify(file.originalname, {
+            lower: true, // convert to lower case, defaults to `false`
+            strict: true, // strip special characters except replacement, defaults to `false`
+          });
+          callback(null, sanitizedFilename);
         },
       }),
     }),
@@ -146,10 +155,16 @@ export class ThreadController {
   @UsePipes(new CustomValidationPipe())
   async addReact(
     @Body('react') reactToDb: string,
+    @Body('quantity') quantity: number,
     @Body('threadId') threadId: string,
     @Body('senderId') senderId: string,
   ): Promise<ResThreadDto> {
-    const rs = await this.threadService.addReact(reactToDb, threadId, senderId);
+    const rs = await this.threadService.addReact(
+      reactToDb,
+      quantity,
+      threadId,
+      senderId,
+    );
     return {
       success: rs.thread.success,
       message: rs.thread.message,
@@ -183,11 +198,11 @@ export class ThreadController {
       storage: diskStorage({
         destination: './uploads',
         filename: (_, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          const filename = `${uniqueSuffix}${ext}`;
-          callback(null, filename);
+          const sanitizedFilename = slugify(file.originalname, {
+            lower: true, // convert to lower case, defaults to `false`
+            strict: true, // strip special characters except replacement, defaults to `false`
+          });
+          callback(null, sanitizedFilename);
         },
       }),
     }),
@@ -195,6 +210,7 @@ export class ThreadController {
   async updateThread(
     @Param('threadId') threadId: string,
     @Body('message') messageCreateDto?: MessageCreateDto,
+    @Body('react') reactCreateDto?: ReactCreateDto,
     @UploadedFile() file?: Express.Multer.File,
     @Body('senderId') senderId?: string,
     @Body('receiveId') receiveId?: string,
@@ -206,6 +222,7 @@ export class ThreadController {
       threadId,
       messageCreateDto,
       fileUpload,
+      reactCreateDto,
       senderId,
       receiveId,
       channelId,
