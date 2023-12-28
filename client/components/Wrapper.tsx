@@ -1,42 +1,55 @@
 'use client'
 
 import { store } from '@/redux/store'
-import React, { Fragment, useEffect } from 'react'
+import { useStorage } from '@/utils/hooks'
+import { onlines } from '@/utils/state'
+import React, { Fragment, useContext, useEffect, useState } from 'react'
 import { ToastContainer } from 'react-custom-alert'
 import 'react-custom-alert/dist/index.css'
 import { Provider } from 'react-redux'
-import { io } from 'socket.io-client'
-const socket = io('http://localhost:8002')
+import { io, Socket } from 'socket.io-client'
+
+// export const socket = io(`${process.env.BASE_URL}`)
+export const WebSocketContext = React.createContext<Socket | null>(null)
+export const WebSocketProvider = WebSocketContext.Provider
 
 const Wrapper = ({ children }: { children: React.ReactNode }) => {
-  window.addEventListener('beforeunload', function (e) {
-    var confirmationMessage = 'o/'
-
-    ;(e || window.event).returnValue = confirmationMessage //Gecko + IE
-    return confirmationMessage //Webkit, Safari, Chrome
-  })
+  const session = useStorage()
+  const [socket, setSocket] = useState<Socket | null>(null)
 
   useEffect(() => {
-    // Connect to the socket
-    socket.on('connect', () => {
-      console.log('socket connected')
-    })
-
-    // Set an interval to send a message to the server every 10 seconds
-    const intervalId = setInterval(() => {
-      socket.emit('message', 'Hello server') // Replace 'message' and 'Hello server' with your actual event name and data
-    }, 10000) // 10000 milliseconds = 10 seconds
-
-    // Clear the interval when the component is unmounted
-    return () => {
-      clearInterval(intervalId)
+    const user = session.getItem('user', 'local')
+    if (user) {
+      const userId = JSON.parse(user).id
+      const newSocket = io(`${process.env.BASE_URL}`, {
+        auth: { userId },
+      })
+      setSocket(newSocket)
+    } else {
+      const newSocket = io(`${process.env.BASE_URL}`, {
+        auth: { userId: 'guest' },
+      })
+      setSocket(newSocket)
     }
   }, [])
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('online', (data) => {
+        console.log('connected', data)
+        onlines.splice(0, onlines.length, ...data)
+      })
+      socket.on('online', (data) => {
+        onlines.splice(0, onlines.length, ...data)
+      })
+    }
+  }, [socket])
+
   return (
-    <Fragment>
+    <WebSocketProvider value={socket}>
       <ToastContainer floatingTime={1000} />
       <Provider store={store}>{children}</Provider>
-    </Fragment>
+    </WebSocketProvider>
   )
 }
 

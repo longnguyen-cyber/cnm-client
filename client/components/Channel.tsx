@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Dropdown } from 'flowbite-react'
 import Image from 'next/image'
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useContext, useEffect, useRef, useState } from 'react'
 import { FaPencil, FaPlus } from 'react-icons/fa6'
 import { IoPersonAdd } from 'react-icons/io5'
 import io, { Socket } from 'socket.io-client'
@@ -14,13 +14,13 @@ import { IThread, IChannel, IUser } from '@/utils/types'
 import { useGetThreadByChannelIdQuery } from '@/redux/api/thread'
 import Loading from './Loading'
 import ModalAddUserToChannel from './modal/ModalAddUserToChannel'
-
-const socket = io('http://localhost:8002')
+import { WebSocketContext } from './Wrapper'
 
 interface IProps {
   channel: IChannel
 }
 function Channel({ channel }: IProps) {
+  const socket = useContext(WebSocketContext)
   const session = useStorage()
 
   const [threadOfChannel, setThreadOfChannel] = useState<IThread[]>([])

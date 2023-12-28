@@ -40,4 +40,7 @@ export class UserModel implements users {
 
   @ApiProperty({ type: 'string[]' })
   channel: string[];
+
+  @ApiProperty({ type: 'boolean' })
+  isOnline: boolean;
 }

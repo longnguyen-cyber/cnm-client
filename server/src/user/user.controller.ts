@@ -111,12 +111,13 @@ export class UserController {
   async getAllUser(@Req() request: Request): Promise<ResUserDto> {
     const data = await this.userService.getAllUser(request);
 
-    return {
-      success: true,
-      message: 'Get all user success',
-      errors: null,
-      data: data,
-    };
+    // return {
+    //   success: true,
+    //   message: 'Get all user success',
+    //   errors: null,
+    //   data: data,
+    // };
+    return data;
   }
 
   @UseGuards(AuthGuard)

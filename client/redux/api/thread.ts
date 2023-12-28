@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const threadApi = createApi({
   reducerPath: 'threadApi',
-  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.BASE_URL}threads` }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.BASE_URL}api/threads` }),
   tagTypes: ['Thread'],
   endpoints: (builder) => ({
     getThreadByChannelId: builder.query<IThread[], string>({
@@ -16,14 +16,14 @@ export const threadApi = createApi({
             ...result.map(({ id }) => ({ type: 'Thread' as const, id })),
             {
               type: 'Thread' as const,
-              id: 'LIST'
-            }
+              id: 'LIST',
+            },
           ]
           return final
         }
 
         return [{ type: 'Thread', id: 'LIST' }]
-      }
+      },
     }),
     getThreadByChatId: builder.query<IThread[], string>({
       query: (id) => `?chatId=${id}`,

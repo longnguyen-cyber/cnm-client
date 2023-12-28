@@ -17,6 +17,7 @@ import {
   FaPenToSquare,
   FaRegFile,
   FaRegMessage,
+  FaRegSquarePlus,
 } from 'react-icons/fa6'
 
 import { AppDispatch } from '@/redux/store'
@@ -26,8 +27,10 @@ import { useGetAllChannelsQuery } from '@/redux/api/channel'
 import { AiOutlineLock } from 'react-icons/ai'
 
 import { useStorage } from '@/utils/hooks'
-import { IChannel } from '@/utils/types'
+import { IChannel, IUser } from '@/utils/types'
 import Modal from './modal/ModalCreateChannel'
+import { useGetAllUsersQuery } from '@/redux/api/user'
+import { onlines } from '@/utils/state'
 
 let arrItemSidebar = [
   {
@@ -62,8 +65,6 @@ interface IProps {
 }
 
 const Slidebar = ({ setChannel }: IProps) => {
-  const dispatch = useDispatch<AppDispatch>()
-
   const [showMenuChannel, setShowMenuChannel] = useState(false)
   const [showDirectMessage, setShowDirectMessage] = useState(false)
   const [showAbsoluteWorkSpace, setShowAbsoluteWorkSpace] = useState(false)
@@ -114,13 +115,22 @@ const Slidebar = ({ setChannel }: IProps) => {
       document.removeEventListener('mousedown', handle)
     }
   })
-  const { data, isFetching, isSuccess } = useGetAllChannelsQuery()
+  const { data, isSuccess } = useGetAllChannelsQuery()
   const [channels, setChannels] = useState<IChannel[]>([])
   useEffect(() => {
     if (isSuccess && data) {
       setChannels(data)
     }
   }, [isSuccess, data])
+  const [users, setUsers] = useState<IUser[]>([])
+
+  const { data: usesDb } = useGetAllUsersQuery()
+  useEffect(() => {
+    if (usesDb) {
+      setUsers(usesDb)
+    }
+  }, [usesDb])
+  console.log(onlines)
 
   const [openModalCreateChannel, setOpenModalCreateChannel] = useState(false)
   return (
@@ -282,36 +292,42 @@ const Slidebar = ({ setChannel }: IProps) => {
               </div>
             </div>
           </li>
-          {/* {showDirectMessage && (
+          {showDirectMessage && (
             <ul className="">
-              {arrUser.map((item: IUser, index: number) => (
-                <li
-                  key={index}
-                  className="cursor-pointer flex items-center gap-2 hover:bg-zinc-800 ease-out duration-100 rounded-lg m-2 p-1"
-                >
-                  <Image
-                    className="rounded bg-white"
-                    src={item.avatar}
-                    alt="logo"
-                    width={20}
-                    height={20}
-                  />
-                  {item.id === idUserLogin ? (
-                    <span>
-                      {item.name}{' '}
-                      <span className="font-semibold text-zinc-500">you</span>
-                    </span>
-                  ) : (
-                    <span>{item.name}</span>
-                  )}
-                </li>
-              ))}
-              <li className="flex items-center gap-2 hover:bg-zinc-800 ease-out duration-100 rounded-lg m-2 p-1">
-                <FaRegSquarePlus />
-                Add coworkers
-              </li>
+              {users.map((item: IUser, index: number) => {
+                //find online with onlines
+                const isOnline = Boolean(
+                  onlines.find((online) => online.userId === item.id)
+                )
+
+                // Create a new user object with the updated isOnline property
+                const user = { ...item, isOnline }
+
+                console.log(user)
+                return (
+                  <li
+                    key={user.id}
+                    className="cursor-pointer flex items-center gap-2 hover:bg-zinc-800 ease-out duration-100 rounded-lg m-2 p-1"
+                  >
+                    <Image
+                      className="rounded bg-white"
+                      src={item.avatar}
+                      alt="logo"
+                      width={20}
+                      height={20}
+                    />
+
+                    <span>{user.name}</span>
+                    <span
+                      className={`${
+                        user?.isOnline ? 'bg-green-600' : 'bg-slate-400'
+                      } h-2 w-2`}
+                    ></span>
+                  </li>
+                )
+              })}
             </ul>
-          )} */}
+          )}
         </ul>
       </div>
       <div className="absolute bottom-0 w-full border-t-2 border-zinc-700 pb-2 flex items-center justify-between rounded-t-xl p-2 bg-black">

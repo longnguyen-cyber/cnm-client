@@ -3,20 +3,20 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const channelApi = createApi({
   reducerPath: 'channelApi',
-  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.BASE_URL}channels` }),
+  baseQuery: fetchBaseQuery({ baseUrl: `${process.env.BASE_URL}api/channels` }),
   endpoints: (builder) => ({
     getAllChannels: builder.query<IChannel[], void>({
-      query: () => '/'
+      query: () => '/',
     }),
     getChannelById: builder.query<IChannel, string>({
-      query: (id) => `/${id}`
+      query: (id) => `/${id}`,
     }),
     createChannel: builder.mutation<IChannel, Partial<IChannel>>({
       query: (body) => ({
         url: '/',
         method: 'POST',
-        body
-      })
+        body,
+      }),
     }),
     updateChannel: builder.mutation<
       IChannel,
@@ -25,23 +25,23 @@ export const channelApi = createApi({
       query: ({ id, body }) => ({
         url: `/${id}`,
         method: 'PUT',
-        body
-      })
+        body,
+      }),
     }),
     deleteChannel: builder.mutation<void, string>({
       query: (id) => ({
         url: `/${id}`,
-        method: 'DELETE'
-      })
+        method: 'DELETE',
+      }),
     }),
     addUserToChannel: builder.mutation<IChannel, Partial<any>>({
       query: (body) => ({
         url: `/${body.id}/add-user`,
         method: 'PUT',
-        body
-      })
-    })
-  })
+        body,
+      }),
+    }),
+  }),
 })
 
 export const {
@@ -50,5 +50,5 @@ export const {
   useCreateChannelMutation,
   useUpdateChannelMutation,
   useDeleteChannelMutation,
-  useAddUserToChannelMutation
+  useAddUserToChannelMutation,
 } = channelApi

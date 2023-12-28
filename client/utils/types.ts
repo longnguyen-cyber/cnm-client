@@ -39,6 +39,7 @@ export interface IUser extends IUserLogin {
   role: string
   enabled?: boolean
   displayName: string
+  isOnline?: boolean
 }
 
 export interface IMessage {

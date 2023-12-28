@@ -3,7 +3,7 @@ import { useGetAllUsersQuery } from '@/redux/api/user'
 import { useStorage, useformatDate, useformatTime } from '@/utils/hooks'
 import { IFile, IReact, IThread, IUser } from '@/utils/types'
 import Image from 'next/image'
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import Picker from '@emoji-mart/react'
 
 import {
@@ -16,7 +16,7 @@ import {
 import { handleDownload } from '@/utils/downloadFile'
 import DisplayFile from './DisplayFile'
 import { io } from 'socket.io-client'
-const socket = io('http://localhost:8002')
+import { WebSocketContext } from './Wrapper'
 
 interface IProps {
   item: IThread
@@ -24,6 +24,8 @@ interface IProps {
 }
 
 const Message = ({ item, onShowThread }: IProps) => {
+  const socket = useContext(WebSocketContext)
+
   console.log(item)
   const [users, setUsers] = useState<IUser[]>([])
   const { data: userData, isSuccess: userSuccess } = useGetAllUsersQuery()

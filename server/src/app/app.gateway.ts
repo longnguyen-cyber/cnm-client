@@ -1,25 +1,46 @@
 import { Req } from '@nestjs/common';
 import {
+  ConnectedSocket,
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Request } from 'express';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { FileCreateDto } from 'src/thread/dto/fileCreate.dto';
 import { MessageCreateDto } from 'src/thread/dto/messageCreate.dto';
 import { ReactCreateDto } from 'src/thread/dto/reactCreate.dto';
 import { ThreadService } from 'src/thread/thread.service';
-@WebSocketGateway(8002, {
+@WebSocketGateway({
   cors: {
     origin: '*',
   },
 })
-export class AppGateway {
+export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private threadService: ThreadService) {}
-
+  user = [];
   @WebSocketServer() server: Server;
+
+  handleConnection(@ConnectedSocket() socket: Socket) {
+    const isAuthenticated = socket.handshake.auth;
+    console.log('User connected');
+    if (isAuthenticated) {
+      this.user.push({ userId: isAuthenticated.userId });
+      this.server.emit('online', this.user);
+    }
+    console.log(this.user);
+  }
+  handleDisconnect(@ConnectedSocket() socket: Socket) {
+    const isAuthenticated = socket.handshake.auth;
+    this.user = this.user.filter(
+      (item) => item.userId !== isAuthenticated.userId,
+    );
+    console.log('User disconnected', this.user);
+    this.server.emit('online', this.user);
+  }
 
   @SubscribeMessage('sendThread')
   async handleSendThread(@MessageBody() data: any): Promise<void> {
@@ -41,7 +62,7 @@ export class AppGateway {
       chatId?: string;
     } = data;
     console.log(data);
-    const rs = await this.threadService.createThread(
+    await this.threadService.createThread(
       messages,
       fileCreateDto,
       react,

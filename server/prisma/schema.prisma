@@ -27,6 +27,7 @@ model users {
   threads     threads[]
   reactions   reactions[]
   token       tokens?
+  isOnline    Boolean?    @default(false)
 }
 
 model tokens {
