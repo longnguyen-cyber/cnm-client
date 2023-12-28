@@ -111,19 +111,8 @@ export class AppGateway {
       threadId: string;
       senderId: string;
     } = data;
+    console.log(data);
     await this.threadService.addReact(react, quantity, threadId, senderId);
     this.server.emit('addReact', null);
-  }
-  @SubscribeMessage('unReact')
-  async handleUnReact(@MessageBody() data: any): Promise<void> {
-    const {
-      threadId,
-      senderId,
-    }: {
-      threadId: string;
-      senderId: string;
-    } = data;
-    await this.threadService.removeReact(threadId, senderId);
-    this.server.emit('unReact', null);
   }
 }

@@ -299,6 +299,7 @@ export class ThreadRepository {
         userId,
       },
     });
+    console.log(react);
 
     if (react) {
       await prisma.reactions.update({

@@ -65,7 +65,8 @@ const Message = ({ item, onShowThread }: IProps) => {
 
   // const [emojiText, setEmojiText] = useState('')
   const [isReactOneTime, setIsReactOneTime] = useState(false)
-
+  const [user, setUser] = useState<IUser>()
+  const session = useStorage()
   const [hashEmoji, setHashEmoji] = useState<{ [key: string]: number }>({})
   useEffect(() => {
     if (item.reactions && item.reactions.length > 0) {
@@ -75,26 +76,40 @@ const Message = ({ item, onShowThread }: IProps) => {
       })
       setHashEmoji(hash)
     }
+
+    if (session.getItem('user', 'local')) {
+      setUser(JSON.parse(session.getItem('user', 'local')))
+    }
   }, [])
-  const session = useStorage()
+
   const AddEmoji = (e: any) => {
     const sym = e.unified.split('-')
     const codesArray: any = []
     sym.forEach((el: any) => codesArray.push('0x' + el))
     const emoji = String.fromCodePoint(...codesArray)
-    setHashEmoji((prevHashEmoji) => ({
-      ...prevHashEmoji,
-      [emoji]: prevHashEmoji[emoji] ? prevHashEmoji[emoji] + 1 : 1,
-    }))
+    setIsReactOneTime(!isReactOneTime)
+    let quantity = 0
+    if (isReactOneTime) {
+      setHashEmoji((prevHashEmoji) => ({
+        ...prevHashEmoji,
+        [emoji]: prevHashEmoji[emoji] - 1,
+      }))
+      quantity = hashEmoji[emoji] - 1
+    } else {
+      setHashEmoji((prevHashEmoji) => ({
+        ...prevHashEmoji,
+        [emoji]: prevHashEmoji[emoji] ? prevHashEmoji[emoji] + 1 : 1,
+      }))
+      quantity = hashEmoji[emoji] ? hashEmoji[emoji] + 1 : 1
+    }
     setIsReactOneTime(true)
     setShowEmoji(false)
-    const user = JSON.parse(session.getItem('user', 'local'))
 
     const newMsg = {
       react: emoji,
-      quantity: hashEmoji[emoji] ? hashEmoji[emoji] + 1 : 1,
+      quantity: quantity,
       threadId: item.id,
-      senderId: user.id,
+      senderId: user?.id,
     }
     socket?.emit('addReact', newMsg)
   }
@@ -244,12 +259,28 @@ const Message = ({ item, onShowThread }: IProps) => {
                 key={index}
                 className=" bottom-0 bg-blue-500 px-2 w-fit rounded-lg mr-1 py-[2px]"
                 onClick={() => {
+                  setIsReactOneTime(!isReactOneTime)
+                  let quantity = 0
                   if (isReactOneTime) {
                     setHashEmoji((prevHashEmoji) => ({
                       ...prevHashEmoji,
                       [key]: prevHashEmoji[key] - 1,
                     }))
+                    quantity = hashEmoji[key] - 1
+                  } else {
+                    setHashEmoji((prevHashEmoji) => ({
+                      ...prevHashEmoji,
+                      [key]: prevHashEmoji[key] + 1,
+                    }))
+                    quantity = hashEmoji[key] + 1
                   }
+                  const newMsg = {
+                    react: key,
+                    quantity: quantity,
+                    threadId: item.id,
+                    senderId: user?.id,
+                  }
+                  socket?.emit('addReact', newMsg)
                 }}
               >
                 {key} {hashEmoji[key]}
