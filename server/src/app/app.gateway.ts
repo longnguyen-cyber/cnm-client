@@ -27,18 +27,18 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleConnection(@ConnectedSocket() socket: Socket) {
     const isAuthenticated = socket.handshake.auth;
     console.log('User connected');
+
     if (isAuthenticated) {
       this.user.push({ userId: isAuthenticated.userId });
       this.server.emit('online', this.user);
     }
-    console.log(this.user);
   }
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     const isAuthenticated = socket.handshake.auth;
+    console.log('User disconnected');
     this.user = this.user.filter(
       (item) => item.userId !== isAuthenticated.userId,
     );
-    console.log('User disconnected', this.user);
     this.server.emit('online', this.user);
   }
 
@@ -61,7 +61,6 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       channelId?: string;
       chatId?: string;
     } = data;
-    console.log(data);
     await this.threadService.createThread(
       messages,
       fileCreateDto,
