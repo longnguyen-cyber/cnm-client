@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import data from '@emoji-mart/data'
 
 import Picker from '@emoji-mart/react'
@@ -23,7 +24,7 @@ import {
 import { RiAddLine } from 'react-icons/ri'
 import { useAddFileMutation } from '../redux/api/thread'
 import { useStorage } from '../utils/hooks'
-import { IChannel, IUser } from '../utils/types'
+import { IChannel } from '../utils/types'
 
 interface Props {
   isThread: boolean
@@ -32,30 +33,6 @@ interface Props {
 }
 
 const Input = ({ isThread, send, channel }: Props) => {
-  const [showCamera, setShowCamera] = useState(false)
-
-  const [focusInput, setFocusInput] = useState({
-    option: '',
-  })
-  function handleFocusInput(op: string) {
-    if (op === focusInput.option) {
-      return {
-        cls_focus: 'flex items-center rounded p-1 bg-green-400 text-zinc-200',
-        cls_hover:
-          'cursor-pointer ease-linear duration-200 p-1 hover:bg-zinc-500 rounded',
-      }
-    } else {
-      return {
-        cls_focus: 'flex items-center rounded p-1 bg-zinc-800 text-zinc-400',
-        cls_hover: 'cursor-pointer ease-linear duration-200 p-1',
-      }
-    }
-  }
-
-  const [showThread, setShowThread] = useState({
-    status: false,
-    idMessageReplies: 0,
-  })
   const [showEmoji, setShowEmoji] = useState(false)
 
   const AddEmoji = (e: any) => {
@@ -82,7 +59,6 @@ const Input = ({ isThread, send, channel }: Props) => {
 
   const [value, setValue] = useState<string>('')
   const [file, setFile] = useState<File>()
-  const [user, setUser] = useState<IUser>()
   const [addFile] = useAddFileMutation()
   const session = useStorage()
   useEffect(() => {
@@ -95,6 +71,7 @@ const Input = ({ isThread, send, channel }: Props) => {
 
       if (file) {
         addFile(formData).then((res) => {
+          console.log(res)
         })
       }
     }
@@ -207,10 +184,7 @@ const Input = ({ isThread, send, channel }: Props) => {
               <FaAt />
             </div>
             <div className="border-r-2 h-4"></div>
-            <div
-              onClick={() => setShowCamera(true)}
-              className="class_hover_iconInputChat"
-            >
+            <div className="class_hover_iconInputChat">
               <BiVideo />
             </div>
             <div className="class_hover_iconInputChat">

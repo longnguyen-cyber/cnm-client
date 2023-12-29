@@ -1,70 +1,59 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Dropdown } from 'flowbite-react'
 import { useEffect, useRef, useState } from 'react'
 
 import {
   FaAngleDown,
   FaAngleRight,
-  FaAt,
   FaCaretDown,
   FaCaretRight,
-  FaEllipsisVertical,
-  FaPaperPlane,
   FaPenToSquare,
-  FaRegFile,
-  FaRegMessage,
 } from 'react-icons/fa6'
 
-import { useGetAllChannelsQuery } from '../redux/api/channel'
 import { AiOutlineLock } from 'react-icons/ai'
 
-import { useGetAllUsersQuery } from '../redux/api/user'
-import { useStorage, useUser } from '../utils/hooks'
-import { onlines, userState } from '../utils/state'
+import { useNavigate } from 'react-router-dom'
+import { useRecoilValue } from 'recoil'
+import { useStorage } from '../utils/hooks'
+import { channelsState, directState, onlines } from '../utils/state'
 import { IChannel, IUser } from '../utils/types'
 import Modal from './modal/ModalCreateChannel'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { useNavigate } from 'react-router-dom'
 
-let arrItemSidebar = [
-  {
-    id: 1,
-    icon: <FaRegMessage />,
-    title: 'Threads',
-  },
-  {
-    id: 2,
-    icon: <FaAt />,
-    title: 'Mentions & reactions',
-  },
-  {
-    id: 3,
-    icon: <FaPaperPlane />,
-    title: 'Dafts & sent',
-  },
-  {
-    id: 4,
-    icon: <FaRegFile />,
-    title: 'Files',
-  },
-  {
-    id: 5,
-    icon: <FaEllipsisVertical />,
-    title: 'More',
-  },
-]
+// let arrItemSidebar = [
+//   {
+//     id: 1,
+//     icon: <FaRegMessage />,
+//     title: 'Threads',
+//   },
+//   {
+//     id: 2,
+//     icon: <FaAt />,
+//     title: 'Mentions & reactions',
+//   },
+//   {
+//     id: 3,
+//     icon: <FaPaperPlane />,
+//     title: 'Dafts & sent',
+//   },
+//   {
+//     id: 4,
+//     icon: <FaRegFile />,
+//     title: 'Files',
+//   },
+//   {
+//     id: 5,
+//     icon: <FaEllipsisVertical />,
+//     title: 'More',
+//   },
+// ]
 
-interface IProps {
-  setChannel: (channel: IChannel) => void
-}
-
-const Slidebar = ({ setChannel }: IProps) => {
-  const restaurant = useUser()
-  console.log(restaurant)
-
+const Slidebar = () => {
   const [showMenuChannel, setShowMenuChannel] = useState(false)
   const [showDirectMessage, setShowDirectMessage] = useState(false)
   const [showAbsoluteWorkSpace, setShowAbsoluteWorkSpace] = useState(false)
   const [showMenuWorkspace, setShowMenuWorkspace] = useState(false)
+  const users = useRecoilValue(directState)
+  const channels = useRecoilValue(channelsState)
   const navigate = useNavigate()
   let workspaceRef = useRef<any>()
 
@@ -112,37 +101,9 @@ const Slidebar = ({ setChannel }: IProps) => {
       document.removeEventListener('mousedown', handle)
     }
   })
-  const { data, isSuccess } = useGetAllChannelsQuery()
-  const [channels, setChannels] = useState<IChannel[]>([])
-  useEffect(() => {
-    if (isSuccess && data) {
-      setChannels(data)
-    }
-  }, [isSuccess, data])
-  const [users, setUsers] = useState<IUser[]>([])
-
-  const { data: usesDb } = useGetAllUsersQuery()
-  useEffect(() => {
-    if (usesDb) {
-      setUsers(usesDb)
-    }
-  }, [usesDb])
-
-  const usersState = useRecoilValue(userState)
-  const setUserState = useSetRecoilState(userState)
-  setUserState(users)
 
   const [openModalCreateChannel, setOpenModalCreateChannel] = useState(false)
-  // const router = useRouter()
-  // const viewUser = () => {
-  //   navigate('/user')
-  // }
-  // const viewDetail = () => {
-  //   router.push({
-  //     pathname: '/',
-  //     query: { id: String() },
-  //   })
-  // }
+
   return (
     <div className="h-full w-[15rem] relative flex flex-col border-r-2 border-zinc-700 text-zinc-400 font-normal">
       <div className="h-12 border-b-2 border-zinc-700">
@@ -271,7 +232,12 @@ const Slidebar = ({ setChannel }: IProps) => {
                   key={index}
                   className="cursor-pointer  gap-2 flex items-center hover:bg-zinc-800 ease-out duration-100 rounded-lg p-1 mr-2 ml-2"
                   onClick={() => {
-                    setChannel(item)
+                    navigate({
+                      pathname: '/',
+                      search: new URLSearchParams({
+                        id: String(item.id),
+                      }).toString(),
+                    })
                   }}
                 >
                   <span className="font-bold text-xl italic ml-1">
@@ -317,7 +283,12 @@ const Slidebar = ({ setChannel }: IProps) => {
                     key={user.id}
                     className="cursor-pointer flex items-center gap-2 hover:bg-zinc-800 ease-out duration-100 rounded-lg m-2 p-1"
                     onClick={() => {
-                      navigate(`/?id=${user.id}`)
+                      navigate({
+                        pathname: '/',
+                        search: new URLSearchParams({
+                          id: String(user.id),
+                        }).toString(),
+                      })
                     }}
                   >
                     <img
@@ -353,11 +324,7 @@ const Slidebar = ({ setChannel }: IProps) => {
         </div>
       </div> */}
       {openModalCreateChannel && (
-        <Modal
-          setOpenModalCreateChannel={setOpenModalCreateChannel}
-          channels={channels}
-          setChannels={setChannels}
-        />
+        <Modal setOpenModalCreateChannel={setOpenModalCreateChannel} />
       )}
     </div>
   )

@@ -16,8 +16,29 @@ export class ChannelService {
     private userCheck: UserCheck,
   ) {}
 
-  async getAllChannel() {
-    return this.channelRepository.getAllChannel();
+  async getAllChannel(req) {
+    const channels = await this.channelRepository.getAllChannel();
+    const newReturn = channels.map((item) => {
+      return {
+        ...item,
+        userCreated: {
+          ...item.userCreated,
+          password: undefined,
+          avatar: this.commonService.transferFileToURL(
+            req,
+            item.userCreated.avatar,
+          ),
+        },
+        users: item.users.map((user) => {
+          return {
+            ...user,
+            password: undefined,
+            avatar: this.commonService.transferFileToURL(req, user.avatar),
+          };
+        }),
+      };
+    });
+    return newReturn;
   }
 
   async getChannelById(channelId: string) {

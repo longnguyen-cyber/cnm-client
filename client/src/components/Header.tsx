@@ -1,33 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { FaMagnifyingGlass, FaSliders } from 'react-icons/fa6'
 
-import { FaCircleInfo, FaMagnifyingGlass, FaSliders } from 'react-icons/fa6'
-
-import { AppDispatch, RootState } from '../redux/store'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { idUserLogin } from '../contant'
-import { IUser } from '../utils/types'
-import { useStorage } from '../utils/hooks'
 const Header = () => {
-  const dispatch = useDispatch<AppDispatch>()
-
-  const [user, setUser] = useState<IUser>()
-
-  const session = useStorage()
-
-  const [showMenuWorkspace, setShowMenuWorkspace] = useState(false)
-  let workspaceRef = useRef<any>()
-  useEffect(() => {
-    let handle = (e: any) => {
-      if (workspaceRef.current && !workspaceRef.current.contains(e.target)) {
-        setShowMenuWorkspace(false)
-      }
-    }
-    document.addEventListener('mousedown', handle)
-    return () => {
-      document.removeEventListener('mousedown', handle)
-    }
-  })
   return (
     <div className="flex items-center justify-center bg-fuchsia-900 p-2">
       <div className="relative ">

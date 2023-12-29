@@ -8,8 +8,8 @@ export enum Status {
 
 export const onlines: any[] = []
 
-export const userState = atom<IUser[]>({
-  key: 'userState',
+export const directState = atom<IUser[]>({
+  key: 'directState',
   default: [],
 })
 
@@ -17,3 +17,4 @@ export const channelsState = atom<IChannel[]>({
   key: 'channelsState',
   default: [],
 })
+

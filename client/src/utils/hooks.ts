@@ -1,7 +1,7 @@
-import { useRecoilValue } from 'recoil'
-import { userState } from './state'
-import { UseStorageReturnValue, StorageType } from './types'
 import { useMemo } from 'react'
+import { useRecoilValue } from 'recoil'
+import { channelsState, directState } from './state'
+import { StorageType, UseStorageReturnValue } from './types'
 
 export const useStorage = (): UseStorageReturnValue => {
   const storageType = (type?: StorageType): 'localStorage' | 'sessionStorage' =>
@@ -150,27 +150,27 @@ export function isValidDateTimeFormat(input: string): boolean {
 
   return true
 }
-export const useUser = (id?: string) => {
-  const users = useRecoilValue(userState)
+export const useDirect = (id?: string) => {
+  const direct = useRecoilValue(directState)
   const location = window.location
   const user = useMemo(() => {
-    return users.find(
+    return direct.find(
       (user) =>
         user.id === (id ? id : new URLSearchParams(location.search).get('id'))
     )
-  }, [users, id, location.search])
+  }, [direct, id, location.search])
   return user
 }
 
-// export const useChannel = (id?: string) => {
-//   const channels = useRecoilValue(channelState)
-//   const location = window.location
-//   const channel = useMemo(() => {
-//     return channels.find(
-//       (channel) =>
-//         channel.id ===
-//         (id ? id : new URLSearchParams(location.search).get('id'))
-//     )
-//   }, [channels, id, location.search])
-//   return channel
-// }
+export const useChannel = (id?: string) => {
+  const channels = useRecoilValue(channelsState)
+  const location = window.location
+  const channel = useMemo(() => {
+    return channels.find(
+      (channel) =>
+        channel.id ===
+        (id ? id : new URLSearchParams(location.search).get('id'))
+    )
+  }, [channels, id, location.search])
+  return channel
+}

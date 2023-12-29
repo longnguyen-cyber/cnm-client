@@ -1,57 +1,40 @@
 import { useEffect, useState } from 'react'
-// import { useAddUserToChannelMutation } from '../../redux/api/user'
 import { IChannel, IUser } from '../../utils/types'
 import Loading from '../Loading'
 
 import { MdDone } from 'react-icons/md'
 
-import { AppDispatch } from '../../redux/store'
 import { useStorage } from '../../utils/hooks'
 
 import { AiOutlineLock } from 'react-icons/ai'
-import { useDispatch } from 'react-redux'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { useGetAllUsersQuery } from '../../redux/api/user'
+import { channelsState } from '../../utils/state'
 
 interface Props {
   channel: IChannel
   setOpenModalAddUserToChannel: (value: boolean) => void
 
   setOpenModalCreateChannel?: (value: boolean) => void
-  channels?: IChannel[]
-  setChannels?: (value: IChannel[]) => void
 }
 
 const ModalAddUserToChannel = ({
   channel,
   setOpenModalAddUserToChannel,
   setOpenModalCreateChannel,
-  channels,
-  setChannels,
 }: Props) => {
+  const channels = useRecoilValue(channelsState)
+  const setChannels = useSetRecoilState(channelsState)
   //state
   const [users, setUsers] = useState<IUser[]>([])
   const [filterUsers, setFilterUsers] = useState<IUser[]>([])
   const [userAdded, setUserAdded] = useState<IUser[]>([])
-  const [lengthChannel, setLengthChannel] = useState(80)
   const [userName, setUserName] = useState('')
 
   //flag
   const [flagCreate, setFlagCreate] = useState(false)
   const [flagModelCreateChannel, setFlagModelCreateChannel] = useState(false)
   const [existing, setExisting] = useState(true)
-  // const session = useStorage()
-  // const [user, setUser] = useState<IUser>()
-
-  // useEffect(() => {
-  //   // if (session.getItem('user', 'local'))
-  //   //   setUser(JSON.parse(session.getItem('user', 'local')))
-  //   // setUser({
-  //   //   ...user,
-  //   //   id: '1'
-  //   // })
-  // }, [])
-
-  const dispatch = useDispatch<AppDispatch>()
 
   //api
   const { data: userData, isSuccess: userSuccess } = useGetAllUsersQuery()

@@ -1,8 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import { useContext, useEffect, useState } from 'react'
-import { useGetAllUsersQuery } from '../redux/api/user'
 import { useStorage, useformatTime } from '../utils/hooks'
 import { IFile, IReact, IThread, IUser } from '../utils/types'
 
@@ -13,10 +13,10 @@ import {
   FaRegMessage,
   FaSquareCheck,
 } from 'react-icons/fa6'
+import { useRecoilValue } from 'recoil'
+import { directState } from '../utils/state'
 import DisplayFile from './DisplayFile'
 import { WebSocketContext } from './SocketClient'
-import { useRecoilValue } from 'recoil'
-import { userState } from '../utils/state'
 
 interface IProps {
   item: IThread
@@ -26,17 +26,7 @@ interface IProps {
 const Message = ({ item, onShowThread }: IProps) => {
   const socket = useContext(WebSocketContext)
 
-  const users = useRecoilValue<IUser[]>(userState)
-  const { data: userData, isSuccess: userSuccess } = useGetAllUsersQuery()
-
-  // useEffect(() => {
-  //   if (userSuccess && userData) {
-  //     const data = userData as any
-  //     setUsers(data.data)
-  //     console.log(data.data)
-  //   }
-  // }, [userSuccess, userData])
-  console.log(users)
+  const users = useRecoilValue<IUser[]>(directState)
 
   const [showToolsMessage, setShowToolMessage] = useState<{
     index: number | string
@@ -121,6 +111,7 @@ const Message = ({ item, onShowThread }: IProps) => {
   useEffect(() => {
     // socket?.emit('message', { message: value, timestamp: 'kuga' })
   }, [hashEmoji])
+  console.log('render message', item)
 
   return (
     <div key={item.id} className="flex space-x-2 items-start">

@@ -7,12 +7,14 @@ import {
   Param,
   Post,
   Put,
+  Req,
 } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { ChannelService } from './channel.service';
 import { ChannelUpdateDto } from './dto/ChannelUpdate.dto';
 import { ChannelResquestCreateDto } from './dto/channelResquestCreate.dto';
 import { ResChannelDto } from './dto/resChannel.dto';
+import { Request } from 'express';
 
 @ApiTags('channels')
 @Controller('channels')
@@ -20,8 +22,8 @@ export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
   @Get()
-  async getAllChannel() {
-    return await this.channelService.getAllChannel();
+  async getAllChannel(@Req() req: Request) {
+    return await this.channelService.getAllChannel(req);
   }
   @Get(':channelId')
   async getChannelById(@Param('channelId') channelId: string) {

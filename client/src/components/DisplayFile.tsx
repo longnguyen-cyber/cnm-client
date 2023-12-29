@@ -5,7 +5,6 @@ import { BsFileWordFill, BsFiletypeMp3, BsFiletypeMp4 } from 'react-icons/bs'
 import { AiFillFilePpt } from 'react-icons/ai'
 import { BiSolidFileTxt } from 'react-icons/bi'
 import { PiFileCsv } from 'react-icons/pi'
-import { CiFileOn } from 'react-icons/ci'
 import { handleDownload } from '../utils/downloadFile'
 import { useEffect, useState } from 'react'
 const DisplayFile = ({ file }: { file: IFile }) => {

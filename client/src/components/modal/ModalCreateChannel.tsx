@@ -4,18 +4,14 @@ import Loading from '../Loading'
 import { toast } from 'react-toastify'
 import { IChannel, IUser } from '../../utils/types'
 import { useStorage } from '../../utils/hooks'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { channelsState } from '../../utils/state'
 
 interface Props {
   setOpenModalCreateChannel: (value: boolean) => void
-  channels: IChannel[]
-  setChannels: (value: IChannel[]) => void
 }
 
-const ModalCreateChannel = ({
-  setOpenModalCreateChannel,
-  channels,
-  setChannels,
-}: Props) => {
+const ModalCreateChannel = ({ setOpenModalCreateChannel }: Props) => {
   const [flagCreate, setFlagCreate] = useState(false)
   const [lengthChannel, setLengthChannel] = useState(80)
   const [nameChannel, setNameChannel] = useState('')
@@ -25,6 +21,9 @@ const ModalCreateChannel = ({
   //api
   const [loadingCreate, setLoadingCreate] = useState(false)
   const [createChannel] = useCreateChannelMutation()
+  const setChannel = useSetRecoilState(channelsState)
+  const channels = useRecoilValue(channelsState)
+
   const handleSubmit = () => {
     setLoadingCreate(true)
     const user = JSON.parse(session.getItem('user', 'local')) as IUser
@@ -38,7 +37,7 @@ const ModalCreateChannel = ({
         setLoadingCreate(false)
         setOpenModalCreateChannel(false)
         toast.success('Create channel success')
-        setChannels([...channels, data])
+        setChannel([...channels, data])
       } else {
         setLoadingCreate(false)
         toast.error('Create channel fail')

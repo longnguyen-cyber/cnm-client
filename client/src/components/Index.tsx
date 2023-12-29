@@ -1,34 +1,37 @@
-import { Outlet } from 'react-router-dom'
-import Slidebar from './Slidebar'
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect } from 'react'
+import { useSetRecoilState } from 'recoil'
+import { useGetAllChannelsQuery } from '../redux/api/channel'
+import { useGetAllUsersQuery } from '../redux/api/user'
+import { channelsState, directState } from '../utils/state'
 import Header from './Header'
-import { useState, useEffect } from 'react'
-import { useStorage } from '../utils/hooks'
-import { IChannel, IUser } from '../utils/types'
-import Channel from './Item'
+import Item from './Item'
+import Slidebar from './Slidebar'
 
 const Index = () => {
-  const [itemChannel, setItemChannel] = useState<IChannel>()
-  const [loading, setLoading] = useState(false)
-
+  const setDirectState = useSetRecoilState(directState)
+  const { data: userDB } = useGetAllUsersQuery()
   useEffect(() => {
-    setLoading(true)
-    if (session.getItem('channel', 'local')) {
-      setItemChannel(JSON.parse(session.getItem('channel', 'local')))
-      setLoading(false)
+    if (userDB) {
+      setDirectState(userDB)
     }
-  }, [])
+  }, [userDB])
+  const setChannelState = useSetRecoilState(channelsState)
+  const { data } = useGetAllChannelsQuery()
+  useEffect(() => {
+    if (data) {
+      setChannelState(data)
+    }
+  }, [data])
 
-  const session = useStorage()
   return (
     <main className="h-screen w-screen bg-black">
       <Header />
 
       <div className="flex h-[calc(100%-56px)]">
-        <Slidebar setChannel={setItemChannel} />
+        <Slidebar />
 
-        <div className="flex-1">
-          {itemChannel && <Channel channel={itemChannel!} />}
-        </div>
+        <div className="flex-1">{<Item />}</div>
       </div>
     </main>
   )
