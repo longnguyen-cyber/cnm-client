@@ -1,9 +1,0 @@
-version: '3.8'
-services:
-  workchat:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: workchat
-    ports:
-      - '5000:5000'
