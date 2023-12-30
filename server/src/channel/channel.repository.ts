@@ -165,6 +165,7 @@ export class ChannelRepository {
       success: true,
       message: 'Create channel successfully',
       errors: ' ',
+      data: newChannel,
     };
   }
 
@@ -218,6 +219,16 @@ export class ChannelRepository {
         },
       },
     });
+    if (add) {
+      return await prisma.channels.findUnique({
+        where: {
+          id: channelId,
+        },
+        include: {
+          users: true,
+        },
+      });
+    }
   }
 
   async removeUserFromChannel(

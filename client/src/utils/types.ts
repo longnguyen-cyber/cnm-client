@@ -97,6 +97,7 @@ export interface IThread {
   updatedAt?: string
   deletedAt?: string
   isEdited?: boolean
+  isRecall?: boolean
   channel?: IChannel
   channelId?: string
   chatId?: string

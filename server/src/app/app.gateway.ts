@@ -61,7 +61,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       channelId?: string;
       chatId?: string;
     } = data;
-    await this.threadService.createThread(
+    const rs = await this.threadService.createThread(
       messages,
       fileCreateDto,
       react,
@@ -70,7 +70,7 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
       channelId,
       chatId,
     );
-    this.server.emit('sendThread', data);
+    this.server.emit('sendThread', { ...data, id: rs.thread.data.id });
   }
 
   @SubscribeMessage('updateThread')
@@ -107,16 +107,10 @@ export class AppGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('updateThread', data);
   }
   @SubscribeMessage('deleteThread')
-  async handleDeleteThread(
-    @MessageBody() data: any,
-    @Req() req: Request,
-  ): Promise<void> {
-    const { id: threadId } = data;
-    await this.threadService.deleteThread(threadId);
-    const index = (
-      await this.threadService.getAllThread('channelId', '2', req)
-    ).findIndex((item) => item.threadId === threadId);
-    this.server.emit('deleteThread', index);
+  async handleDeleteThread(@MessageBody() data: any): Promise<void> {
+    const { threadId, senderId } = data;
+    const rs = await this.threadService.recallSendThread(threadId, senderId);
+    this.server.emit('deleteThread', rs);
   }
   @SubscribeMessage('addReact')
   async handleAddReact(@MessageBody() data: any): Promise<void> {

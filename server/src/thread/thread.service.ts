@@ -35,7 +35,7 @@ export class ThreadService {
     if (fileCreateDto) {
       const limitFileSize = this.limitFileSize(fileCreateDto.size);
       console.log(limitFileSize);
-      if (!limitFileSize) {
+      if (limitFileSize) {
         return {
           success: false,
           message: 'File size is too large',
@@ -95,6 +95,16 @@ export class ThreadService {
     };
   }
 
+  async recallSendThread(threadId: string, senderId: string) {
+    const thread = await this.threadRepository.recallSendThread(
+      threadId,
+      senderId,
+    );
+    return {
+      thread,
+    };
+  }
+
   async createReplyThread(
     threadId: string,
     senderId?: string,
@@ -113,11 +123,11 @@ export class ThreadService {
       threadId,
     );
 
-    await this.threadRepository.createReplyThread(thread);
     if (fileCreateDto) {
       const limitFileSize = this.limitFileSize(fileCreateDto.size);
+      console.log(limitFileSize);
 
-      if (!limitFileSize) {
+      if (limitFileSize) {
         return {
           success: false,
           message: 'File size is too large',
@@ -126,6 +136,7 @@ export class ThreadService {
         };
       }
     }
+    await this.threadRepository.createReplyThread(thread);
     return {
       success: true,
       message: 'Create reply thread success',

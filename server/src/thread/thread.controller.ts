@@ -41,8 +41,12 @@ export class ThreadController {
         destination: './uploads',
         filename: (req, file, callback) => {
           const sanitizedFilename = slugify(file.originalname, {
-            lower: true, // convert to lower case, defaults to `false`
-            strict: true, // strip special characters except replacement, defaults to `false`
+            replacement: '-', // replace spaces with replacement character, defaults to `-`
+            remove: undefined, // remove characters that match regex, defaults to `undefined`
+            lower: false, // convert to lower case, defaults to `false`
+            strict: false, // strip special characters except replacement, defaults to `false`
+            locale: 'vi', // language code of the locale to use
+            trim: true,
           });
           callback(null, sanitizedFilename);
         },
@@ -59,7 +63,6 @@ export class ThreadController {
     @UploadedFile() file?: Express.Multer.File,
   ): Promise<ResThreadDto> {
     let fileUpload: FileCreateDto;
-    console.log(file);
     if (file) {
       fileUpload = {
         ...file,
@@ -76,6 +79,7 @@ export class ThreadController {
       channelId,
       chatId,
     );
+    console.log(rs);
     if (!rs) {
       console.log('error');
       if (file && file.path) {

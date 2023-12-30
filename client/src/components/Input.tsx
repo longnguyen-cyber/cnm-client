@@ -70,9 +70,7 @@ const Input = ({ isThread, send, channel }: Props) => {
       formData.append('channelId', channel?.id!.toString())
 
       if (file) {
-        addFile(formData).then((res) => {
-          console.log(res)
-        })
+        addFile(formData).then((res) => {})
       }
     }
   }, [file])
@@ -95,7 +93,10 @@ const Input = ({ isThread, send, channel }: Props) => {
           <div className="class_hover_iconInputChat">
             <AiOutlineUnderline />
           </div>
-          <label htmlFor="file" className="class_hover_iconInputChat">
+          <label
+            htmlFor="file"
+            className="class_hover_iconInputChat cursor-pointer"
+          >
             <AiOutlineLink />
             <input
               type="file"

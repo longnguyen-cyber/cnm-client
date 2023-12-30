@@ -37,7 +37,7 @@ const ModalCreateChannel = ({ setOpenModalCreateChannel }: Props) => {
         setLoadingCreate(false)
         setOpenModalCreateChannel(false)
         toast.success('Create channel success')
-        setChannel([...channels, data])
+        setChannel([...channels, res.data.data])
       } else {
         setLoadingCreate(false)
         toast.error('Create channel fail')

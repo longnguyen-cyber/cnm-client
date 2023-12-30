@@ -87,6 +87,7 @@ model threads {
   deletedAt DateTime?
   isEdited  Boolean?
   isReply   Boolean?
+  isRecall  Boolean?  @default(false)
 
   receiveId String?   @unique @db.ObjectId
   senderId  String?   @unique @db.ObjectId

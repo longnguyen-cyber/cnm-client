@@ -195,8 +195,8 @@ const Slidebar = () => {
           ))}
         </ul>
       </div> */}
-      <div className="h-96 relative">
-        <ul className="h-full overflow-auto text-zinc-400 font-normal list-inside dark:text-gray-400">
+      <div className="h-full relative overflow-auto">
+        <ul className=" text-zinc-400 font-normal list-inside dark:text-gray-400">
           <li className="flex items-center gap-1 rounded-lg p-1">
             <div className="p-1 hover:bg-zinc-800 ease-out duration-300 rounded">
               <span

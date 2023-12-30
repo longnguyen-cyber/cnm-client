@@ -5,7 +5,7 @@ import { FaPencil, FaPlus } from 'react-icons/fa6'
 import { IoPersonAdd } from 'react-icons/io5'
 import { useLocation } from 'react-router-dom'
 import { useChannel, useStorage, useformatDate } from '../utils/hooks'
-import { IThread } from '../utils/types'
+import { IChannel, IThread } from '../utils/types'
 import HeaderItem from './HeaderItem'
 import Input from './Input'
 import Loading from './Loading'
@@ -13,11 +13,13 @@ import Message from './Message'
 import { WebSocketContext } from './SocketClient'
 // import Thread from './Thread'
 import ModalAddUserToChannel from './modal/ModalAddUserToChannel'
+import ModalCreateChannel from './modal/ModalCreateChannel'
 
 function Item() {
   const location = useLocation()
   const idSearch = new URLSearchParams(location.search).get('id') ?? ''
-  const channel = useChannel(idSearch)
+  const channelQuery = useChannel(idSearch)
+  const [channel, setChannel] = useState<IChannel>()
   // const direct = useDirect(idSearch)
   const socket = useContext(WebSocketContext)
   const session = useStorage()
@@ -27,7 +29,7 @@ function Item() {
   useEffect(() => {
     const getThread = async () => {
       const res = await fetch(
-        `${process.env.REACT_APP_BASE_URL}api/threads?channelId=${channel?.id}`
+        `${process.env.REACT_APP_BASE_URL}api/threads?channelId=${idSearch}`
       )
       const data = await res.json()
       setThreadOfChannel(data.data)
@@ -35,6 +37,8 @@ function Item() {
     if (channel) {
       getThread()
     }
+
+    setChannel(channelQuery)
   }, [channel, idSearch])
 
   const [showThread, setShowThread] = useState({
@@ -44,6 +48,7 @@ function Item() {
 
   const [openModalAddUserToChannel, setOpenModalAddUserToChannel] =
     useState(false)
+  const [openModalCreateChannel, setOpenModalCreateChannel] = useState(false)
 
   useEffect(() => {
     let handle = (e: any) => {}
@@ -171,7 +176,15 @@ function Item() {
       {openModalAddUserToChannel && (
         <ModalAddUserToChannel
           channel={channel!}
+          setChannel={setChannel}
           setOpenModalAddUserToChannel={setOpenModalAddUserToChannel}
+          setOpenModalCreateChannel={setOpenModalCreateChannel}
+        />
+      )}
+
+      {openModalCreateChannel && (
+        <ModalCreateChannel
+          setOpenModalCreateChannel={setOpenModalCreateChannel}
         />
       )}
     </div>

@@ -30,13 +30,13 @@ const router = createBrowserRouter([
 ])
 root.render(
   <React.StrictMode>
-    <SocketClient>
-      <RecoilRoot>
+    <RecoilRoot>
+      <SocketClient>
         <Provider store={store}>
           <ToastContainer floatingTime={1000} />
           <RouterProvider router={router} />
         </Provider>
-      </RecoilRoot>
-    </SocketClient>
+      </SocketClient>
+    </RecoilRoot>
   </React.StrictMode>
 )

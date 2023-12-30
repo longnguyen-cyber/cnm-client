@@ -1,63 +1,46 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { IChannel, IUser } from '../../utils/types'
 import Loading from '../Loading'
 
 import { MdDone } from 'react-icons/md'
 
-import { useStorage } from '../../utils/hooks'
-
+import { toast } from 'react-custom-alert'
 import { AiOutlineLock } from 'react-icons/ai'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { useGetAllUsersQuery } from '../../redux/api/user'
-import { channelsState } from '../../utils/state'
+import { useRecoilValue } from 'recoil'
+import { useAddUserToChannelMutation } from '../../redux/api/channel'
+import { directState, userLogin } from '../../utils/state'
 
 interface Props {
   channel: IChannel
+  setChannel: (value: IChannel) => void
   setOpenModalAddUserToChannel: (value: boolean) => void
-
-  setOpenModalCreateChannel?: (value: boolean) => void
+  setOpenModalCreateChannel: (value: boolean) => void
 }
 
 const ModalAddUserToChannel = ({
   channel,
+  setChannel,
   setOpenModalAddUserToChannel,
   setOpenModalCreateChannel,
 }: Props) => {
-  const channels = useRecoilValue(channelsState)
-  const setChannels = useSetRecoilState(channelsState)
-  //state
-  const [users, setUsers] = useState<IUser[]>([])
   const [filterUsers, setFilterUsers] = useState<IUser[]>([])
   const [userAdded, setUserAdded] = useState<IUser[]>([])
   const [userName, setUserName] = useState('')
 
   //flag
   const [flagCreate, setFlagCreate] = useState(false)
-  const [flagModelCreateChannel, setFlagModelCreateChannel] = useState(false)
   const [existing, setExisting] = useState(true)
-
-  //api
-  const { data: userData, isSuccess: userSuccess } = useGetAllUsersQuery()
-  useEffect(() => {
-    if (userSuccess && userData) {
-      const data = userData as any
-      setUsers(data.data)
-    }
-  }, [userSuccess, userData])
-
-  const [user, setUser] = useState<IUser>()
-
-  const session = useStorage()
+  const users = useRecoilValue(directState)
+  const user = useRecoilValue(userLogin)
 
   //api
   const [loadingCreate, setLoadingCreate] = useState(false)
   const handleSubmit = () => {
-    // setLoadingCreate(true)
-    // const user = JSON.parse(session.getItem('user', 'local')) as IUser
+    setLoadingCreate(true)
     // const data: IChannel = {
     //   name: nameChannel,
     //   isPublic: isPublic,
-    //   userCreated: user
+    //   userCreated: user!
     // }
     // createChannel(data).then((res: any) => {
     //   if (res.data) {
@@ -72,7 +55,7 @@ const ModalAddUserToChannel = ({
     // })
   }
 
-  // const [addUserToChannel] = useAddUserToChannelMutation()
+  const [addUserToChannel] = useAddUserToChannelMutation()
   const [loadingAddUser, setLoadingAddUser] = useState(false)
   const handleAddUserToChannel = () => {
     setLoadingAddUser(true)
@@ -82,17 +65,18 @@ const ModalAddUserToChannel = ({
         id: channel.id!,
         users: userAdded.map((u) => u.id),
       }
-      // addUserToChannel(data).then((res: any) => {
-      //   if (res.data) {
-      //     setLoadingAddUser(false)
-      //     setOpenModalAddUserToChannel(false)
-      //     // toast.success('Add user to channel success')
-      //     // setChannels([...channels, data])
-      //   } else {
-      //     setLoadingAddUser(false)
-      //     // toast.error('Add user to channel fail')
-      //   }
-      // })
+      addUserToChannel(data).then((res: any) => {
+        if (res.data) {
+          setLoadingAddUser(false)
+          setOpenModalAddUserToChannel(false)
+          toast.success('Add user to channel success')
+          //!cant change quantity users display in header item when added user to channel
+          setChannel(res.data)
+        } else {
+          setLoadingAddUser(false)
+          // toast.error('Add user to channel fail')
+        }
+      })
     }
   }
 
@@ -183,8 +167,9 @@ const ModalAddUserToChannel = ({
                   placeholder="Enter a name or email"
                   value={userName}
                   autoFocus={true}
+                  autoComplete="off"
                   onBlur={() => {
-                    if (userName == '') {
+                    if (userName === '') {
                       setFilterUsers([])
                     }
                   }}
@@ -192,7 +177,7 @@ const ModalAddUserToChannel = ({
                     setUserName(e.target.value)
                     if (e.target.value.length === 0) setFilterUsers([])
                     const findUser = users
-                      .filter((user) => {
+                      ?.filter((user) => {
                         return (
                           user.name
                             .toLowerCase()
@@ -203,6 +188,9 @@ const ModalAddUserToChannel = ({
                         )
                       })
                       .filter((u) => u.id !== user?.id)
+                      .filter(
+                        (u) => !channel.users!.find((f) => f.id === u.id)
+                      ) as IUser[]
 
                     setFilterUsers(findUser)
                   }}
@@ -253,11 +241,17 @@ const ModalAddUserToChannel = ({
                               src={user.avatar}
                               alt=""
                             />
-                            <span className="ml-2">{user.name}</span>
-                            <span>-</span>//check online
-                            <span className="ml-2 flex-1">
-                              {user.displayName}
-                            </span>
+                            <div className="flex items-center space-x-2">
+                              <span
+                                className={`${
+                                  user?.isOnline
+                                    ? 'bg-green-500'
+                                    : 'bg-slate-400'
+                                } h-2 w-2 rounded-full`}
+                              ></span>
+                              <span className="ml-2">{user.name}</span>
+                            </div>
+
                             <span className="float-right">
                               {userAdded.find((f) => f.id === user.id) && (
                                 <MdDone />
@@ -284,7 +278,10 @@ const ModalAddUserToChannel = ({
                       name="default-radio"
                       defaultChecked={true}
                       checked={existing}
-                      onClick={() => setExisting(true)}
+                      // onClick={() => setExisting(true)}
+                      onChange={() => {
+                        setExisting(true)
+                      }}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 "
                     />
                     <label
@@ -306,7 +303,9 @@ const ModalAddUserToChannel = ({
                       type="radio"
                       value=""
                       name="default-radio"
-                      onClick={() => setExisting(false)}
+                      onChange={() => {
+                        setExisting(false)
+                      }}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 "
                     />
                     <label
@@ -336,7 +335,10 @@ const ModalAddUserToChannel = ({
                     className=" bg-[#017A5B] p-2 px-5 rounded font-semibold flex justify-center items-center"
                     onClick={() => {
                       if (existing) setFlagCreate(true)
-                      else setFlagModelCreateChannel(true)
+                      else {
+                        setOpenModalCreateChannel(true)
+                        setOpenModalAddUserToChannel(false)
+                      }
                     }}
                   >
                     {user && user.id === channel.userCreated.id
@@ -348,7 +350,6 @@ const ModalAddUserToChannel = ({
             </>
           )}
         </div>
-        {/* {flagModelCreateChannel && <ModalCreateChannel />} */}
       </div>
     </div>
   )

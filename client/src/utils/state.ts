@@ -18,3 +18,7 @@ export const channelsState = atom<IChannel[]>({
   default: [],
 })
 
+export const userLogin = atom<IUser|null>({
+  key: 'userLogin',
+  default: null
+})

@@ -18,6 +18,7 @@ export class ThreadRepository {
     let newMsg: any;
     let newFile: any;
     let react: any;
+    console.log(threadToDB);
     if (threadToDB.chatId === undefined || threadToDB.receiveId === null) {
       newThread = await prisma.threads.create({
         data: {
@@ -108,6 +109,63 @@ export class ThreadRepository {
           ...react,
         },
       },
+    };
+  }
+
+  async recallSendThread(
+    threadId: string,
+    senderId: string,
+    prisma: Tx = this.prisma,
+  ): Promise<Res> {
+    const deleteThread = await prisma.threads.update({
+      where: {
+        id: threadId,
+        senderId: senderId,
+      },
+      data: {
+        isRecall: true,
+      },
+    });
+    if (!deleteThread) {
+      return {
+        success: false,
+        message: 'Recall thread failed',
+        errors: 'Recall thread failed',
+        data: null,
+      };
+    }
+    const deleteMsg = await prisma.messages.deleteMany({
+      where: {
+        threadId: threadId,
+      },
+    });
+
+    const deleteFile = await prisma.files.deleteMany({
+      where: {
+        threadId: threadId,
+      },
+    });
+
+    const deleteReact = await prisma.reactions.deleteMany({
+      where: {
+        threadId: threadId,
+      },
+    });
+
+    if (!deleteMsg && !deleteFile && !deleteReact && !deleteThread) {
+      return {
+        success: false,
+        message: 'Delete thread failed',
+        errors: 'Delete message, file, react and thread failed',
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Delete thread successfully',
+      errors: '',
+      data: threadId,
     };
   }
 
