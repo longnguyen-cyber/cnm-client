@@ -1,0 +1,53 @@
+.login-google-facebook{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: solid 1px rgb(176, 176, 176);
+    border-radius: 50px;
+    height: 50px !important;
+    margin-bottom: 1rem;
+}
+
+.login-google-facebook .btn-google-login{
+    width: 100%;
+    height: 30px !important;
+    
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 24px;
+    border: solid 1px black o !important;
+    border-radius: 50%;
+    justify-content: center;
+    background-color: white !important;
+    box-shadow: none !important;
+    border-radius:50px !important;
+    margin-top: 1rem;
+}
+
+.login-google-facebook .btn-google-login span{
+  font-size: 20px;
+}
+.login-google-facebook .btn-login-facebook{
+    border: none !important;
+
+
+}
+
+.content_meo p{
+    text-align: center;
+    color: gray;
+
+    margin-top: 2rem; 
+}
+
+.hror{
+    display: grid;
+    grid-template-columns: 40% 20% 40%;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+.hror p{
+    margin-top: -1px;
+}
