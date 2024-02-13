@@ -8,14 +8,7 @@ import ChatLoading from './SeachLoadingUser';
 import { useDispatch, useSelector } from 'react-redux';
 import { userSeach } from '../../../../../feature/user/pathApi';
 import { IUser } from '../../../../../Type';
-interface IUserdemo {
-    id: string;
-    name: string;
-    email: string;
-    phone:string,
-    avatar:string
-  
-  }
+
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const SearchUserAddChat: FunctionComponent<any> = ({searchValue }) => {
 
@@ -24,11 +17,6 @@ export const SearchUserAddChat: FunctionComponent<any> = ({searchValue }) => {
      const ListUsers = useSelector((state: any) => state.Users.UserSlice);
      
      const Loading=useSelector((state:any)=>state.Users.loading)
-     
-     
-     //tao du lieu mau
-     
-   
     const AddUserChat=(value:any)=>{
         notification.success({message:'Thêm bạn thành công'})
     }
