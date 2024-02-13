@@ -1,42 +1,33 @@
-import React from 'react'
-import { ToastContainer } from 'react-custom-alert'
-import 'react-custom-alert/dist/index.css'
-import ReactDOM from 'react-dom/client'
-import { Provider } from 'react-redux'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { RecoilRoot } from 'recoil'
-import Index from './components/Index'
-import Login from './components/Login'
-import SocketClient from './components/SocketClient'
-import ErrorPage from './error-page'
-import 'react-custom-alert/dist/index.css'
-import './globals.css'
-import './index.css'
-import { store } from './redux/store'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import {BrowserRouter} from 'react-router-dom'
+import {Provider} from 'react-redux';
+import store from './appstore/store';
+import { UserContextProvider } from './Context/UserContext';
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Index />,
-    errorElement: <ErrorPage />,
-    children: [],
-  },
-  {
-    path: '/login',
-    element: <Login />,
-    errorElement: <ErrorPage />,
-  },
-])
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
 root.render(
-  <React.StrictMode>
-    <RecoilRoot>
-      <SocketClient>
-        <Provider store={store}>
-          <ToastContainer floatingTime={1000} />
-          <RouterProvider router={router} />
-        </Provider>
-      </SocketClient>
-    </RecoilRoot>
+  
+  <BrowserRouter>
+    <Provider store={store}>
+    <React.StrictMode>
+    <UserContextProvider>
+    <App />
+    
+    </UserContextProvider>
+   
   </React.StrictMode>
-)
+    </Provider>
+
+  </BrowserRouter>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();

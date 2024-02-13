@@ -1,0 +1,51 @@
+.MainPageHomeRecomend{
+
+max-width: 1400px;
+ 
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+
+    align-items: center;
+
+
+}
+.mySwiper{
+
+   width: 100%;
+  
+}
+.SwiperSlideContent{
+   
+     
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+   
+    justify-content: center;
+    padding-bottom: 70px;
+}
+.SwiperSlideContent img{
+    width: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.swiper-button-next, .swiper-button-prev{
+    font-size: 12px !important;
+    width: 10px;
+    height: 10px;
+}
+
+.swiper-button-next:after, .swiper-rtl .swiper-button-prev:after {
+    content: 'next';
+}
+.swiper-button-next:after, .swiper-button-prev:after {
+    font-family: swiper-icons;
+    font-size: 19px !important;
+    text-transform: none!important;
+    font-variant: initial; 
+
+}
+

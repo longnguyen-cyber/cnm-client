@@ -1,0 +1,41 @@
+
+
+
+
+.ant-tabs-tab-btn {
+  font-weight: 600;
+  font-size: 13px;
+
+}
+.items_icon.active{
+    color: white !important;
+    transition: all 0.2s ease-in-out;
+  
+    padding: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    
+    text-shadow: 0 0 0.25px currentcolor;
+    background-color: rgba(0, 0, 0, 0.164);
+}
+
+
+
+.ground-menu::-webkit-scrollbar-track{
+  display: none;
+  transition: 0.3s ease-in-out;
+}
+
+.ground-menu::-webkit-scrollbar{
+  display: none;
+  width: 4px;
+}
+.ground-menu:hover::-webkit-scrollbar{
+  display: block;    
+}
+.ground-menu::-webkit-scrollbar-thumb{
+  border-radius: 50px;
+  background-image: linear-gradient(-45deg,rgba(16, 213, 248, 0.823), rgb(232, 231, 231));
+}
+
