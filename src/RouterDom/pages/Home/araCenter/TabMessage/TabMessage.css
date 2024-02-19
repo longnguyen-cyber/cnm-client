@@ -1,0 +1,21 @@
+.Tagmessage {
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+   /* for Firefox */
+    scrollbar-color: none; /* for Firefox */
+  }
+  
+  .Tagmessage::-webkit-scrollbar {
+    width: 2px; /* for WebKit browsers */
+    height:3px;
+  }
+  
+  .Tagmessage::-webkit-scrollbar-thumb {
+    background-color: none; /* for WebKit browsers */
+  }
+  
+  .Tagmessage::-webkit-scrollbar-track {
+    background-color: none; /* for WebKit browsers */
+  }
+  

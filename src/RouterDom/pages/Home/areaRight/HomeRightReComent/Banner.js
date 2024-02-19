@@ -7,10 +7,10 @@ import zalo3 from '../../../../../image/zalo3.png';
 import zalo4 from '../../../../../image/zalo4.jpg';
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Navigation,Autoplay } from "swiper";
- import './Homepage.css'
+import { Pagination, Navigation, Autoplay } from "swiper";
+import './Homepage.css'
 Banner.propTypes = {
-    
+
 };
 
 function Banner() {
@@ -37,9 +37,9 @@ function Banner() {
     },
   ];
 
-   
-    return (
-      <div className='MainPageHomeRecomend  '>
+
+  return (
+    <div className='MainPageHomeRecomend  '>
       <div className='text-center flex flex-col gap-5 mb-5'>
         <p className='text-2xl'>
           Chào mừng đến với <b>Zalo PC !</b>{' '}
@@ -50,33 +50,33 @@ function Banner() {
         </p>
       </div>
       <Swiper
-      slidesPerView={1}
-      spaceBetween={30}
-      loop={true}
-      pagination={{
-        clickable: true,
-      }}
-      navigation={true}
-      modules={[Autoplay,Pagination, Navigation]}
-      autoplay={{
-        delay: 3000,
-        disableOnInteraction: false
-    }}
-      className="mySwiper"
-    >
+        slidesPerView={1}
+        spaceBetween={30}
+        loop={true}
+        pagination={{
+          clickable: true,
+        }}
+        navigation={true}
+        modules={[Autoplay, Pagination, Navigation]}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false
+        }}
+        className="mySwiper"
+      >
 
-      {dataSlider&&dataSlider.map((imgSlider,index)=>(
-        
-        <SwiperSlide className='SwiperSlideContent' key={index}><img src={imgSlider.imgNike}/></SwiperSlide>
-      ))}  
-    </Swiper>
-   
-  
-    
+        {dataSlider && dataSlider.map((imgSlider, index) => (
+
+          <SwiperSlide className='SwiperSlideContent' key={index}><img src={imgSlider.imgNike} /></SwiperSlide>
+        ))}
+      </Swiper>
+
+
+
     </div>
-    
-     
-    );
+
+
+  );
 }
 
 export default Banner;

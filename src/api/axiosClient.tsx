@@ -17,7 +17,7 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(
   (config) => {
     const getLocalToken =JSON.parse(localStorage.getItem("tokenUser") as string);
-    console.log(getLocalToken)
+ 
     if (getLocalToken) {
       config.headers.Authorization = `Bearer ${(getLocalToken)}`;
    
@@ -32,7 +32,7 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => {
     if (response && response.data) {
-      console.log(response.data);
+      // console.log(response.data);
       return response.data;
     }
     return response;

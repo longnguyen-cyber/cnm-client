@@ -11,42 +11,27 @@ import { ILogin } from '../../../Type';
 import { useNavigate } from 'react-router-dom';
 import { unwrapResult } from '@reduxjs/toolkit';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
 export default function Login() {
-
   const [responseRecapCha, setResponeRecapCha] = useState(false);
-  const dispatch=useDispatch();
-  const loading=useSelector((state:any)=>state.Users.loading)
-  const navigate=useNavigate()
-  console.log(responseRecapCha)
-  
-
+  const dispatch = useDispatch();
+  const loading = useSelector((state: any) => state.Users.loading)
+  const navigate = useNavigate()
   ///============================= du lieu in sert hoan thanh se chay vao day ==========================///
   const onFineshInSertLogin = async (value: ILogin) => {
-    if(responseRecapCha){   
+    if (responseRecapCha) {
       const errorRecapCha = document.querySelector(".errorRecapCha");
-      if(errorRecapCha){
+      if (errorRecapCha) {
         errorRecapCha.innerHTML = "";
-        if(value){
-          const actionResult=await dispatch<any>(userLogin(value));
-        const userLoginResult= unwrapResult(actionResult);
-        if (userLoginResult) {
-          
-          navigate('/home');
-        }
+        if (value) {
+          dispatch<any>(userLogin(value)); 
         }
       }
-  
     }
-    else{
-          const errorRecapCha = document.querySelector(".errorRecapCha");
-          if(errorRecapCha)
-          errorRecapCha.innerHTML="Vui lòng xác mình người máy ";
-       
-      
-      
+    else {
+      const errorRecapCha = document.querySelector(".errorRecapCha");
+      if (errorRecapCha)
+        errorRecapCha.innerHTML = "Vui lòng xác mình người máy ";
     }
-    console.log(value)
   }
 
   ///=============================check RecapCha==========================///
@@ -133,13 +118,13 @@ export default function Login() {
             sitekey="6Lc6HdYgAAAAAIKgwEaw-mAtM1zOtaDW3YP9TJOt"
             onChange={onChangeReCapch}
           />
-         
+
         </div>
-     
-          <p className='errorRecapCha w-full flex items-center justify-center' style={{ color: 'red' }}></p>
+
+        <p className='errorRecapCha w-full flex items-center justify-center' style={{ color: 'red' }}></p>
         <Form.Item>
           <Button type="primary" className='w-full bg-blue-500 h-12 ' htmlType='submit'>
-            {loading&&<Spin indicator={antIcon} className='text-white mr-3' />}   Login
+            {loading && <Spin indicator={antIcon} className='text-white mr-3' />}   Login
           </Button>
           <Button type="primary" className='w-full mt-4 mb-2 border-r h-12 border-gray-200' ghost>
             Gửi yêu cầu để đăng nhập
@@ -148,7 +133,7 @@ export default function Login() {
         </Form.Item>
       </Form>
 
-       {/* form login  */}
+      {/* form login  */}
     </div>
   )
 }

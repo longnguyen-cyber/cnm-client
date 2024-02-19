@@ -7,7 +7,7 @@ import Sidebar from "../../../Layout/Sidebar";
 import TabLeft from "./areaLeft/TabLeft";
 import AreaRight from "./areaRight/AreaRight";
 import { SearchPage } from "./araCenter/Search/Search";
-import SearchUserAddChat from "./araCenter/Search/SearchUserAddChat";
+import SearchUserAddChat from "./araCenter/Search/SearchUserAddSingleChat";
 export default function Home() {
   const dispatch = useDispatch();
   const [tabCurrent, setTabCurrent] = useState("measages");

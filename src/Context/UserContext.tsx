@@ -16,20 +16,17 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const [idUser,setIdUser]=useState<string>("");
     const [socket, setSocket] = useState<Socket>(null!);
     const [token,setToken]=useState<string|null>(null);
-
-   
+    const [selectedChat, setselectedChats] = useState<any>([]);
     useEffect(()=>{
       
       async function connectSocket(){
         const UserLogin:IUser=JSON.parse(userTokenString);
-       
         const idUser= UserLogin?UserLogin.id:null;
         if(UserLogin){
           navigate('/home')
           const newSocket = io("http://localhost:8080/", {
             auth: { idUser },
           })
-       
           setSocket(newSocket);
           setUser(UserLogin)
           if(UserLogin.token){
@@ -39,13 +36,14 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
        return ()=>socket.close();
     }
     connectSocket();
-      //  return ()=>socket.close()
+      
     },[]);
     const state = {
       user: [user, setUser],
       idUser: [idUser, setIdUser],
       token: [token, setToken],
-      socket: socket
+      socket: socket,
+      selectedChat: [selectedChat, setselectedChats]
     };
 
     return (

@@ -20,6 +20,22 @@ const UserApi={
         const url = `users/search/${payload.name}`;
         console.log(url)
         return axiosClient.get(url)
-    }
+    },
+    UserCreateChannel:(payload: any)=>{
+        const url = `channels`;
+        return axiosClient.post(url,payload)
+    },
+    UserCreateSingleChat:(payload: any)=>{
+        const url = `chats`;
+        return axiosClient.post(url,payload)
+    },
+    UserGetAllChannel:()=>{
+        const url = `channels`;
+        return axiosClient.get(url)
+    },
+    UserGetAllSingleChat:()=>{
+        const url = `chats`;
+        return axiosClient.get(url)
+    },
 }
 export default UserApi

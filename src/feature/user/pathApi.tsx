@@ -6,7 +6,6 @@ export const getAllUser = createAsyncThunk("getAllUser", async () => {
 
   return data;
 });
-
 export const userLogin = createAsyncThunk(
   "UserLogin",
   async (dataUserLogin: ILogin) => {
@@ -14,7 +13,6 @@ export const userLogin = createAsyncThunk(
     return data;
   }
 );
-
 export const userRegister = createAsyncThunk(
   "UserRegister",
   async (dataUserRegister: IRegister) => {
@@ -22,9 +20,16 @@ export const userRegister = createAsyncThunk(
     return data;
   }
 );
-
 export const userSeach=createAsyncThunk("UserSearch",async (payload: { name: string })=>{
   const dataUser = UserApi.UserSearch(payload);
   return dataUser;
-
 })
+export const UserCreateChannel=createAsyncThunk("UserCreateChannel",async (payload: any)=>{
+  const dataUser = UserApi.UserCreateChannel(payload);
+  return dataUser;
+})
+export const UserCreateSingleChat=createAsyncThunk("UserCreateSingleChat",async (payload: any)=>{
+  const dataUser = UserApi.UserCreateSingleChat(payload);
+  return dataUser;
+} )
+

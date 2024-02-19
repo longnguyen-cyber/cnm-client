@@ -3,4 +3,5 @@
     display: grid;
     grid-template-columns: 100px 400px 1fr;
     grid-template-rows: 100vh;
+    overflow: hidden;
 }
