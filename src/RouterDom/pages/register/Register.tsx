@@ -9,12 +9,13 @@ import ImgCrop from "antd-img-crop";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 import UserApi from "../../../api/user";
 import { useNavigate } from "react-router-dom";
+import { on } from "events";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 type FieldType = {
   name: string;
   password: string;
-  // confirmPassword: string;
+  confirmPassword: string;
   // displayName: string;
   // status: string;
   // phone: string;
@@ -57,14 +58,18 @@ export default function Register() {
   };
 
   const handleRegister = async (values: IRegister) => {
+    // delete values.confirmPassword;
     try {
-      const response = await UserApi.UserRegister(values);
+      const response = await UserApi.UserRegister({
+        name: values.name,
+        password: values.password,
+        email: values.email,
+      });
       if (response) {
-        navigate("/login");
+        navigate("/");
       }
-      // Handle the response here
-      // console.log('aaaaaaa', fileAvatar)
-      // dispatch<any>(userRegister({ ...values }));
+      console.log(response);
+    
     } catch (error) {
       // Handle the error here
     }
