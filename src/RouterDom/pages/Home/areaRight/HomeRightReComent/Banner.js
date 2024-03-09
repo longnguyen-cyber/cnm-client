@@ -41,8 +41,8 @@ function Banner() {
   return (
     <div className='MainPageHomeRecomend  '>
       <div className='text-center flex flex-col gap-5 mb-5'>
-        <p className='text-2xl'>
-          Chào mừng đến với <b>Zalo PC !</b>{' '}
+        <p className='text-4xl'>
+          Chào mừng đến với nền tảng  <b>WorkChat !</b>{' '}
         </p>
         <p>
           khám phá những tiện ích hỗ trợ làm việc và trò chuyện cũng <br /> người thân và bạn bẻ được tối ưu hóa cho máy

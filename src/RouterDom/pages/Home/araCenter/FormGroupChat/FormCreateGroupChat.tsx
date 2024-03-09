@@ -39,6 +39,9 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
       setSubmitSuccess(false); // Đặt lại trạng thái submit thành công để tránh lặp lại
     }
   }, [submitSuccess, dispatch]);
+  
+
+
   const bagTag = [
     'bg-blue-400',
     'bg-red-400',
@@ -74,7 +77,6 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
         userCreated: user ? user.id : '',
         members: selectedUsers.map((item: IUser) => item.id),
       };
-  
       // Optimistically update the UI
       setTimeout(() => {
         notification["success"]({
@@ -108,6 +110,7 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
   };
 
   const handleClickFunction = (users: IUser) => {
+    
     if (selectedUsers) {
       const check = selectedUsers.every(usercheck => usercheck.id != users.id)
       if (check) {
@@ -203,7 +206,7 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
           />
         </Form.Item>
         <div className='mb-3 flex flex-wrap gap-3 items-center'>
-          {selectedUsers?.map((value: IUser, index) => (
+           {selectedUsers?.map((value: IUser, index) => (
             <p key={index} className={`border border-gray-300 flex items-center justify-center gap-2  rounded-xl text-white w-32 text-md ${bagTag[Math.floor(Math.random() * bagTag.length)]}`}>{value.name}
               <span><AiOutlineClose color={"white"} className="cursor-pointer" onClick={() => handleRemoveUser(value)} /></span>
             </p>
@@ -211,11 +214,9 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
         </div>
           {
             search && search.length > 0 ? ListUsersSeach.length > 0 ? ListUsersSeach.slice(0, 5).map((value: IUser, index: number) => (<div className='flex flex-col gap-5' key={index}>
-              {<UserListItem value={value} index={index} handleClickFunction={() => handleClickFunction(value)} />}
+              {<UserListItem value={value} index={index} handleClickFunction={() => handleClickFunction(value)} selectedUsers={selectedUsers} />}
             </div>)) : "Không có kết quả tìm kiếm" : ""
           }
-        
-        
         <Form.Item>
           <Button type="primary" className='w-full bg-blue-500 h-10 ' htmlType='submit'>
             {loading && <Spin indicator={antIcon} className='text-white mr-3' />}  Submit

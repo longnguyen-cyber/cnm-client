@@ -1,13 +1,15 @@
 import { Spin } from 'antd';
 import React, { FunctionComponent } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
+import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const ShowChatMessage: FunctionComponent<any> = ({ ListChannel, Loading ,setselectedChats}) => {
-  console.log(ListChannel);
+  console.log(ListChannel)
+
   return (
     <div className='flex flex-col gap-5 w-full' style={{ width: '100%' }}>
       {
-    !Loading&&ListChannel?ListChannel.map((item: any, index: number) => (
+    !Loading&&ListChannel?ListChannel?.map((item: any, index: number) => (
         <div key={index} className="flex items-center pl-1 cursor-pointer"  onClick={()=>{ setselectedChats(item);}} >
           <div className="flex-shrink-0">
             <div className="flex flex-wrap w-10 justify-center items-center">
@@ -18,14 +20,22 @@ const ShowChatMessage: FunctionComponent<any> = ({ ListChannel, Loading ,setsele
             </div>
           </div>
           <div className="flex-grow ml-4">
-            <div className="flex items-center">
+            <div className="flex items-center justify-between">
               <h4 className="text-lg font-medium">{item.name}</h4>
+              {format(new Date(String(item.timeThread)), "HH:mm")}
             </div>
             <div className="text-gray-500">
-              {item.latesMessage ?
-                (item.latesMessage.content && item.latesMessage.content.length > 30 ?
-                  item.latesMessage.content.substring(0, 51) + "..." :
-                  item.latesMessage.content)
+              {item.lastedThread ?
+              <div className='flex justify-between'>
+            {item.lastedThread.messages.message
+                              && item.lastedThread.messages.message.length > 30 ?
+                              item.lastedThread.messages.message.substring(0, 51) + "..." :
+                              item.lastedThread.messages.message}
+                <div></div>
+
+                
+              </div>
+                
                 :
                 <div className='flex justify-between  w-full inline-flex'>
                   <p className='flex-1' style={{ fontWeight: '450' }}>

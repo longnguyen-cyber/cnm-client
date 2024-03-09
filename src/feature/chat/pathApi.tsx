@@ -8,3 +8,14 @@ export const UserGetAllChannel=createAsyncThunk("UserGetAllChannel",async ()=>{
     const dataUser = UserApi.UserGetAllSingleChat();
     return dataUser;
   })
+
+  export const UserGetChannelById=createAsyncThunk("UserGetChannelById",async (payload: { id: string })=>{
+    const dataUser = UserApi.UserGetChannelById(payload);
+    return dataUser;
+  }
+  )
+  export const UserGetChatsSingleById=createAsyncThunk("UserGetChatsSingleById",async (payload: { id: string })=>{
+    const dataUser = UserApi.UserGetChatsSingleById(payload);
+    return dataUser;
+  }
+  )

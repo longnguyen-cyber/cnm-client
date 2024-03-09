@@ -1,65 +1,88 @@
 import { Input, Spin } from 'antd'
-import React, { useContext, useState } from 'react'
+import React, { FunctionComponent, useContext, useEffect, useState } from 'react'
 import { LoadingOutlined } from '@ant-design/icons';
 import './GroupChat.css'
 import { UserContext } from '../../../../../Context/UserContext';
-export default function GroupChat() {
-    const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
-    const UserContexts = useContext(UserContext);
+import {ScrollChat} from './ScrollChat';
+export const  GroupChat:FunctionComponent<any>=({loading,Channelid,submitChatSuccess})=> {
+  const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
+  const UserContexts = useContext(UserContext);
   const { state } = UserContexts;
   const [user, setUser] = state.user;
-  const [token, setToken] = state.token
   const { socket } = state
+  const [token, setToken] = state.token
   const [selectedChat,setselectedChats]=state.selectedChat;
-  console.log(selectedChat)
-    const [inputValue, setInputValue] = useState('');
-    const handleChangInputChatFocus=()=>{
-       
-      }
+  const [loadingsending,setLoadingsending]=useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [wordchat,setwordChat]=useState('')
+  const [loadingSelectChat,setLoadingSelectChat]=useState(false)
 
-      const handleChangInputChatBlur=()=>{
-       
+    useEffect(() => {
+      if(socket){
+        socket.on("updatedSendThread",(data:any)=>{
+          submitChatSuccess(data);
+          console.log(data)
+          setTimeout(()=>{
+            setLoadingsending(false)
+            setwordChat('')
+          },2000)
+        })
+       return ()=>{
+         socket.off('updatedSendThread')
+       }
       }
+    },[]) 
+    useEffect(()=>{
+      if(selectedChat.id){
+        setLoadingSelectChat(true)
+      }
+      setTimeout(() => {
+        setLoadingSelectChat(false)
+      }, 2800);
+    },[selectedChat.id])
 
-      const handleChange = (event:any) => {
-       
-      };
+   
       const handleKeyPress = (event:any) => {
         if (event.key === 'Enter') {
           const Thread={
-            messages:event.target.value,
+            messages:{
+              message:event.target.value
+            },
             userId:user.id,
-            // receiveId:'65a4ac2ccd6716d6b33286c5',
-            channelId:selectedChat.id,
-            // chatId:'65b0ccddaf9c3c58daa98515',
-            
+            channelId:selectedChat.id,      
+            // token:token
           }
-       
-
           if(socket){
              socket.emit('sendThread',Thread)
           }
-         
+          setwordChat(event.target.value)
           event.target.value = '';
+          setLoadingsending(true)
+          setInputValue('')
       }
     }
-
-
   return (
-    <div className='contentGroupChat flex flex-grow justify-end  flex-col'>
-    {<Spin indicator={antIcon} style={{ fontSize: '100px' }} className='justify-center m-auto'/>}
-    {/* <ScrollAbleChat messages={messages}/> */}
-    {/* {<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""}  */}
-                <Input
-              onKeyPress={handleKeyPress}
-              // onChange={handleChange}
-              // onFocus={() => { handleChangInputChatFocus() }}
-              placeholder='Nhập @, tin nhắn mới ???'
-              // onBlur={() => { handleChangInputChatBlur() }}
-              // value={inputValue}
-              className='rounded-none h-14 w-full  placeholder-gray-500 to-black'
-            />
-
-</div>
+    <>
+   
+      <div>
+      {
+       <div className='contentGroupChat flex flex-grow justify-end  flex-col'>
+        {loadingSelectChat?<Spin indicator={antIcon} style={{ fontSize: '100px' }} className='justify-center m-auto'/>:<>
+        <ScrollChat Channelid={Channelid} loadingsending={loadingsending} wordchat={wordchat}/>
+      {/* {<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""}  */}
+                  <Input
+                onChange={(e) => {setInputValue(e.target.value)}}
+                onKeyPress={handleKeyPress}
+                placeholder='Nhập @, tin nhắn mới ???'
+                value={inputValue}
+                className='rounded-none h-14 w-full  placeholder-gray-500 to-black'
+              />
+        </>}
+  
+  </div>}
+  </div>
+   
+    </>
+   
   )
 }

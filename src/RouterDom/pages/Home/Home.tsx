@@ -8,6 +8,7 @@ import TabLeft from "./areaLeft/TabLeft";
 import AreaRight from "./areaRight/AreaRight";
 import { SearchPage } from "./araCenter/Search/Search";
 import SearchUserAddChat from "./araCenter/Search/SearchUserAddSingleChat";
+
 export default function Home() {
   const dispatch = useDispatch();
   const [tabCurrent, setTabCurrent] = useState("measages");
@@ -45,6 +46,7 @@ export default function Home() {
       
       
       </div>
+   
     </div>
   );
 }

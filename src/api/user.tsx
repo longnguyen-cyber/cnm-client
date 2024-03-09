@@ -17,25 +17,33 @@ const UserApi={
         return axiosClient.post(url,data)
     },
     UserSearch:(payload: { name: string })=>{
-        const url = `users/search/${payload.name}`;
+        const url = `/users/search/${payload.name}`;
         console.log(url)
         return axiosClient.get(url)
     },
     UserCreateChannel:(payload: any)=>{
-        const url = `channels`;
+        const url = `/channels`;
         return axiosClient.post(url,payload)
     },
     UserCreateSingleChat:(payload: any)=>{
-        const url = `chats`;
+        const url = `/chats`;
         return axiosClient.post(url,payload)
     },
     UserGetAllChannel:()=>{
-        const url = `channels`;
+        const url = `/channels`;
         return axiosClient.get(url)
     },
     UserGetAllSingleChat:()=>{
-        const url = `chats`;
+        const url = `/chats`;
         return axiosClient.get(url)
     },
+    UserGetChannelById:(payload: { id: string })=>{
+        const url = `/channels/${payload.id}`;
+        return axiosClient.get(url)
+    },
+    UserGetChatsSingleById(payload: { id: string }) {
+        const url = `/chats/${payload.id}`;
+        return axiosClient.get(url)
+    }
 }
 export default UserApi

@@ -89,7 +89,7 @@ const userSlide = createSlice({
     state.loading = false;
   })
   builder.addCase(userSeach.fulfilled, (state:any, action) => {
-    state.UserSlice = action.payload
+    state.UserSlice = action.payload.data
     console.log(state.UserSlice)
     state.loading = false;
   })

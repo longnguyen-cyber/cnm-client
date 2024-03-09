@@ -3,20 +3,20 @@ import React, { FunctionComponent } from 'react'
 import { LoadingOutlined } from '@ant-design/icons';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats})=> {
-    console.log(ListSingleChat)
+ console.log(ListSingleChat)
   return (
     <div className='flex flex-col-reverse gap-3'>
     {
-       !Loading&&ListSingleChat?ListSingleChat?.map((itemChat: any, index: number) => (
+       !Loading?ListSingleChat?.map((itemChat: any, index: number) => (
             <div key={index} className="flex items-center pl-1 cursor-pointer" onClick={()=>{setselectedChats(itemChat)}}>
             <div className="flex-shrink-0">
               <div className="flex flex-wrap w-14 justify-center items-center">
-                  <img key={index} className="w-14 h-14 rounded-full" src={`${itemChat?itemChat.userReceive.avatar:""}`} alt="Avatar 1" />
+                  <img key={index} className="w-14 h-14 rounded-full" src={`${itemChat?itemChat.user.avatar:""}`} alt="Avatar 1" />
               </div>
             </div>
             <div className="flex-grow ml-4">
               <div className="flex items-center">
-                <h4 className="text-lg font-medium">{itemChat.userReceive.name}</h4>
+                <h4 className="text-lg font-medium">{itemChat.user.name}</h4>
               </div>
               <div className="text-gray-500">
                 {itemChat.latesMessage ?

@@ -24,9 +24,13 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
         const idUser= UserLogin?UserLogin.id:null;
         if(UserLogin){
           navigate('/home')
-          const newSocket = io("http://localhost:8000/", {
-            auth: { idUser },
+          const newSocket = io("http://103.72.96.143:8081/", {
+            auth: { 
+              Authorization: `Bearer ${UserLogin.token}`
+             },
+           
           })
+          
           setSocket(newSocket);
           setUser(UserLogin)
           if(UserLogin.token){

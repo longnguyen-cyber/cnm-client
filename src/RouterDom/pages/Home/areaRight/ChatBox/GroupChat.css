@@ -1,4 +1,49 @@
 .contentGroupChat{
     min-height: 95vh;
-    overflow: hidden;
+    
 }
+.chatBox{
+    margin: 0px;
+   display: grid;
+    grid-template-columns: 1fr 400px;
+}
+.no-outline:focus {
+    outline: none;
+  }
+  .content_Scroll {
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: scroll;
+  }
+  
+.content_Scroll::-webkit-scrollbar-track{
+    display: none;
+  
+}
+
+.content_Scroll::-webkit-scrollbar{
+    display: none;
+    width: 8px;
+}
+.content_Scroll::-webkit-scrollbar{
+   display: block;    
+}
+.content_Scroll::-webkit-scrollbar-thumb{
+    border-radius: 50px;
+    background-image: linear-gradient(-45deg,rgba(155, 155, 155, 0.823), rgb(213, 212, 212));
+}
+ 
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  

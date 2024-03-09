@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserGetAllChannel, UserGetAllSingleChat } from "./pathApi";
+import { UserGetAllChannel,UserGetChannelById,UserGetChatsSingleById, UserGetAllSingleChat } from "./pathApi";
 
 
 const initialState :any={
@@ -7,7 +7,12 @@ const initialState :any={
     channelsSlide:[],
     loading:false,
     loadingSingChat:false,
-    loadingChannelChat:false
+    loadingChannelChat:false,
+    channelId:null,
+    loadingchanneid:false,
+    loadingchatSingleId:false,
+    chatSingleId:null
+
 
 }
 
@@ -37,6 +42,33 @@ const ChatSlide=createSlice({
       state.chatSingleSlide = action.payload.data
       state.loadingSingChat = false;
     })
+    builder.addCase(UserGetChannelById.pending, (state, action) => {
+      state.loadingchanneid = true;
+      
+    })
+    builder.addCase(UserGetChannelById.rejected, (state, action) => {
+      state.loadingchanneid = false;
+    })
+    builder.addCase(UserGetChannelById.fulfilled, (state: any, action) => {
+      state.channelId = action.payload.data
+      state.loadingchanneid = false;
+   
+    })
+
+    builder.addCase(UserGetChatsSingleById.pending, (state, action) => {
+      state.loadingchatSingleId = true;
+
+    })
+    builder.addCase(UserGetChatsSingleById.rejected, (state, action) => {
+      state.loadingchatSingleId = false;
+    })
+    builder.addCase(UserGetChatsSingleById.fulfilled, (state: any, action) => {
+      state.chatSingleId = action.payload.data
+      state.loadingchatSingleId = false;
+    })
+
+
+
     }
 })
 
