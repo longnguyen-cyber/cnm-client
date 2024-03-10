@@ -4,35 +4,6 @@
 
 import { IUser } from "../../../../../Type";
 
-//nếu tin nhắn phía sau khác người 
-// export const isSamMessageUser=(messages:any,m:any,i:number,user:IUser)=>{
-//     return (
-//                i<messages.length-1&&
-//                (messages[i+1].senderId!=m.senderId||messages[i+1].senderId===undefined)&&messages[i].senderId!==user.id
-//     )
-// }
-// export const isLastMessage = (messages:any, i:number, userId:String) => {
-//   return (
-//     i === messages.length - 1 &&
-//     messages[messages.length - 1].senderId !== userId &&
-//     messages[messages.length - 1].senderId
-//   );
-// };
-// export const isMessagesUserMargin=(messages:any,m:any,i:number,user:IUser)=>{
-//   console.log(messages[i+1].senderId)
-
-//       if(i<messages.length-1&&messages[i+1].senderId===m.senderId&&messages[i+1].senderId!==user.id){
-//         return 'ml-16'
-        
-//       }
-//       else if(i<messages.length-1&&messages[i+1].senderId!=m.senderId&&messages[i].senderId!==user.id||(i===messages.length-1&&messages[i].senderId!==user.id)){
-//         return 'ml-2'
-//       }
-//       else{
-//         return 'ml-auto pr-5'
-//       }
-
-// }
 export const isSameSenderMargin = (messages:any, m:any, i:any, userId:string) => {
   // console.log(i === messages.length - 1);
 

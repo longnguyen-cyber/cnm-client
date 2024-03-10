@@ -4,24 +4,31 @@ import { LoadingOutlined } from '@ant-design/icons';
 import './GroupChat.css'
 import { UserContext } from '../../../../../Context/UserContext';
 import {ScrollChat} from './ScrollChat';
-export const  GroupChat:FunctionComponent<any>=({loading,Channelid,submitChatSuccess})=> {
+import { useDispatch, useSelector } from 'react-redux';
+import { UserGetChannelById } from '../../../../../feature/chat/pathApi';
+export const  GroupChat:FunctionComponent<any>=({})=> {
   const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
+  const Channelid = useSelector((state: any) => state.Chats.channelId)
+  const dispatch = useDispatch();
   const UserContexts = useContext(UserContext);
   const { state } = UserContexts;
   const [user, setUser] = state.user;
   const { socket } = state
-  const [token, setToken] = state.token
   const [selectedChat,setselectedChats]=state.selectedChat;
   const [loadingsending,setLoadingsending]=useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [DataSocket,setDataSocket]=useState<any>(null)
   const [wordchat,setwordChat]=useState('')
   const [loadingSelectChat,setLoadingSelectChat]=useState(false)
-
+  useEffect(() => {
+    if (selectedChat.id) {
+      dispatch<any>(UserGetChannelById({ id: selectedChat.id }));
+    }
+  }, [DataSocket])
     useEffect(() => {
       if(socket){
         socket.on("updatedSendThread",(data:any)=>{
-          submitChatSuccess(data);
-          console.log(data)
+          setDataSocket(data)
           setTimeout(()=>{
             setLoadingsending(false)
             setwordChat('')
@@ -38,10 +45,8 @@ export const  GroupChat:FunctionComponent<any>=({loading,Channelid,submitChatSuc
       }
       setTimeout(() => {
         setLoadingSelectChat(false)
-      }, 2800);
+      }, 3000);
     },[selectedChat.id])
-
-   
       const handleKeyPress = (event:any) => {
         if (event.key === 'Enter') {
           const Thread={

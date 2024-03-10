@@ -1,7 +1,7 @@
 import axios from "axios";
 import queryString from "query-string";
 
-const REACT_APP_API_URL = "http://103.72.96.143:8081/api/";
+const REACT_APP_API_URL = "http://localhost:8080/api/";
 
 const axiosClient = axios.create({
   baseURL: REACT_APP_API_URL,

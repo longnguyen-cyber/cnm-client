@@ -24,25 +24,22 @@ import { InformationChat } from './InformationChat';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ChatBox = () => {
   const UserContexts = useContext(UserContext);
-  const Channelid = useSelector((state: any) => state.Chats.channelId)
   const loadingchanneid = useSelector((state: any) => state.Chats.loadingchanneid)
   const dispatch = useDispatch();
   const { state } = UserContexts;
   const [selectedChat, setselectedChats] = state.selectedChat;
   const [submitSuccess, setSubmitSuccess] = useState(null);
-  console.log(selectedChat)
+
   useEffect(() => {
     if (selectedChat.id) {
       dispatch<any>(UserGetChannelById({ id: selectedChat.id }));
     }
   }, [selectedChat.id, submitSuccess])
 
-
   useEffect(() => {
     if(selectedChat.id){
       dispatch<any>(UserGetChannelById({ id: selectedChat.id }));
     }
-
   }, [submitSuccess])
 
   const submitChatSuccess = (data: any) => {
@@ -70,7 +67,6 @@ export const ChatBox = () => {
                          <ChatSingleSend selectedChat={selectedChat}/>
                         </>
                         :
-
                         selectedChat.users ?
                           <>
                             <div>
@@ -92,7 +88,7 @@ export const ChatBox = () => {
 
                               <div className='bg-gray-300'>
                                 {<>
-                                  <GroupChat loading={loadingchanneid} Channelid={Channelid} submitChatSuccess={submitChatSuccess}/>
+                                  <GroupChat loading={loadingchanneid}  submitChatSuccess={submitChatSuccess}/>
                                 </>}
                               </div>
                             </div>
@@ -103,23 +99,16 @@ export const ChatBox = () => {
                           </div>
                     }
                   </div>
-
                     <InformationChat selectedChat={selectedChat}/>
                 </div>
-
               }
-
             </div>
           </div>
-
         </>
       ) :
         <div className='flex flex-col  min-h-screen item-center justify-center'>
           <Banner />
         </div>}
-
-
-
     </div>
   )
 }

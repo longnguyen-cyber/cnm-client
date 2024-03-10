@@ -9,19 +9,46 @@ import { useDispatch, useSelector } from 'react-redux';
 import { UserCreateSingleChat, userSeach } from '../../../../../feature/user/pathApi';
 import { IUser } from '../../../../../Type';
 import { UserContext } from '../../../../../Context/UserContext';
+import { UserGetAllSingleChat } from '../../../../../feature/chat/pathApi';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const SearchUserAddChat: FunctionComponent<any> = ({ searchValue }) => {
     const contextUser = useContext(UserContext)
     const { state } = contextUser;
     const [user, setUser] = state.user;
+    const {socket}=state;
     const ListUsers = useSelector((state: any) => state.Users.UserSlice);
     const Loading = useSelector((state: any) => state.Users.loading)
+    const [DataSocket,setDataSocket]=useState<any>(null)
+   
     const AddUserChat = (value: any) => {
         if (user) {
-            dispatch<any>(UserCreateSingleChat({ receiveId: value.id }))
+            if(socket){
+                console.log(value)
+                socket.emit('createChat', { receiveId: value.id });
+            }
+           
         }
     }
+
+    useEffect(()=>{
+        if(socket){
+            socket.on("chatWS",(data:any)=>{
+                if(data){
+                    notification["success"]({
+                        message: "Thông báo",
+                        description: "login success",
+                      });
+
+                }
+                setDataSocket(data)
+            })
+        }
+    },[])
+
+    useEffect(()=>{
+        dispatch<any>(UserGetAllSingleChat())
+    },[DataSocket])
 
     const dispatch = useDispatch();
     useEffect(() => {

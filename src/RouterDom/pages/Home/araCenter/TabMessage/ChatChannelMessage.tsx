@@ -4,7 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const ShowChatMessage: FunctionComponent<any> = ({ ListChannel, Loading ,setselectedChats}) => {
-  console.log(ListChannel)
+
 
   return (
     <div className='flex flex-col gap-5 w-full' style={{ width: '100%' }}>

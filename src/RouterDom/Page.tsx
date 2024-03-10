@@ -2,19 +2,19 @@ import { lazy } from "react";
 import { IRouteConfig } from '../Type'
 const LoginPage = lazy(() => {
   return new Promise((resolve: any) => {
-    setTimeout(() => resolve(import('./pages/GroupLoginRegister/Index')), 300)
+    setTimeout(() => resolve(import('./pages/GroupLoginRegister/Index')), 100)
   })
 })
 
 const Register = lazy(() => {
   return new Promise((resolve: any) => {
-    setTimeout(() => resolve(import('./pages/register/Register')), 300)
+    setTimeout(() => resolve(import('./pages/register/Register')), 100)
   })
 })
 
 const Home = lazy(() => {
   return new Promise((resolve: any) => {
-    setTimeout(() => resolve(import('./pages/Home/Home')), 300)
+    setTimeout(() => resolve(import('./pages/Home/Home')), 100)
   })
 })
 

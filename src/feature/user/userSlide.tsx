@@ -121,6 +121,7 @@ const userSlide = createSlice({
     })
     builder.addCase(UserCreateSingleChat.fulfilled, (state, action) => {
       state.loading = false;
+      console.log(action.payload)
       notification['success']({
         message:'Thông báo',
         description:'Thêm bạn thành công '

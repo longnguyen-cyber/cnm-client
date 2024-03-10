@@ -1,15 +1,16 @@
 import React, { FunctionComponent, useContext, useEffect, useRef } from 'react'
 import { UserContext } from '../../../../../Context/UserContext'
-import { isLastMessage, isSameSender, isSameSenderMargin, isSameUser } from './ConfigUserChatBox';
+import { isLastMessage, isSameSender, isSameSenderMargin, isSameUser } from './ConfigUserChatSingle';
 import { format } from 'date-fns';
 import './GroupChat.css'
 import { CiClock1 } from "react-icons/ci";
 import { TiTickOutline } from "react-icons/ti";
 import ScrollableFeed from "react-scrollable-feed";
-export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,wordchat}) => {
+export const ScrollChatSingle: FunctionComponent<any> = ({ Channelid ,loadingsending,wordchat}) => {
     const ContexChat = useContext(UserContext);
     const { state } = ContexChat;
     const [users, setUser] = state.user
+  
     const chatContainerRef = useRef<any>(null);
     const fadeInClass = "fade-in";
     useEffect(() => {
@@ -17,9 +18,10 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     }, [Channelid,wordchat]);
+
     return (
       <div>
-      {Channelid && (
+      {Channelid &&Channelid.threads&& (
         <div className='content_Scroll' ref={chatContainerRef}>
           {Channelid.threads
             .slice()
@@ -28,16 +30,17 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
               <div style={{ display: "flex", marginLeft:'20px' }} key={m._id}>
                 {(isSameSender(messagesArray, m, i, users.id) ||
                   isLastMessage(messagesArray, i, users.id)) && (
+                    
                    <img
                       src={`${m.user.avatar}`}
                       className="w-12 h-12 rounded-full"
-                      style={{marginLeft:"-20px",marginTop:'10px'}}
+                      style={{marginLeft:"-20px",marginTop:'-10px'}}
                    />
                 )}
                 <span
                   style={{
                     backgroundColor: `${
-                      m.senderId === users.id ? "white" : "white"
+                      m.user.senderId === users.id ? "white" : "white"
                     }`,
                     marginLeft: isSameSenderMargin(messagesArray, m, i, users.id),
                     marginTop: isSameUser(messagesArray, m, i) ? 5 : 10,
@@ -49,7 +52,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                 >
                   <p>{m.messages.message}</p>
                   <span className="text-sm text-gray-500">
-                    {/* {format(new Date(String(m.updatedAt)), "HH:mm")} */}
+                    {format(new Date(String(m.createdAt)), "HH:mm")}
                   </span>
                 </span>
               </div>
