@@ -8,22 +8,25 @@ import { Upload } from "antd";
 import ImgCrop from "antd-img-crop";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 import UserApi from "../../../api/user";
+import { useNavigate } from "react-router-dom";
+import { on } from "events";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 type FieldType = {
   name: string;
   password: string;
   confirmPassword: string;
-  displayName: string;
-  status: string;
-  phone: string;
+  // displayName: string;
+  // status: string;
+  // phone: string;
   email: string;
-  avatar: any;
+  // avatar: any;
 };
 
 export default function Register() {
   const dispatch = useDispatch();
   const loading = useSelector((state: any) => state.Users.loading);
+  const navigate = useNavigate();
 
   const [fileAvatar, setFileAvatar] = useState<UploadFile | undefined>();
   // change file avatar
@@ -55,17 +58,18 @@ export default function Register() {
   };
 
   const handleRegister = async (values: IRegister) => {
+    // delete values.confirmPassword;
     try {
-      // const response = await UserApi.UserRegister(values);
-      // Handle the response here
-      console.log('aaaaaaa', fileAvatar)
-
-      const formData = {
-        ...values,
-        avatar: fileAvatar?.thumbUrl,
-      };
-      // console.log('values', formData)
-      dispatch<any>(userRegister({ ...values, avatar: fileAvatar}));
+      const response = await UserApi.UserRegister({
+        name: values.name,
+        password: values.password,
+        email: values.email,
+      });
+      if (response) {
+        navigate("/");
+      }
+      console.log(response);
+    
     } catch (error) {
       // Handle the error here
     }
@@ -81,9 +85,9 @@ export default function Register() {
         onFinish={handleRegister}
       >
         <Form.Item<FieldType>
-          label="Username"
+          label="Tên đăng nhập"
           name="name"
-          rules={[{ required: true, message: "Please input your username!" }]}
+          rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
         >
           <Input />
         </Form.Item>
@@ -91,9 +95,7 @@ export default function Register() {
         <Form.Item<FieldType>
           label="Email"
           name="email"
-          rules={[
-            { required: true, message: "Please input your email address!" },
-          ]}
+          rules={[{ required: true, message: "Vui lòng nhập địa chỉ email!" }]}
         >
           <Input />
         </Form.Item>
@@ -107,21 +109,21 @@ export default function Register() {
           <Input />
         </Form.Item> */}
         <Form.Item<FieldType>
-          label="Password"
+          label="Mật khẩu"
           name="password"
-          rules={[{ required: true, message: "Please input your password!" }]}
+          rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
         >
           <Input.Password />
         </Form.Item>
         <Form.Item
           name="confirmPassword"
-          label="Confirm Password"
+          label="Xác nhận mật khẩu"
           dependencies={["password"]}
           hasFeedback
           rules={[
             {
               required: true,
-              message: "Please confirm your password!",
+              message: "Vui lòng xác nhận lại mật khẩu!",
             },
             ({ getFieldValue }) => ({
               validator(rule, value) {
@@ -164,8 +166,8 @@ export default function Register() {
         >
           <Input />
         </Form.Item> */}
-        
-        <Form.Item
+
+        {/* <Form.Item
           name="avatar"
           valuePropName="fileList"
           getValueFromEvent={normFile}
@@ -181,7 +183,7 @@ export default function Register() {
               {!fileAvatar && "+ Upload"}
             </Upload>
           </ImgCrop>
-        </Form.Item>
+        </Form.Item> */}
 
         <Form.Item>
           <Button
@@ -192,7 +194,7 @@ export default function Register() {
             {loading && (
               <Spin indicator={antIcon} className="text-white mr-3" />
             )}{" "}
-            Register
+            Đăng ký
           </Button>
           {/* <Button type="primary" className='w-full mt-4 mb-2 border-r h-12 border-gray-200' ghost>
             Gửi yêu cầu để đăng nhập
