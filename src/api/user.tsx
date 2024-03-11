@@ -44,6 +44,10 @@ const UserApi={
     UserGetChatsSingleById(payload: { id: string }) {
         const url = `/chats/${payload.id}`;
         return axiosClient.get(url)
-    }
+    },
+    UserUpdate: (payload: any) => {
+      const url = `users/update`;
+      return axiosClient.put(url, payload);
+    },
 }
 export default UserApi
