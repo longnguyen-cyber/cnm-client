@@ -12,6 +12,7 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
     const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
     const chatSingleId = useSelector((state: any) => state.Chats.chatSingleId)
     const dispatch = useDispatch();
+    
     if(chatSingleId){
       console.log(chatSingleId)
     }
@@ -23,17 +24,19 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
     const { state } = contextUser
     const [user, setUser] = state.user
     const {socket}=state
+
+    
     const [wordchat,setwordChat]=useState('')
     const [loadingSelectChat,setLoadingSelectChat]=useState(false)
     const [loadingsending,setLoadingsending]=useState(false);
     const [DataSocket,setDataSocket]=useState<any>(null)
-
+    const [checkRender,setScheckRender]=state.checkRender
     useEffect(()=>{
       if(selectedChat.id){
         dispatch<any>(UserGetChatsSingleById({ id: selectedChat.id }));
       }
    
-    },[selectedChat.id,DataSocket])
+    },[selectedChat.id,DataSocket,checkRender])
 
     const getSelectUserIsChoose = (selectedChat: any) => {
         return (
@@ -46,7 +49,10 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
                   <img src={`${selectedChat.user.avatar}`} className='w-12 h-12 rounded-full' />
                   <div>
                     <p className='text-xl font-medium '>{selectedChat.user.name}</p>
-                    <AiOutlineTags color='gray' className='mt-1' />
+                    <div className='flex'>
+                       <AiOutlineTags color='gray' className='mt-1' /><p>Bạn bè</p>
+                    </div>
+                  
                   </div>
     
                 </div>}
@@ -87,7 +93,7 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
                 message:event.target.value
               },
               chatId:selectedChat.id, 
-              receiveId:user.id,
+              receiveId:selectedChat.user.id,
             }
 
             console.log(Thread)

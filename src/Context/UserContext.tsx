@@ -7,7 +7,6 @@ import { IUser } from '../Type';
 import { useNavigate } from 'react-router-dom';
 const UserContext=createContext<any>(null);
 const tokenLocal:any=localStorage.getItem('tokenUser');
-console.log(tokenLocal)
 const userTokenString:any=localStorage.getItem('user');
 const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const dispatch=useDispatch()
@@ -17,14 +16,17 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const [socket, setSocket] = useState<Socket>(null!);
     const [token,setToken]=useState<string|null>(null);
     const [selectedChat, setselectedChats] = useState<any>([]);
+    const [userSelect,setUserSelect]=useState<any>(null);
+    const [checkRender,setScheckRender]=useState<any>(null);
     useEffect(()=>{
       
       async function connectSocket(){
         const UserLogin:IUser=JSON.parse(userTokenString);
+        console.log(UserLogin)
         const idUser= UserLogin?UserLogin.id:null;
         if(UserLogin){
           navigate('/home')
-          const newSocket = io("http://localhost:8080/", {
+          const newSocket = io(`${process.env.REACT_APP_API_URL_SocketIo}`, {
             auth: { 
               Authorization: `Bearer ${UserLogin.token}`
              },
@@ -47,7 +49,9 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
       idUser: [idUser, setIdUser],
       token: [token, setToken],
       socket: socket,
-      selectedChat: [selectedChat, setselectedChats]
+      selectedChat: [selectedChat, setselectedChats],
+      userSelect:[userSelect,setUserSelect],
+      checkRender:[checkRender,setScheckRender]
     };
 
     return (

@@ -1,8 +1,16 @@
 import { lazy } from "react";
 import { IRouteConfig } from '../Type'
+import ForgotPassword from "./pages/login/ForgotPassword/ForgotPassword";
+
 const LoginPage = lazy(() => {
   return new Promise((resolve: any) => {
     setTimeout(() => resolve(import('./pages/GroupLoginRegister/Index')), 100)
+  })
+})
+
+const ActiveEmail = lazy(() => {
+  return new Promise((resolve: any) => {
+    setTimeout(() => resolve(import('./pages/register/ActiveEmail')), 100)
   })
 })
 
@@ -37,6 +45,14 @@ const AllPage: any = [
     path: '/home',
     main: <Home />,
   },
+  {
+    path:'auth/verify-email',
+    main:<ActiveEmail/>
+  },
+  {
+    path:'/forgot-password',
+    main:<ForgotPassword/>
+  }
 
 ];
 export default AllPage

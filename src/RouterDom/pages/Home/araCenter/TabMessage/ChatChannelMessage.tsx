@@ -4,8 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const ShowChatMessage: FunctionComponent<any> = ({ ListChannel, Loading ,setselectedChats}) => {
-
-
+ 
   return (
     <div className='flex flex-col gap-5 w-full' style={{ width: '100%' }}>
       {
@@ -25,6 +24,8 @@ const ShowChatMessage: FunctionComponent<any> = ({ ListChannel, Loading ,setsele
               {format(new Date(String(item.timeThread)), "HH:mm")}
             </div>
             <div className="text-gray-500">
+             
+             
               {item.lastedThread ?
               <div className='flex justify-between'>
             {item.lastedThread.messages.message

@@ -28,20 +28,20 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
   const contextUser = useContext(UserContext)
   const { state } = contextUser;
   const [user, setUser] = state.user;
+  const {socket}=state
   const [loading, setLoading] = useState(false);
   const navigate=useNavigate()
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  useEffect(() => {
-    if (submitSuccess) {
-      // Gọi các hành động bạn muốn thực hiện khi submit thành công
-      dispatch<any>(UserGetAllChannel());
-      // Có thể thực hiện các hành động khác tại đây
-      setSubmitSuccess(false); // Đặt lại trạng thái submit thành công để tránh lặp lại
-    }
-  }, [submitSuccess, dispatch]);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  // useEffect(() => {
+  //   if (submitSuccess) {
+  //     // Gọi các hành động bạn muốn thực hiện khi submit thành công
+  //     dispatch<any>(UserGetAllChannel());
+  //     // Có thể thực hiện các hành động khác tại đây
+  //     setSubmitSuccess(false); // Đặt lại trạng thái submit thành công để tránh lặp lại
+  //   }
+  // }, [submitSuccess, dispatch]);
   
-
-
   const bagTag = [
     'bg-blue-400',
     'bg-red-400',
@@ -68,6 +68,32 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
     }
   }, [search])
 
+  useEffect(() => {
+    return () => {
+      setShowSuccessNotification(false);
+    };
+  }, []);
+
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('channelWS', (data: any) => {
+        console.log(data);
+        if (data && !showSuccessNotification) { // Kiểm tra xem thông báo đã được hiển thị hay chưa
+          setShowSuccessNotification(true); // Đánh dấu rằng thông báo đã được hiển thị
+          notification["success"]({
+            message: "Thông báo",
+            description: "Tạo nhóm thành công",
+          });
+          formRef.current?.resetFields();
+          dispatch<any>(UserGetAllChannel());
+          setLoading(false);
+          setSubmitSuccess(true);
+        }
+      });
+    }
+  }, [socket, showSuccessNotification]);
+
   const CreateGroup = async (value: any) => {
     setLoading(true)
     if (value) {
@@ -77,25 +103,8 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
         userCreated: user ? user.id : '',
         members: selectedUsers.map((item: IUser) => item.id),
       };
-      // Optimistically update the UI
-      setTimeout(() => {
-        notification["success"]({
-          message: "Thông báo",
-          description: "Tạo nhóm thành công",
-        });
-        formRef.current?.resetFields();
-        setLoading(false);
-        setSubmitSuccess(true); 
-      }, 2000);
-      try {
-        // Dispatch the action
-        dispatch<any>(UserCreateChannel(channel)); 
-        dispatch<any>(UserGetAllChannel());
-       
-      
-        // Handle success if needed
-      } catch (error) {
-        // Handle error if needed
+      if(socket){
+        socket.emit('createChannel',channel)
       }
     }
   };

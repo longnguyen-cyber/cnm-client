@@ -5,7 +5,7 @@
 import { IUser } from "../../../../../Type";
 
 export const isSameSenderMargin = (messages:any, m:any, i:any, userId:string) => {
-  console.log(messages)
+
   // console.log(i === messages.length - 1);
 
   if (
@@ -25,7 +25,7 @@ export const isSameSenderMargin = (messages:any, m:any, i:any, userId:string) =>
 };
 
 export const isSameSender = (messages:any, m:any, i:any, userId:any) => {
-  console.log(messages)
+
   return (
     i < messages.length - 1 &&
     (messages[i + 1].user.id !== m.user.id||
@@ -35,7 +35,7 @@ export const isSameSender = (messages:any, m:any, i:any, userId:any) => {
 };
 
 export const isLastMessage = (messages:any, i:any, userId:any) => {
-  console.log(messages)
+
   return (
     i === messages.length - 1 &&
     messages[messages.length - 1].user.id !== userId &&
@@ -44,6 +44,6 @@ export const isLastMessage = (messages:any, i:any, userId:any) => {
 };
 
 export const isSameUser = (messages:any, m:any, i:any) => {
-  console.log(messages)
+
   return i > 0 && messages[i - 1].user.id=== m.user.id;
 };

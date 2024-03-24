@@ -5,7 +5,7 @@ import { MdDelete } from 'react-icons/md'
 import { IoIosLogOut } from 'react-icons/io'
 import { RiUserAddFill } from 'react-icons/ri'
 
-export const InformationChat:FunctionComponent<any>=({selectedChat})=> {
+export const InformationChat:FunctionComponent<any>=({selectedChat,user})=> {
   return (
   
     <div className='col-md-2 h-full overflow-y-auto relative'>
@@ -16,13 +16,19 @@ export const InformationChat:FunctionComponent<any>=({selectedChat})=> {
       <div className='flex justify-center items-center '>
         {
           typeof selectedChat === 'object' && selectedChat !== null ?
-
+        
             selectedChat.receiveId ?
               <div className='flex gap-3 items-center px-5'>
                 <img src={`${selectedChat.user ? selectedChat.user.avatar : ""}`} className='w-16 h-16 mt-8 rounded-full' />
                 <div>
                 </div>
               </div> :
+                   !selectedChat.receiveId &&      !selectedChat.users ?
+      
+               <div className='flex gap-3 items-center px-5'>
+                           <img src={`${selectedChat ? selectedChat.avatar : ""}`} className='w-16 h-16 mt-8 rounded-full' />
+               </div>
+                   :
               <>
                 <div className="flex flex-wrap w-24  justify-center mt-8  items-center">
 
@@ -43,7 +49,20 @@ export const InformationChat:FunctionComponent<any>=({selectedChat})=> {
               <p className='text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2'><MdDelete /> Xóa nhóm</p>
               <p className='text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2'><IoIosLogOut /> Rời nhóm chat</p>
             </div>
-          </> : <div>
+          </> :
+          
+          !selectedChat.receiveId &&      !selectedChat.users ?
+<>
+            <p style={{ fontSize: '25px', fontWeight: "500px" }} className='text-center mt-2 font-semibold'>{selectedChat.name}</p>
+            <div className='absolute bottom-1 p-2'>
+              <p className='text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2'><CiWarning />Xóa lịch sử nhóm chat </p>
+              <p className='text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2'><MdDelete /> Xóa nhóm</p>
+              <p className='text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2'><IoIosLogOut /> Rời nhóm chat</p>
+            </div>
+          </> 
+      :
+          
+          <div>
             <p style={{ fontSize: '25px', fontWeight: "500px" }} className='text-center mt-2  mb-4 font-semibold'>{selectedChat.name}</p>
             <div className=' flex justify-center items-center h-16 w-auto border border-gray-200 border-l border-gray-200'>
               <p className='font-medium text-xl'>Thành viên  </p>

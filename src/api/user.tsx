@@ -23,6 +23,7 @@ const UserApi={
     },
     UserCreateChannel:(payload: any)=>{
         const url = `channels`;
+        console.log(payload)
         return axiosClient.post(url,payload)
     },
     UserCreateSingleChat:(payload: any)=>{
@@ -38,12 +39,18 @@ const UserApi={
         return axiosClient.get(url)
     },
     UserGetChannelById:(payload: { id: string })=>{
+        console.log(payload)
         const url = `/channels/${payload.id}`;
         return axiosClient.get(url)
     },
     UserGetChatsSingleById(payload: { id: string }) {
         const url = `/chats/${payload.id}`;
         return axiosClient.get(url)
+    },
+    UserFotGotPassword(payload:any){
+        const url='users/forgot-password';
+        return axiosClient.post(url,payload)
     }
+
 }
 export default UserApi

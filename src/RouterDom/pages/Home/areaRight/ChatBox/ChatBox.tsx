@@ -1,26 +1,23 @@
 import React, { useContext, useEffect, useState, useRef } from 'react'
-import { notification, message } from 'antd'
+
 import { AiOutlineTags, AiOutlineArrowLeft } from "react-icons/ai";
-import { Form, Input } from 'antd';
-import { CiWarning } from "react-icons/ci";
-import { MdDelete } from "react-icons/md";
-import { IoIosLogOut } from "react-icons/io";
+
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { LoadingOutlined } from '@ant-design/icons';
-import { Spin } from 'antd';
-import { RiUserAddFill } from "react-icons/ri";
-import axios from 'axios';
+
 import { UserContext } from '../../../../../Context/UserContext';
 import { IUser } from '../../../../../Type';
 import Banner from '../HomeRightReComent/Banner';
 import { GroupChat } from './GroupChat';
 import './GroupChat.css'
-import { ScrollChat } from './ScrollChat';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { UserGetChannelById } from '../../../../../feature/chat/pathApi';
-import { BsDatabaseFill } from 'react-icons/bs';
+
 import {ChatSingleSend} from './ChatSingleSend';
 import { InformationChat } from './InformationChat';
+import { ChaxBoxNoMustFriend } from './ChaxBoxNoMustFriend';
+import InviteFriend from '../../araCenter/InviteFriend/InviteFriend';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ChatBox = () => {
   const UserContexts = useContext(UserContext);
@@ -29,6 +26,8 @@ export const ChatBox = () => {
   const { state } = UserContexts;
   const [selectedChat, setselectedChats] = state.selectedChat;
   const [submitSuccess, setSubmitSuccess] = useState(null);
+  const [user, setUser] = state.user;
+
 
   useEffect(() => {
     if (selectedChat.id) {
@@ -48,7 +47,9 @@ export const ChatBox = () => {
   
   return (
     <div>
-      {typeof selectedChat === 'object' && !Array.isArray(selectedChat) && selectedChat !== null ? (
+      {typeof selectedChat === 'object' && !Array.isArray(selectedChat) && selectedChat !== null ? 
+      
+      (
         <>
           <div>
             <div
@@ -61,12 +62,15 @@ export const ChatBox = () => {
                 <div className='chatBox'>
                   <div className=''>
                     {
-                      selectedChat.receiveId ?
-
+                      selectedChat.receiveId&&selectedChat.isFriend ?
                         <>
-                         <ChatSingleSend selectedChat={selectedChat}/>
+                         <ChatSingleSend selectedChat={selectedChat} setselectedChats={setselectedChats}/>
                         </>
                         :
+                     !selectedChat.users && !selectedChat.isFriend ?
+
+                       <><ChaxBoxNoMustFriend selectedChat={selectedChat}/></>:
+
                         selectedChat.users ?
                           <>
                             <div>
@@ -93,19 +97,22 @@ export const ChatBox = () => {
                               </div>
                             </div>
                           </>
-                          :
+                          : selectedChat==="ketban"?<div>
+                            <p><InviteFriend/></p>
+                          </div>:
                           <div className='flex flex-col  min-h-screen item-center justify-center'>
                             <Banner />
                           </div>
                     }
                   </div>
-                    <InformationChat selectedChat={selectedChat}/>
+                    <InformationChat selectedChat={selectedChat} user={user}/>
                 </div>
               }
             </div>
           </div>
         </>
       ) :
+         selectedChat==="ketban"?<><InviteFriend/></>:
         <div className='flex flex-col  min-h-screen item-center justify-center'>
           <Banner />
         </div>}

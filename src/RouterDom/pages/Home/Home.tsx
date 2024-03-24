@@ -42,9 +42,6 @@ export default function Home() {
       {/* này là phần hiển thị tin nhắn */}
       <div className="areaRight ">
         <AreaRight/>
-
-      
-      
       </div>
    
     </div>

@@ -10,18 +10,17 @@ export const ScrollChatSingle: FunctionComponent<any> = ({ Channelid ,loadingsen
     const ContexChat = useContext(UserContext);
     const { state } = ContexChat;
     const [users, setUser] = state.user
-  
     const chatContainerRef = useRef<any>(null);
     const fadeInClass = "fade-in";
+  
     useEffect(() => {
         if (chatContainerRef.current) {
             chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
     }, [Channelid,wordchat]);
-
     return (
       <div>
-      {Channelid &&Channelid.threads&& (
+      {Channelid && Channelid.threads ? (
         <div className='content_Scroll' ref={chatContainerRef}>
           {Channelid.threads
             .slice()
@@ -57,7 +56,8 @@ export const ScrollChatSingle: FunctionComponent<any> = ({ Channelid ,loadingsen
                 </span>
               </div>
             ))}
-                  {loadingsending && wordchat ?(
+           
+                  {loadingsending && wordchat?(
                 <div className={`flex flex-col items-end w-full ${fadeInClass}`} ref={chatContainerRef}>
                   <p className="bg-white mt-1 rounded mr-4 p-2 mb-1">
                     {wordchat}
@@ -79,7 +79,34 @@ export const ScrollChatSingle: FunctionComponent<any> = ({ Channelid ,loadingsen
               
              }
         </div>
-      )}
+      ):
+      (
+        <div className='content_Scroll' ref={chatContainerRef}>
+                  {loadingsending && wordchat?(
+                <div className={`flex flex-col items-end w-full ${fadeInClass}`} ref={chatContainerRef}>
+                  <p className="bg-white mt-1 rounded mr-4 p-2 mb-1">
+                    {wordchat}
+                    <span className="text-sm text-gray-500">
+                      {/* {format(new Date(String(m.timeThread)), "HH:mm")} */}
+                    </span>
+                  </p>
+                  <p style={{fontSize:'12px'}} className='text-white px-2 mb-2 mt-2 bg-gray-400 flex items-center mr-4 gap-1 rounded-lg'> 
+                    <CiClock1 color='white'/> Đang gửi
+                  </p>
+                </div>
+              ):
+              <>
+              {( <div className='flex flex-col items-end w-full mb-2 py-1'> 
+              <p style={{fontSize:'12px'}} className='text-white px-2 bg-gray-400 flex items-center mr-4 gap-1 rounded-lg'> 
+              <TiTickOutline color='white'/> Delivered
+               </p></div>)}
+              </>
+              
+             }
+        </div>
+      )
+      
+      }
 
               
     </div>

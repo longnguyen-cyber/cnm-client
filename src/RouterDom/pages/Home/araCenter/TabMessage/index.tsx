@@ -5,11 +5,14 @@ import React, { useState, useContext, useEffect, FunctionComponent, useCallback 
 import { AiOutlineDown, AiFillTag, AiOutlineUserAdd } from "react-icons/ai";
 import { BsThreeDots } from "react-icons/bs";
 import { UserContext } from '../../../../../Context/UserContext';
-import ShowChatMessage from './ChatChannelMessage';
+
 import { useDispatch, useSelector } from 'react-redux';
 import './TabMessage.css'
 import { UserGetAllChannel, UserGetAllSingleChat } from '../../../../../feature/chat/pathApi';
 import {ChatSingle} from './ChatSingle';
+import ShowChatMessage from './ChatChannelMessage';
+import ShowChatStranger from './ShowChatStranger';
+
 export default function Tabmessage() {
   const [stateType, setType] = useState(false)
    const UserContexts=useContext(UserContext);
@@ -48,16 +51,19 @@ export default function Tabmessage() {
       <div className='flex relative Tagmessage '>
         <div className='flex-1 flex-shrink-0 '>
           <Tabs >
-            <TabPane tab="Chat đơn" className=' w-full' key="1">
+            <TabPane tab="Bạn bè" className=' w-full' key="1">
               <ChatSingle ListSingleChat={ListSingleChat} Loading={LoadingSingle} setselectedChats={setselectedChats}/>
             </TabPane>
             <TabPane tab="Chat nhóm " key="2">
             <ShowChatMessage ListChannel={ListChannel} Loading={LoadingChannels} setselectedChats={setselectedChats} />
             </TabPane>
+            <TabPane tab="Người lạ " key="3">
+            <ShowChatStranger ListSingleChat={ListSingleChat} Loading={LoadingSingle} setselectedChats={setselectedChats} />
+            </TabPane>
           </Tabs>
         </div>
   
-        <div className='flex ml-auto right-0 mt-3 absolute items-center gap-4 mb-4'>
+        {/* <div className='flex ml-auto right-0 mt-3 absolute items-center gap-4 mb-4'>
           <div className='flex items-center gap-3 relative cursor-pointer'>
             <p className={`text-sm  flex  items-center gap-3 cursor-pointer ${stateType ? "rounded-full transition-all text-blue-600 font-medium px-2 bg-blue-100" : ""}`}
              onClick={() => { setType(stateType == false ? true : false) }}>Phân loại<span><AiOutlineDown size={14} /></span></p>
@@ -94,7 +100,7 @@ export default function Tabmessage() {
             <BsThreeDots />
           </div>
   
-        </div>
+        </div> */}
   
       </div></>:""}
      </>

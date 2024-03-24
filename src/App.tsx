@@ -14,10 +14,14 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import 'swiper/css/autoplay';
 function App() {
+  const dem=process.env.REACT_APP_API_URL
+  console.log(dem)
+  
   const showPageUser = (AllPage: any) => {
     // localStorage.removeItem("user");
     // localStorage.removeItem("tokenUser");
-  
+ 
+
     if (AllPage.length > 0) {
       return AllPage.map((page: any, index: any) => (
         <Route
@@ -41,8 +45,8 @@ function App() {
       <Routes>
         {showPageUser(AllPage)}
         <Route path="/*" element={<NotFound />} />
-      </Routes>
-      {/* <Footer/> */}
+      </Routes> 
+       {/* <Footer/> */}
     </div>
   );
 }

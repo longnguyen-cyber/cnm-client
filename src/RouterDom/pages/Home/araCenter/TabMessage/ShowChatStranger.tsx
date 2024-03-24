@@ -1,16 +1,14 @@
-import { Spin } from 'antd'
-import React, { FunctionComponent } from 'react'
+import { Spin } from 'antd';
+import React, { FunctionComponent } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats})=> {
- 
+export const ShowChatStranger:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats})=> {
   return (
     <div className='flex flex-col-reverse gap-3'>
     {
        !Loading?ListSingleChat?.map((itemChat: any, index: number) => (
-            itemChat.isFriend&&
-        
+        !itemChat.isFriend&&
             <div key={index} className="flex items-center pl-1 cursor-pointer" onClick={()=>{setselectedChats(itemChat)}}>
             <div className="flex-shrink-0">
               <div className="flex flex-wrap w-14 justify-center items-center">
@@ -18,12 +16,12 @@ export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselec
               </div>
             </div>
             <div className="flex-grow ml-4">
-              <div className="flex items-center">
+              <div className="flex items-center  justify-between">
                 <h4 className="text-lg font-medium">{itemChat.user.name}</h4>
                 {format(new Date(String(itemChat.timeThread)), "HH:mm")}
               </div>
               <div className="text-gray-500">
-                   
+                 
               {itemChat.lastedThread ?
               <div className='flex justify-between'>
             {itemChat.lastedThread.messages.message
@@ -51,7 +49,7 @@ export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselec
 
     }
     </div>
+  );
+};
 
-   
-  )
-}
+export default ShowChatStranger;

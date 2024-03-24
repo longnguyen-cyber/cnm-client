@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllUser, userRegister } from "../../../feature/user/pathApi";
 import { IRegister, IUser } from "../../../Type";
-import { Button, Checkbox, Form, Input, Select, Spin } from "antd";
+import { Button, Checkbox, Form, Input, Select, Spin, notification } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Upload } from "antd";
 import ImgCrop from "antd-img-crop";
@@ -27,6 +27,8 @@ export default function Register() {
   const dispatch = useDispatch();
   const loading = useSelector((state: any) => state.Users.loading);
   const navigate = useNavigate();
+  const [loadingmail,setLoadingmail]=useState(false);
+  console.log(loadingmail)
 
   const [fileAvatar, setFileAvatar] = useState<UploadFile | undefined>();
   // change file avatar
@@ -56,22 +58,46 @@ export default function Register() {
     }
     return e && e.fileList;
   };
+  useEffect(() => {
+
+  },[loadingmail])
 
   const handleRegister = async (values: IRegister) => {
     // delete values.confirmPassword;
+    setLoadingmail(true)
     try {
       const response = await UserApi.UserRegister({
         name: values.name,
         password: values.password,
         email: values.email,
       });
+
+  
+      
+
+
+      
+    
       if (response) {
-        navigate("/");
-      }
-      console.log(response);
+           
+          
+        
+           notification["success"]({
+            message: "Thông báo",
+            description: "Vui lòng kiểm tra email để xác nhận đăng ký !",
+          });
+          setLoadingmail(false)
+        }
+      // setLoadingmail(false)
+          // console.log(response)
+      
+    
     
     } catch (error) {
-      // Handle the error here
+      notification["error"]({
+        message: "Thông báo",
+        description: "Vui lòng kiểm tra email để xác nhận đăng ký !",
+      });
     }
   };
 
@@ -191,7 +217,7 @@ export default function Register() {
             className="w-full bg-blue-500 h-12 "
             htmlType="submit"
           >
-            {loading && (
+            {loadingmail && (
               <Spin indicator={antIcon} className="text-white mr-3" />
             )}{" "}
             Đăng ký

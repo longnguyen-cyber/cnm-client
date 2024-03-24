@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-  ]
+, "src/RouterDom/pages/Home/araCenter/TabMessage/ShowChatStranger.tsx"  ]
 }

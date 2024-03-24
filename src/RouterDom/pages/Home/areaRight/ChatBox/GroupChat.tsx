@@ -6,6 +6,7 @@ import { UserContext } from '../../../../../Context/UserContext';
 import {ScrollChat} from './ScrollChat';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserGetChannelById } from '../../../../../feature/chat/pathApi';
+import UserApi from '../../../../../api/user';
 export const  GroupChat:FunctionComponent<any>=({})=> {
   const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
   const Channelid = useSelector((state: any) => state.Chats.channelId)
@@ -20,15 +21,28 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
   const [DataSocket,setDataSocket]=useState<any>(null)
   const [wordchat,setwordChat]=useState('')
   const [loadingSelectChat,setLoadingSelectChat]=useState(false)
+  const [channelIdNew, setChatSingleIdNew] = useState<{ threads: any[] }>({ threads: [] });
+
+  console.log(channelIdNew)
   useEffect(() => {
-    if (selectedChat.id) {
-      dispatch<any>(UserGetChannelById({ id: selectedChat.id }));
+     async function  GetChannelById(){
+      if (selectedChat.id) {
+        const dataChannels = await UserApi.UserGetChannelById({ id: selectedChat.id });
+        if (dataChannels) {
+          setChatSingleIdNew(dataChannels.data)
+        }
+      }
     }
-  }, [DataSocket])
+    GetChannelById();
+  }, [DataSocket, selectedChat.id]);
     useEffect(() => {
       if(socket){
         socket.on("updatedSendThread",(data:any)=>{
-          setDataSocket(data)
+          if(data){
+         
+            setDataSocket(data)
+          }
+        
           setTimeout(()=>{
             setLoadingsending(false)
             setwordChat('')
@@ -57,10 +71,30 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
             channelId:selectedChat.id,      
             // token:token
           }
+          const dataPush={
+            channelId:selectedChat.id,
+            senderId:user.id,
+            messages:{
+              message:event.target.value
+            },
+            user
+          }
+
+          if(dataPush){
+            const newThreads = [...channelIdNew.threads, dataPush];
+            setChatSingleIdNew({ ...channelIdNew, threads: newThreads });
+           
+          }
+         
+
+
+
+
+          console.log(Thread)
           if(socket){
              socket.emit('sendThread',Thread)
           }
-          setwordChat(event.target.value)
+          // setwordChat(event.target.value)
           event.target.value = '';
           setLoadingsending(true)
           setInputValue('')
@@ -73,7 +107,7 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
       {
        <div className='contentGroupChat flex flex-grow justify-end  flex-col'>
         {loadingSelectChat?<Spin indicator={antIcon} style={{ fontSize: '100px' }} className='justify-center m-auto'/>:<>
-        <ScrollChat Channelid={Channelid} loadingsending={loadingsending} wordchat={wordchat}/>
+        <ScrollChat Channelid={channelIdNew} loadingsending={loadingsending} wordchat={wordchat}/>
       {/* {<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""}  */}
                   <Input
                 onChange={(e) => {setInputValue(e.target.value)}}

@@ -1,7 +1,7 @@
 import axios from "axios";
 import queryString from "query-string";
 
-const REACT_APP_API_URL = "http://localhost:8080/api/";
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL;
 
 const axiosClient = axios.create({
   baseURL: REACT_APP_API_URL,
@@ -17,6 +17,7 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(
   (config) => {
     const getLocalToken =JSON.parse(localStorage.getItem("tokenUser") as string);
+    console.log(getLocalToken)
  
     if (getLocalToken) {
       config.headers.Authorization = `Bearer ${(getLocalToken)}`;

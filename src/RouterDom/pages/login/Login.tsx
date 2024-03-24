@@ -129,7 +129,7 @@ export default function Login() {
           <Button type="primary" className='w-full mt-4 mb-2 border-r h-12 border-gray-200' ghost>
             Gửi yêu cầu để đăng nhập
           </Button>
-          <p className='text-center text-gray-500'>Quên mật khẩu </p>
+          <p className='text-center text-gray-500 cursor-pointer'><a href='/forgot-password'>Quên mật khẩu </a></p>
         </Form.Item>
       </Form>
 
