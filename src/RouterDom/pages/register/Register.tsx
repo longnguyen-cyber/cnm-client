@@ -71,32 +71,18 @@ export default function Register() {
         password: values.password,
         email: values.email,
       });
-
-  
-      
-
-
-      
-    
       if (response) {
-           
-          
-        
            notification["success"]({
             message: "Thông báo",
             description: "Vui lòng kiểm tra email để xác nhận đăng ký !",
           });
           setLoadingmail(false)
         }
-      // setLoadingmail(false)
-          // console.log(response)
-      
-    
-    
     } catch (error) {
+      console.log(error)
       notification["error"]({
         message: "Thông báo",
-        description: "Vui lòng kiểm tra email để xác nhận đăng ký !",
+        description: "lỗi đăng ký  !",
       });
     }
   };
@@ -115,32 +101,65 @@ export default function Register() {
           name="name"
           rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
         >
-          <Input />
-        </Form.Item>
+          <Input/>
+          </Form.Item>
 
-        <Form.Item<FieldType>
+
+
+          <Form.Item
+           style={{marginTop:"20px"}} 
           label="Email"
           name="email"
-          rules={[{ required: true, message: "Vui lòng nhập địa chỉ email!" }]}
-        >
-          <Input />
-        </Form.Item>
-        {/* <Form.Item<FieldType>
-          label="Display Name"
-          name="displayName"
           rules={[
-            { required: true, message: "Please input your name will display!" },
+            { required: true, message: "Vui lòng nhập địa chỉ email!" },
+            {
+              pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$/,
+              message: 'Địa chỉ email không hợp lệ!',
+            }
           ]}
         >
-          <Input />
-        </Form.Item> */}
-        <Form.Item<FieldType>
-          label="Mật khẩu"
-          name="password"
-          rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
-        >
-          <Input.Password />
+          <Input/>
         </Form.Item>
+
+        
+              <Form.Item
+          style={{marginTop:"-20px"}} 
+        label="Mật khẩu"
+        name="password"
+        rules={[
+          { required: true, message: "Vui lòng nhập mật khẩu!" },
+          {
+            validator: (_, value) => {
+              if (!value || value.length < 6) {
+                return Promise.reject(
+                  new Error("Mật khẩu phải có ít nhất 6 ký tự!")
+                );
+              }
+              if (!/(?=.*[A-Z])/.test(value)) {
+                return Promise.reject(
+                  new Error("Mật khẩu phải có ít nhất 1 chữ cái viết hoa!")
+                );
+              }
+              if (!/(?=.*\d)/.test(value)) {
+                return Promise.reject(
+                  new Error("Mật khẩu phải có ít nhất 1 chữ số!")
+                );
+              }
+              if (!/(?=.*[!@#$%^&*])/.test(value)) {
+                return Promise.reject(
+                  new Error("Mật khẩu phải có ít nhất 1 ký tự đặc biệt!")
+                );
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+        validateTrigger="onBlur"
+      >
+        <Input.Password />
+      </Form.Item>
+
+
         <Form.Item
           name="confirmPassword"
           label="Xác nhận mật khẩu"
@@ -167,49 +186,6 @@ export default function Register() {
           <Input.Password />
         </Form.Item>
 
-        {/* <Form.Item<FieldType>
-          label="Display Name"
-          name="displayName"
-          rules={[
-            { required: true, message: "Please input your name will display!" },
-          ]}
-        >
-          <Input />
-        </Form.Item> */}
-
-        {/* <Form.Item label="Status">
-          <Select value={"active"}>
-            <Select.Option value="active">Active</Select.Option>
-            <Select.Option value="inactive">Inactive</Select.Option>
-          </Select>
-        </Form.Item>
-        <Form.Item<FieldType>
-          label="Phone"
-          name="phone"
-          rules={[
-            { required: true, message: "Please input your phone number!" },
-          ]}
-        >
-          <Input />
-        </Form.Item> */}
-
-        {/* <Form.Item
-          name="avatar"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
-        >
-          <ImgCrop rotationSlider>
-            <Upload
-              // action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              listType="picture-card"
-              onChange={onChange}
-              onPreview={onPreview}
-              beforeUpload={() => false}
-            >
-              {!fileAvatar && "+ Upload"}
-            </Upload>
-          </ImgCrop>
-        </Form.Item> */}
 
         <Form.Item>
           <Button
@@ -222,10 +198,7 @@ export default function Register() {
             )}{" "}
             Đăng ký
           </Button>
-          {/* <Button type="primary" className='w-full mt-4 mb-2 border-r h-12 border-gray-200' ghost>
-            Gửi yêu cầu để đăng nhập
-          </Button> */}
-          {/* <p className="text-center text-gray-500">Quên mật khẩu </p> */}
+      
         </Form.Item>
       </Form>
     </div>

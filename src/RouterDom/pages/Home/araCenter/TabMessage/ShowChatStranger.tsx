@@ -4,6 +4,8 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ShowChatStranger:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats})=> {
+  console.log('day la single chat tranger')
+  console.log(ListSingleChat)
   return (
     <div className='flex flex-col-reverse gap-3'>
     {

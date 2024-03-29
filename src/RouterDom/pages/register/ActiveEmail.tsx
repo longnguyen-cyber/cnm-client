@@ -26,17 +26,18 @@ export default function ActiveEmail() {
               };
 
               const {data}=await axios.get(`${process.env.REACT_APP_API_URL}users/verify-email?token=${token}`,config)
+              console.log('Data verify')
+              console.log(data)
               if(data){
-
-                console.log(data)
+                if(data.message==="Verify user success"){
                 navigate('/login')
                 notification["success"]({
                     message: "Thông báo",
                     description: "Tạo tài khoảng thành công!",
                   });
+                }
               }          
             }
-
          vertifyEmail()
       },[token])
 

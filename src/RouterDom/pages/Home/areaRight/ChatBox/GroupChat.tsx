@@ -22,8 +22,9 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
   const [wordchat,setwordChat]=useState('')
   const [loadingSelectChat,setLoadingSelectChat]=useState(false)
   const [channelIdNew, setChatSingleIdNew] = useState<{ threads: any[] }>({ threads: [] });
+  const [typing,setTyping]=useState(false)
 
-  console.log(channelIdNew)
+
   useEffect(() => {
      async function  GetChannelById(){
       if (selectedChat.id) {
@@ -34,19 +35,30 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
       }
     }
     GetChannelById();
-  }, [DataSocket, selectedChat.id]);
+  }, [selectedChat.id]);
+
+  useEffect(()=>{
+    if(socket){
+      socket.on('sendObjectArrayForThread',(data:any)=>{
+        if(data){
+          const newThreads = [...channelIdNew.threads, data];
+            setChatSingleIdNew({ ...channelIdNew, threads: newThreads });
+        }
+      })
+    }
+  },[socket,channelIdNew])
     useEffect(() => {
       if(socket){
         socket.on("updatedSendThread",(data:any)=>{
           if(data){
          
-            setDataSocket(data)
+            // setDataSocket(data)
           }
         
-          setTimeout(()=>{
-            setLoadingsending(false)
-            setwordChat('')
-          },2000)
+          // setTimeout(()=>{
+          //   setLoadingsending(false)
+          //   setwordChat('')
+          // },2000)
         })
        return ()=>{
          socket.off('updatedSendThread')
@@ -59,7 +71,7 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
       }
       setTimeout(() => {
         setLoadingSelectChat(false)
-      }, 3000);
+      }, 5500);
     },[selectedChat.id])
       const handleKeyPress = (event:any) => {
         if (event.key === 'Enter') {
@@ -71,6 +83,7 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
             channelId:selectedChat.id,      
             // token:token
           }
+         
           const dataPush={
             channelId:selectedChat.id,
             senderId:user.id,
@@ -79,18 +92,9 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
             },
             user
           }
-
-          if(dataPush){
-            const newThreads = [...channelIdNew.threads, dataPush];
-            setChatSingleIdNew({ ...channelIdNew, threads: newThreads });
-           
+          if(socket){
+            socket.emit('sendObjectArrayForThread',dataPush)
           }
-         
-
-
-
-
-          console.log(Thread)
           if(socket){
              socket.emit('sendThread',Thread)
           }
@@ -100,6 +104,18 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
           setInputValue('')
       }
     }
+  
+    const handleChangledata=(e:any)=>{
+      setInputValue(e.target.value)
+      if(socket){
+        socket.emit('typing',(e.target.value))
+        console.log('vao day')
+      }
+
+      
+       
+    }
+
   return (
     <>
    
@@ -110,8 +126,10 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
         <ScrollChat Channelid={channelIdNew} loadingsending={loadingsending} wordchat={wordchat}/>
       {/* {<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""}  */}
                   <Input
-                onChange={(e) => {setInputValue(e.target.value)}}
+                onChange={(e) => {handleChangledata(e)}}
                 onKeyPress={handleKeyPress}
+                onBlur={()=>{}}
+               
                 placeholder='Nhập @, tin nhắn mới ???'
                 value={inputValue}
                 className='rounded-none h-14 w-full  placeholder-gray-500 to-black'

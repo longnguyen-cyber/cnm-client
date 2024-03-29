@@ -7,6 +7,8 @@ import { CiClock1 } from "react-icons/ci";
 import { TiTickOutline } from "react-icons/ti";
 import ScrollableFeed from "react-scrollable-feed";
 export const ScrollChatSingle: FunctionComponent<any> = ({ Channelid ,loadingsending,wordchat}) => {
+  console.log('data tra ve')
+  console.log(Channelid)
     const ContexChat = useContext(UserContext);
     const { state } = ContexChat;
     const [users, setUser] = state.user

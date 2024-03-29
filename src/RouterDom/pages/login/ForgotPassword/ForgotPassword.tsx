@@ -1,22 +1,30 @@
-import { Button, Form, Input, notification } from 'antd'
-import React from 'react'
+import { Button, Form, Input, Spin, notification } from 'antd'
+import React, { useState } from 'react'
 import { AiOutlineMail } from 'react-icons/ai';
 import "../ForgotPassword/Fotgot.css"
 import UserApi from '../../../../api/user'
 import imagebgzal from "../../../../image/bgLoginZalo.png"
+import { LoadingOutlined } from "@ant-design/icons";
+import { unwrapResult } from '@reduxjs/toolkit';
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export default function ForgotPassword() {
+    const [loading,setLoading]=useState(false)
     const onFineshInSertLogin = async (value: any) => {   
-
+        setLoading(true)
         try{
-         
-           
-            console.log(value)
-            const dataVeriFy=await UserApi.UserFotGotPassword(value)
-            if(dataVeriFy){
-                console.log(dataVeriFy)
-                console.log(dataVeriFy)
+            const dataVeriFy = await UserApi.UserFotGotPassword(value);
+            if(dataVeriFy.status===404){
+                notification['error']({
+                    message:"Lỗi",
+                    description: "Email không tồn tại!"})
+                    setLoading(false)
             }
-       
+            else{
+                notification["success"]({
+                    message:"Thông báo",
+                    description: "Vui lòng kiểm tra email để cập nhập lại mật khẩu!"})
+                    setLoading(false)
+            }
         }
         catch(err){
             if(err){
@@ -25,13 +33,10 @@ export default function ForgotPassword() {
                     message: "Lỗi",
                     description: "Lỗi khi gửi mail!"
                     });
-            } 
+               } 
             }
         }
-   
-
         return (
-    
             <div className='ground-login'>
                              <img src={imagebgzal} alt="image" className='absolute left-0 right-0 top-0 w-full min-h-full object-cover z-1'/>
                              <div className='wrapper-login-register'>
@@ -62,20 +67,12 @@ export default function ForgotPassword() {
                                          <Input size='large' placeholder='Nhập Email' prefix={<AiOutlineMail />} color={"gray"} />
                                          </Form.Item>
                                          <Form.Item>
-                                         <Button htmlType='submit' type='primary' className='btn btn-primary bg-blue-400 w-full h-10 text-xl'>Gửi Mail </Button>
-         
+                                         <Button htmlType='submit' type='primary' className='btn btn-primary bg-blue-400 w-full h-10 text-xl'>{loading&&<Spin indicator={antIcon} className="text-white mr-3" />}  Gửi Mail </Button>    
                                          </Form.Item>
-         
-                                       
                                          </Form>
                                  </div>
               
             </div>
            )
-         
-         
-      
-
-
     } 
  

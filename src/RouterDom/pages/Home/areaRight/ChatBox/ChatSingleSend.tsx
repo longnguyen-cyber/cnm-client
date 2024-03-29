@@ -16,16 +16,12 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
     if(chatSingleId){
       console.log(chatSingleId)
     }
-   
- 
+
     const [inputValue, setInputValue] = useState('');
-    
     const contextUser = useContext(UserContext)
     const { state } = contextUser
     const [user, setUser] = state.user
-    const {socket}=state
-
-    
+    const {socket}=state    
     const [wordchat,setwordChat]=useState('')
     const [loadingSelectChat,setLoadingSelectChat]=useState(false)
     const [loadingsending,setLoadingsending]=useState(false);

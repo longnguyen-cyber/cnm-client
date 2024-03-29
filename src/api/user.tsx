@@ -50,7 +50,7 @@ const UserApi={
     UserFotGotPassword(payload:any){
         const url='users/forgot-password';
         return axiosClient.post(url,payload)
-    }
+    },
 
 }
 export default UserApi

@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { IRouteConfig } from '../Type'
 import ForgotPassword from "./pages/login/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/login/ForgotPassword/ResetPassword";
 
 const LoginPage = lazy(() => {
   return new Promise((resolve: any) => {
@@ -52,6 +53,10 @@ const AllPage: any = [
   {
     path:'/forgot-password',
     main:<ForgotPassword/>
+  },
+  {
+    path:'auth/reset-password',
+    main:<ResetPassword/>
   }
 
 ];

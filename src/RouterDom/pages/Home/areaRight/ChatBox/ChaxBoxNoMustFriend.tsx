@@ -24,6 +24,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     const [DataSocket,setDataSocket]=useState<any>(null)
     const [checkRender,setScheckRender]=state.checkRender
     const [chatSingleIdnew,setChatSingleIdNew]=useState<any>(null)
+    console.log(chatSingleIdnew)
     useEffect(()=>{
      async function getData(){
       if(selectedChat){
@@ -34,69 +35,117 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
       }
     }
      getData()
-    },[selectedChat,DataSocket,checkRender])
-   
-      useEffect(() => {
-        if(socket){
-          socket.on("updatedSendThread",(data:any)=>{
-            setDataSocket(data)
-            setTimeout(()=>{
-              setLoadingsending(false)
-              setwordChat('')
-            },3000)
-          })
-         return ()=>{
-           socket.off('updatedSendThread')
-         }
-        }
-      },[]) 
+    },[selectedChat])
+    
+    useEffect(()=>{
+      if(socket){
+        socket.on("updatedSendThread",(data:any)=>{
+          console.log('day la tin nhan gui ve')
+          console.log(data)
+          
+        })
+      }
 
-      useEffect(() => {
-        if(!chatSingleIdnew){
-          if(socket){
-            socket.on("chatWS",(data:any)=>{
-              if(data){
-                setScheckRender(data)
-                setDataSocket(data)
-              }
-           
-              setTimeout(()=>{
-                setLoadingsending(false)
-                setwordChat('')
-              },3000)
-            })
-           return ()=>{
-             socket.off('chatWS')
-           }
+    },[socket,chatSingleIdnew])
+
+    ///khi tao chat 
+    useEffect(() => {
+      if(socket){
+        socket.on("chatWS",async(payload:any)=>{
+          const {data}=payload
+          console.log(data)
+          if(data){
+            const datachatbyid = await dispatch<any>(UserGetChatsSingleById({ id: data.id}));
+                     if(datachatbyid){
+                          setChatSingleIdNew(datachatbyid.payload.data)
+                      }
+            setLoadingsending(false)
+            setwordChat("")
           }
-        }
-        else{
-          if(socket){
-            socket.on("chatWS",(data:any)=>{
-              console.log(data)
-              if(data.message==='Đã gửi lời mời kết bạn'){
-                notification['error']({
-                  message: 'Thông báo',
-                  description:
-                    'Đã gửi lời mời kết bạn trước đó rồi ',
-                });
-              }
-              else{
-                setDataSocket(data)
-                setScheckRender(data)
-              }
+        
+        })
+       return ()=>{
+         socket.off('chatWS')
+       }
+      }
+    },[socket])
+   
+    //   useEffect(() => {
+    //     if(socket){
+    //       socket.on("updatedSendThread",async (data:any)=>{
+    //         if(data&&data.chatId){
+    //           const datachatbyid = await dispatch<any>(UserGetChatsSingleById({ id: data.chatId}));
+    //           if(datachatbyid){
+    //             setChatSingleIdNew(datachatbyid.payload.data)
+    //           }
+    //         }
+    //         console.log(data)
+    //         setDataSocket(data)
+    //         setTimeout(()=>{
+    //           setLoadingsending(false)
+    //           setwordChat('')
+    //         },2000)
+    //       })
+    //      return ()=>{
+    //        socket.off('updatedSendThread')
+    //      }
+    //     }
+    //   },[]) 
+
+    //   useEffect(() => {
+    //     if(!chatSingleIdnew){
+    //       if(socket){
+    //         socket.on("chatWS", async (dataChat: any) => {
+    //             const {data}=dataChat
+    //             if(data&&data.id){
+    //               const datachatbyid = await dispatch<any>(UserGetChatsSingleById({ id: data.id}));
+    //               if(datachatbyid){
+    //                 setChatSingleIdNew(datachatbyid.payload.data)
+    //               }
+    //             }
+    
+             
+    //           if (data) {
+    //             setScheckRender(data);
+    //             setDataSocket(data);
+    //           }
+
+    //           setTimeout(() => {
+    //             setLoadingsending(false);
+    //             setwordChat('');
+    //           }, 2000);
+    //         });
+    //        return ()=>{
+    //          socket.off('chatWS')
+    //        }
+    //       }
+    //     }
+    //     else{
+    //       if(socket){
+    //         socket.on("chatWS",(data:any)=>{
+    //           console.log(data)
+    //           if(data.message==='Đã gửi lời mời kết bạn'){
+    //             notification['error']({
+    //               message: 'Thông báo',
+    //               description:
+    //                 'Đã gửi lời mời kết bạn trước đó rồi ',
+    //             });
+    //           }
+    //           else{
+    //             setDataSocket(data)
+    //             setScheckRender(data)
+    //           }
           
               
-            })
-           return ()=>{
-             socket.off('chatWS')
-           }
-          }
+    //         })
+    //        return ()=>{
+    //          socket.off('chatWS')
+    //        }
+    //       }
 
-        }
+    //     }
         
-      },[socket]) 
-
+    //   },[socket]) 
 
       useEffect(()=>{
         if(selectedChat.id){
@@ -125,7 +174,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
                 }
 
                 if(!chatSingleIdnew){
-                console.log(chatSingleIdnew)
+            
                   if(socket){
                     const Threadcreate={
                       messages:{
