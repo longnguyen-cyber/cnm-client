@@ -10,16 +10,44 @@ import {
 import { Button, Modal } from "antd";
 import { Navigate, useNavigate } from "react-router";
 import "./TabLeft.css";
+import UserApi from "../../../../api/user";
+import { IRegister } from "../../../../Type";
 const TabLeft: FunctionComponent<{
   setTabCurrent: React.Dispatch<React.SetStateAction<string>>;
 }> = ({ setTabCurrent }) => {
   const [open, setOpen] = useState(false);
+  const [openModalImage, setOpenModalImage] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [modalText, setModalText] = useState("Content of the modal");
 
   const showModal = () => {
     setOpen(true);
   };
+  const showModalImage = () => {
+    setOpenModalImage(true);
+  }
+  const handleUpdateImage = ()=>{
+    // async (values: IRegister) => {
+    //   // delete values.confirmPassword;
+    //   try {
+    //     const response = await UserApi.UserUpdate({
+    //       name: values.name,
+    //       password: values.password,
+    //       email: values.email,
+    //       avatar: {
+
+    //       }
+    //     });
+    //     if (response) {
+    //       navigate("/");
+    //     }
+    //     console.log(response);
+      
+    //   } catch (error) {
+    //     // Handle the error here
+    //   }
+    // };
+  }
 
   const handleOk = () => {
     setModalText("The modal will be closed after two seconds");
@@ -34,6 +62,9 @@ const TabLeft: FunctionComponent<{
     console.log("Clicked cancel button");
     setOpen(false);
   };
+  const handelCancelImage = () => {
+    setOpenModalImage(false);
+  }
 
   const storedUser = localStorage.getItem("user");
   const userInfor = storedUser ? JSON.parse(storedUser) : null;
@@ -73,7 +104,7 @@ const TabLeft: FunctionComponent<{
                 className=" rounded-full h-16 w-16 border border-white"
                 src={`${
                   userInfor
-                    ? userInfor.avatar
+                    ? userInfor?.avatar
                     : "https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg"
                 }`}
               />
@@ -186,13 +217,14 @@ const TabLeft: FunctionComponent<{
               <img
                 src={
                   userInfor
-                    ? userInfor.avatar
+                    ? userInfor?.avatar
                     : "https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg"
                 }
                 className="rounded-full h-[100px] w-[100px] border border-white "
               />
               {/* FaRegEdit */}
               <FaFileImage
+                onClick={showModalImage}
                 className=" right-0 h-[30px] w-[30px] bottom-0
                  text-white bg-blue-500 rounded-full p-2 cursor-pointer relative left-[55%] top-[-30px]"
                 // size={36}
@@ -217,6 +249,16 @@ const TabLeft: FunctionComponent<{
           </div>
         </div>
         
+      </Modal>
+      <Modal
+         width={400}
+         title="Hồ sơ"
+         open={openModalImage}
+         onOk={handleUpdateImage}
+         confirmLoading={confirmLoading}
+         onCancel={handelCancelImage}
+      >
+        <input type="file" name="avatar" />
       </Modal>
     </>
   );

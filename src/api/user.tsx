@@ -52,5 +52,9 @@ const UserApi={
         return axiosClient.post(url,payload)
     },
 
+    UserUpdate: (payload: any) => {
+      const url = `users/change-password`;
+      return axiosClient.put(url, payload);
+    },
 }
 export default UserApi
