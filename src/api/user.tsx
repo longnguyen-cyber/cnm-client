@@ -53,8 +53,13 @@ const UserApi={
     },
 
     UserUpdate: (payload: any) => {
-      const url = `users/change-password`;
+      const url = `users/reset-password`;
       return axiosClient.put(url, payload);
     },
+    UserVerifyEmail: (payload: { token: string }) => {
+        const url = `users/verify-email?token=${payload.token}`;
+        return axiosClient.get(url);
+    },
+   
 }
 export default UserApi

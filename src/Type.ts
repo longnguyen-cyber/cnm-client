@@ -33,6 +33,7 @@ export interface IRouteConfig {
     UserSlice:IUser[],
     loading:boolean
     tokenUser:String|null
+    accessTokenToGen2fa:String|null
     
   }
 

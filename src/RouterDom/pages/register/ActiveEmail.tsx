@@ -30,6 +30,7 @@ export default function ActiveEmail() {
               console.log(data)
               if(data){
                 if(data.message==="Verify user success"){
+                  localStorage.setItem("accessTokenToGen2fa", JSON.stringify(data));
                 navigate('/login')
                 notification["success"]({
                     message: "Thông báo",

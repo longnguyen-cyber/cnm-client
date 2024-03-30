@@ -33,3 +33,8 @@ export const UserCreateSingleChat=createAsyncThunk("UserCreateSingleChat",async 
   return dataUser;
 } )
 
+//const {data}=await axios.get(`${process.env.REACT_APP_API_URL}users/verify-email?token=${token}`,config)
+export const UserVerifyEmail=createAsyncThunk("UserVerifyEmail",async (payload: { token: string })=>{
+  const dataUser = UserApi.UserVerifyEmail(payload);
+  return dataUser;
+})

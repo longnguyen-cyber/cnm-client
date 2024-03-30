@@ -13,6 +13,7 @@
     "@types/react-dom": "^18.2.18",
     "antd": "^5.12.8",
     "antd-img-crop": "^4.21.0",
+    "antd-input-otp": "^2.1.0",
     "axios": "^1.6.5",
     "date-fns": "^3.3.1",
     "query-string": "^8.1.0",
