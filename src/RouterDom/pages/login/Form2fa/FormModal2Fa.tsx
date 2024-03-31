@@ -14,7 +14,7 @@ const FormModal2Fa = ({ handleCancel }: IFormModal2Fa) => {
 
   const accessToken = JSON.parse(
     localStorage.getItem("accessTokenToGen2fa") as string
-  ).data.accessToken;
+  ).data.token;
   const urlCall2Fa = process.env.REACT_APP_API_URL + "users/2fa/generate";
 
   const [data2FA, setData2FA] = useState<any>(null);
