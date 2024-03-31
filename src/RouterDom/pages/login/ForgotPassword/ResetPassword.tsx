@@ -24,7 +24,7 @@ export default function ResetPassword() {
             },
           };
 
-          const {data}=await axios.post(`${process.env.REACT_APP_API_URL}users/change-password?token=${token}`,
+          const {data}=await axios.post(`${process.env.REACT_APP_API_URL}users/reset-password?token=${token}`,
           value,
           config
           )

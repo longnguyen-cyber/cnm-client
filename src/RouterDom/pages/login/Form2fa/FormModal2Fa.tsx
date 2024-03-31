@@ -1,6 +1,6 @@
 import { Button, Modal, Image } from "antd";
 import React, { useEffect, useState } from "react";
-import { InputOTP } from 'antd-input-otp'; 
+import { InputOTP } from "antd-input-otp";
 import axios from "axios";
 interface IFormModal2Fa {
   handleCancel: () => void;
@@ -30,10 +30,26 @@ const FormModal2Fa = ({ handleCancel }: IFormModal2Fa) => {
         },
       }
     );
-   
+
     return response.data;
   };
- 
+
+  const handleTurnOn2fa = async (accessToken: string, otp: string) => {
+    const response = await axios.post(
+      process.env.REACT_APP_API_URL + "users/2fa/turn-on",
+      {
+        twoFactorAuthenticationCode: otp,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "content-type": "application/json",
+          Accept: "application/json",
+        },
+      }
+    );
+  };
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,24 +58,27 @@ const FormModal2Fa = ({ handleCancel }: IFormModal2Fa) => {
         // console.log('data2FA------>', data);
         setData2FA(data2FA.data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
   }, []);
 
   const showModal = () => {
     setOpen(true);
   };
- 
+
   const handleOk = () => {
     setModalText("The modal will be closed after two seconds");
-    const handleFinish = (otp:string) => {
-      const payload = otp || value; // Since useState work asynchronously, we shall add the field value from the autoSubmit.
+    const handleFinish = () => {
+      const payload = value; // Since useState work asynchronously, we shall add the field value from the autoSubmit.
       // Your logic with state
+      console.log("payload", payload);
+      handleTurnOn2fa(accessToken, payload.join(""));
       setConfirmLoading(true);
     };
+    handleFinish()
     setTimeout(() => {
       setOpen(false);
       setConfirmLoading(false);
@@ -71,24 +90,38 @@ const FormModal2Fa = ({ handleCancel }: IFormModal2Fa) => {
       width={400}
       title="Mã 2FA"
       open={true}
-      onOk={handleOk}
-      style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
+      // onOk={handleOk}
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
       confirmLoading={confirmLoading}
       onCancel={handleCancel}
       footer={(_, { OkBtn, CancelBtn }) => (
         <>
           {/* <OkBtn/> */}
-          <Button className="bg-blue-500">Gửi</Button>
+          <Button className="bg-blue-500" onClick={handleOk}>Gửi</Button>
           <Button onClick={handleCancel} className="">
             Hủy
           </Button>
         </>
       )}
     >
-      <div style={{display: 'flex', justifyContent: 'center',flexDirection: 'column'}}>
-
-      <Image className="flex items-center" src={data2FA ? data2FA : ""}   width={200}/>
-      <InputOTP onChange={setValue} value={value} autoSubmit={handleOk} />
+      <div
+        className="ant-modal-body."
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          flexDirection: "column",
+        }}
+      >
+        <Image
+          className="flex items-center relative right-[-50%] translate-x-[-25%]"
+          src={data2FA ? data2FA : ""}
+          width={200}
+        />
+        <InputOTP onChange={setValue} value={value} autoSubmit={handleOk} />
       </div>
     </Modal>
   );

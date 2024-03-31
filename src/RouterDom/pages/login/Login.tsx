@@ -65,122 +65,128 @@ export default function Login() {
 
   return (
     <>
-     <div className="group-login ">
-      <div className="title-text text-center font-medium mb-5 "></div>
-      <div className="login-google-facebook">
-        {/* loginGooglenew2024 */}
-        <GoogleLogin
-          className="btn-google-login"
-          clientId="39780276999-23ndjnog9cr448vg0jqcmcf4qq62ufnq.apps.googleusercontent.com"
-          // onSuccess={responseGoogle}
-          // onFailure={responseGoogleFail}
-          buttonText="Login with google"
-          cookiePolicy={"single_host_origin"}
-        />
-      </div>
-
-      <div className="content_meo">
-        <p>Mẹo đăng ký nhanh với Google hoặc facebook</p>
-        <div className="hror">
-          <hr />
-          <p>Hoặc</p>
-          <hr />
+      <div className="group-login ">
+        <div className="title-text text-center font-medium mb-5 "></div>
+        <div className="login-google-facebook">
+          {/* loginGooglenew2024 */}
+          <GoogleLogin
+            className="btn-google-login"
+            clientId="39780276999-23ndjnog9cr448vg0jqcmcf4qq62ufnq.apps.googleusercontent.com"
+            // onSuccess={responseGoogle}
+            // onFailure={responseGoogleFail}
+            buttonText="Login with google"
+            cookiePolicy={"single_host_origin"}
+          />
         </div>
-      </div>
 
-      {/* form login  */}
+        <div className="content_meo">
+          <p>Mẹo đăng ký nhanh với Google hoặc facebook</p>
+          <div className="hror">
+            <hr />
+            <p>Hoặc</p>
+            <hr />
+          </div>
+        </div>
 
-      <Form onFinish={onFineshInSertLogin}>
-        <Form.Item
-          name="email"
-          hasFeedback
-          rules={[
-            {
-              required: true,
-              message: "không được để trống ",
-            },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                if (
-                  !value ||
-                  /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
-                ) {
-                  return Promise.resolve();
-                }
-                return Promise.reject("Vui lòng nhập đúng định dạng email");
+        {/* form login  */}
+
+        <Form onFinish={onFineshInSertLogin}>
+          <Form.Item
+            name="email"
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: "không được để trống ",
               },
-            }),
-          ]}
-        >
-          <Input
-            size="large"
-            placeholder="Nhập Email"
-            prefix={<AiOutlineMail />}
-            color={"gray"}
-          />
-        </Form.Item>
-        <Form.Item
-          name="password"
-          hasFeedback
-          rules={[
-            {
-              required: true,
-              message: "không được để trống ",
-            },
-          ]}
-        >
-          <Input.Password
-            size="large"
-            placeholder="Nhập password"
-            iconRender={(visible) =>
-              visible ? <AiFillEyeInvisible /> : <AiOutlineEye />
-            }
-          />
-        </Form.Item>
-
-        <div className="content-recapCha flex items-center mb-5 justify-center">
-          <ReCAPTCHA
-            sitekey="6Lc6HdYgAAAAAIKgwEaw-mAtM1zOtaDW3YP9TJOt"
-            onChange={onChangeReCapch}
-          />
-        </div>
-
-        <p
-          className="errorRecapCha w-full flex items-center justify-center"
-          style={{ color: "red" }}
-        ></p>
-        <Form.Item>
-          <Button
-            type="primary"
-            className="w-full bg-blue-500 h-12 "
-            htmlType="submit"
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (
+                    !value ||
+                    /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
+                  ) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject("Vui lòng nhập đúng định dạng email");
+                },
+              }),
+            ]}
           >
-            {loading && (
-              <Spin indicator={antIcon} className="text-white mr-3" />
-            )}{" "}
-            Login
-          </Button>
-          {/* <Button type="primary" className='w-full mt-4 mb-2 border-r h-12 border-gray-200' ghost>
+            <Input
+              size="large"
+              placeholder="Nhập Email"
+              prefix={<AiOutlineMail />}
+              color={"gray"}
+            />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            hasFeedback
+            rules={[
+              {
+                required: true,
+                message: "không được để trống ",
+              },
+            ]}
+          >
+            <Input.Password
+              size="large"
+              placeholder="Nhập password"
+              iconRender={(visible) =>
+                visible ? <AiFillEyeInvisible /> : <AiOutlineEye />
+              }
+            />
+          </Form.Item>
+
+          <div className="content-recapCha flex items-center mb-5 justify-center">
+            <ReCAPTCHA
+              sitekey="6Lc6HdYgAAAAAIKgwEaw-mAtM1zOtaDW3YP9TJOt"
+              onChange={onChangeReCapch}
+            />
+          </div>
+
+          <p
+            className="errorRecapCha w-full flex items-center justify-center"
+            style={{ color: "red" }}
+          ></p>
+          <Form.Item>
+            <Button
+              type="primary"
+              className="w-full bg-blue-500 h-12 "
+              htmlType="submit"
+            >
+              {loading && (
+                <Spin indicator={antIcon} className="text-white mr-3" />
+              )}{" "}
+              Login
+            </Button>
+            {/* <Button type="primary" className='w-full mt-4 mb-2 border-r h-12 border-gray-200' ghost>
             Gửi yêu cầu để đăng nhập
           </Button> */}
-          <Button
+            {/* <Button
             type="primary"
             className="w-full mt-4 mb-2 border-r h-12 border-gray-200"
             onClick={() => setOpen2FaForm(true)}
             ghost
           >
             Tạo xác thực 2FA
-          </Button>
-          <p className="text-center text-gray-500 cursor-pointer">
-            <a href="/forgot-password">Quên mật khẩu </a>
-          </p>
-        </Form.Item>
-      </Form>
+          </Button> */}
+            <Button
+              type="primary"
+              className="w-full mt-4 mb-2 border-r h-12 border-gray-200"
+              onClick={() => setOpen2FaForm(true)}
+              ghost
+            >
+              <p className="text-center text-gray-500 cursor-pointer">
+                <a href="/forgot-password">Quên mật khẩu </a>
+              </p>
+            </Button>
+          </Form.Item>
+        </Form>
 
-      {/* form login  */}
-    </div>
-    {open2FaForm && <FormModal2Fa handleCancel={handleCancel} />}
+        {/* form login  */}
+      </div>
+      {open2FaForm && <FormModal2Fa handleCancel={handleCancel} />}
     </>
-   
   );
 }
