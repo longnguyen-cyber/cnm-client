@@ -13,10 +13,6 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
     const chatSingleId = useSelector((state: any) => state.Chats.chatSingleId)
     const dispatch = useDispatch();
     
-    if(chatSingleId){
-      console.log(chatSingleId)
-    }
-
     const [inputValue, setInputValue] = useState('');
     const contextUser = useContext(UserContext)
     const { state } = contextUser
@@ -26,13 +22,47 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
     const [loadingSelectChat,setLoadingSelectChat]=useState(false)
     const [loadingsending,setLoadingsending]=useState(false);
     const [DataSocket,setDataSocket]=useState<any>(null)
-    const [checkRender,setScheckRender]=state.checkRender
+    const [chatSingleIdnew,setChatSingleIdNew]=useState<any>(null)
+    console.log(chatSingleIdnew)
+ 
     useEffect(()=>{
-      if(selectedChat.id){
-        dispatch<any>(UserGetChatsSingleById({ id: selectedChat.id }));
+     
+      async function getData(){
+     
+       if(selectedChat){
+         const data=await dispatch<any>(UserGetChatsSingleById({ id: selectedChat.id }));
+         // console.log("day la data check")
+         if(data.error){
+           setChatSingleIdNew(null)
+         }
+         
+         if(data&&data.payload&&data.payload.data){
+           setChatSingleIdNew(data.payload.data)
+         }
+       }
+     }
+      getData()
+     },[selectedChat])
+
+     useEffect(()=>{
+      if(socket){
+        socket.on("updatedSendThread",(data:any)=>{
+         if(data&&chatSingleIdnew){
+  
+          const newThreads = [...chatSingleIdnew.threads, data];
+          setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads });
+         
+          setwordChat("")
+     
+          setLoadingsending(false)
+        }
+          
+        })
       }
-   
-    },[selectedChat.id,DataSocket,checkRender])
+
+    },[socket,chatSingleIdnew])
+
+
 
     const getSelectUserIsChoose = (selectedChat: any) => {
         return (
@@ -57,20 +87,20 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
         )
       }
      
-      useEffect(() => {
-        if(socket){
-          socket.on("updatedSendThread",(data:any)=>{
-            setDataSocket(data)
-            setTimeout(()=>{
-              setLoadingsending(false)
-              setwordChat('')
-            },3500)
-          })
-         return ()=>{
-           socket.off('updatedSendThread')
-         }
-        }
-      },[]) 
+      // useEffect(() => {
+      //   if(socket){
+      //     socket.on("updatedSendThread",(data:any)=>{
+      //       setDataSocket(data)
+      //       setTimeout(()=>{
+      //         setLoadingsending(false)
+      //         setwordChat('')
+      //       },3500)
+      //     })
+      //    return ()=>{
+      //      socket.off('updatedSendThread')
+      //    }
+      //   }
+      // },[]) 
       useEffect(()=>{
         if(selectedChat.id){
           setLoadingSelectChat(true)
@@ -83,7 +113,7 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
 
       const handleKeyPress = async (event: any) => {
         if (event.key === 'Enter') {
-          console.log(123)
+
             const Thread={
               messages:{
                 message:event.target.value
@@ -117,7 +147,7 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
    {loadingSelectChat ?<Spin indicator={antIcon}
         style={{ fontSize: '100px' }}
         className='text-black text-4xl m-auto justify-center self-center  ' /> :<div>
-         <ScrollChatSingle Channelid={chatSingleId} loadingsending={loadingsending} wordchat={wordchat}/>
+         <ScrollChatSingle Channelid={chatSingleIdnew} loadingsending={loadingsending} wordchat={wordchat}/>
       {/* {isTyPing?<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""}  */}
           <Input
                 onChange={(e) => {setInputValue(e.target.value)}}

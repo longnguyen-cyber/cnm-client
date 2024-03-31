@@ -14,6 +14,7 @@ import { listeners } from 'process';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const SearchUserAddChat: FunctionComponent<any> = ({ searchValue }) => {
+    console.log(searchValue)
     const contextUser = useContext(UserContext)
     const { state } = contextUser;
     const [user, setUser] = state.user;
@@ -25,7 +26,9 @@ export const SearchUserAddChat: FunctionComponent<any> = ({ searchValue }) => {
     const [DataSocket,setDataSocket]=useState<any>(null)
     const [selectedChat, setselectedChats] = state.selectedChat;
     const ListSingleChat=useSelector((state:any)=>state.Chats.chatSingleSlide)
-      useEffect(()=>{
+    console.log(ListSingleChat)
+   
+    useEffect(()=>{
         dispatch<any>(UserGetAllSingleChat());
       },[])
   
@@ -37,52 +40,45 @@ export const SearchUserAddChat: FunctionComponent<any> = ({ searchValue }) => {
 
     useEffect(() => {
         if (searchValue) {
-            if (ListUsers) {
+            console.log('vao search value')
+            console.log(searchValue)
+          
                 dispatch<any>(userSeach({ name: searchValue }));
-            }
+          
         }
-        else {
-
-            dispatch<any>(userSeach({ name: "" }));
-        }
+       
     }, [searchValue])
     const getUserForChat = (value: any) => {
-
-        if (value) {
-            ListSingleChat.forEach((item: any) => {
-                if (value.id===item.user.id&&item.isFriend===false) {
-             
-                   
-                    // Nếu tìm thấy phần tử có receiveId khớp với value.id
+        console.log('lis')
+        console.log(ListSingleChat)
+        let found = false; // Biến kiểm tra xem có tìm thấy khớp với điều kiện nào không
+        if (value && ListSingleChat.length > 0) {
+            for (const item of ListSingleChat) {
+                if ((value.id === item.senderId || value.id === item.receiveId) && item.isFriend === false) {
+                    console.log("vao day 1")
                     setselectedChats(item);
-                    dispatch<any>(UserGetChatsSingleById({ id: item.id }));
-                    return
-                   
-                } 
-
-                if (value.id===item.user.id&&item.isFriend===true) {
-           
-                   
-                    // Nếu tìm thấy phần tử có receiveId khớp với value.id
+                    found = true;
+                    break; // Dừng vòng lặp ngay khi điều kiện đầu tiên được thỏa mãn
+                } else if ((value.id === item.senderId || value.id === item.receiveId) && item.isFriend === true) {
+                    console.log("vao day 2")
                     setselectedChats(item);
-                    dispatch<any>(UserGetChatsSingleById({ id: item.id }));
-                    return
-                   
-                } 
-                if(value.id!==item.user.id){
-                   
-                    setselectedChats(value);
-
-                    dispatch<any>(UserGetChatsSingleById({ id: "" }));
-                return
+                    found = true;
+                    break; // Dừng vòng lặp ngay khi điều kiện thứ hai được thỏa mãn
                 }
-               
-            });
+                else{
+                    console.log("vao day 3")
+                    setselectedChats(value);
+                
+                }
+            }
         }
-        if(ListSingleChat.length===0){
+    
+        if (!found || ListSingleChat.length === 0) { // Nếu không tìm thấy bất kỳ phần tử nào thỏa mãn hoặc danh sách rỗng
+            console.log("vao day 3 hoặc 4")
             setselectedChats(value);
         }
     };
+    
     
 
     return (

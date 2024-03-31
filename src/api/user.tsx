@@ -18,7 +18,7 @@ const UserApi={
     },
     UserSearch:(payload: { name: string })=>{
         const url = `users/search/${payload.name}`;
-        console.log(url)
+        // console.log(url)
         return axiosClient.get(url)
     },
     UserCreateChannel:(payload: any)=>{
@@ -54,7 +54,7 @@ const UserApi={
 
     UserUpdate: (payload: any) => {
       const url = `users/reset-password`;
-      return axiosClient.put(url, payload);
+      return axiosClient.post(url, payload);
     },
     UserVerifyEmail: (payload: { token: string }) => {
         const url = `users/verify-email?token=${payload.token}`;

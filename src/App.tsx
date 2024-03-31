@@ -15,7 +15,7 @@ import "swiper/css/navigation";
 import 'swiper/css/autoplay';
 function App() {
   const dem=process.env.REACT_APP_API_URL
-  console.log(dem)
+  // console.log(dem)
   
   const showPageUser = (AllPage: any) => {
     // localStorage.removeItem("user");

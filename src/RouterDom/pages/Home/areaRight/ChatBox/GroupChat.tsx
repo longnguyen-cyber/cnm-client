@@ -41,6 +41,7 @@ export const  GroupChat:FunctionComponent<any>=({})=> {
     if(socket){
       socket.on('sendObjectArrayForThread',(data:any)=>{
         if(data){
+          console.log(data)
           const newThreads = [...channelIdNew.threads, data];
             setChatSingleIdNew({ ...channelIdNew, threads: newThreads });
         }

@@ -6,10 +6,11 @@ import { AiOutlineTags } from 'react-icons/ai'
 import { MdKeyboardArrowLeft } from 'react-icons/md'
 import { UserContext } from '../../../../../Context/UserContext'
 import { useDispatch, useSelector } from 'react-redux'
-import { UserGetChatsSingleById } from '../../../../../feature/chat/pathApi'
+import { UserGetAllSingleChat, UserGetChatsSingleById } from '../../../../../feature/chat/pathApi'
 import { LoadingOutlined } from '@ant-design/icons';
 import { AiOutlineUserAdd } from "react-icons/ai";
 export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselectedChats})=> {
+  var ListSingleChat=useSelector((state:any)=>state.Chats.chatSingleSlide)
     const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
     const chatSingleId = useSelector((state: any) => state.Chats.chatSingleId)
     const dispatch = useDispatch();
@@ -22,13 +23,25 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     const [loadingSelectChat,setLoadingSelectChat]=useState(false)
     const [loadingsending,setLoadingsending]=useState(false);
     const [DataSocket,setDataSocket]=useState<any>(null)
-    const [checkRender,setScheckRender]=state.checkRender
     const [chatSingleIdnew,setChatSingleIdNew]=useState<any>(null)
-    console.log(chatSingleIdnew)
+    console.log('day la selected chat')
+    console.log(selectedChat)
+    // console.log('day la wordk chat')
+    // console.log(wordchat)
+ 
+
+    
     useEffect(()=>{
+     
      async function getData(){
+    
       if(selectedChat){
         const data=await dispatch<any>(UserGetChatsSingleById({ id: selectedChat.id }));
+        // console.log("day la data check")
+        if(data.error){
+          setChatSingleIdNew(null)
+        }
+        
         if(data&&data.payload&&data.payload.data){
           setChatSingleIdNew(data.payload.data)
         }
@@ -40,8 +53,15 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     useEffect(()=>{
       if(socket){
         socket.on("updatedSendThread",(data:any)=>{
-          console.log('day la tin nhan gui ve')
-          console.log(data)
+         if(data&&chatSingleIdnew){
+  
+          const newThreads = [...chatSingleIdnew.threads, data];
+          setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads });
+         
+          setwordChat("")
+     
+          // setLoadingsending(false)
+        }
           
         })
       }
@@ -52,108 +72,70 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     useEffect(() => {
       if(socket){
         socket.on("chatWS",async(payload:any)=>{
+          console.log(payload)
+    
           const {data}=payload
-          console.log(data)
+      
           if(data){
-            const datachatbyid = await dispatch<any>(UserGetChatsSingleById({ id: data.id}));
-                     if(datachatbyid){
-                          setChatSingleIdNew(datachatbyid.payload.data)
-                      }
-            setLoadingsending(false)
-            setwordChat("")
+            if(data.id){
+              if(!chatSingleIdnew){
+                const datachatbyid = await dispatch<any>(UserGetChatsSingleById({ id: data.id}));
+                if(datachatbyid){
+                     setChatSingleIdNew(datachatbyid.payload.data)
+                 }
+              setLoadingsending(false)
+              setwordChat("")
+              }
+              
+            }
           }
+
+
+          if(data&&data.chat){
+                 ListSingleChat.map((value: any) => {
+                if (value.id === data.chat.id) {
+                  // Tạo một bản sao của đối tượng và cập nhật thuộc tính
+                  console.log('vao day 2data gui ve khi sendmessage')
+                  setselectedChats({ ...value, isFriend: true ,requestAdd:false});
+
+                }
+                // Trả về đối tượng không thay đổi nếu không đáp ứng điều kiện
+              });
+            setDataSocket(data.user)
+        }
+         if(payload&&payload.message==='Đã gửi lời mời kết bạn'){
+          notification['error']({
+            message:'Thông báo',
+            description:'Đã gửi lời mời kết bạn'
+          })
+       
+        }
+
+        if(payload&&payload.message==='Request friend success'){
+          setselectedChats({ ...selectedChat, isFriend: false ,requestAdd:true});
+        }
+
         
+          
         })
        return ()=>{
          socket.off('chatWS')
        }
       }
     },[socket])
+
+
+    useEffect(()=>{
+      dispatch<any>(UserGetAllSingleChat())
+  },[DataSocket])
    
-    //   useEffect(() => {
-    //     if(socket){
-    //       socket.on("updatedSendThread",async (data:any)=>{
-    //         if(data&&data.chatId){
-    //           const datachatbyid = await dispatch<any>(UserGetChatsSingleById({ id: data.chatId}));
-    //           if(datachatbyid){
-    //             setChatSingleIdNew(datachatbyid.payload.data)
-    //           }
-    //         }
-    //         console.log(data)
-    //         setDataSocket(data)
-    //         setTimeout(()=>{
-    //           setLoadingsending(false)
-    //           setwordChat('')
-    //         },2000)
-    //       })
-    //      return ()=>{
-    //        socket.off('updatedSendThread')
-    //      }
-    //     }
-    //   },[]) 
-
-    //   useEffect(() => {
-    //     if(!chatSingleIdnew){
-    //       if(socket){
-    //         socket.on("chatWS", async (dataChat: any) => {
-    //             const {data}=dataChat
-    //             if(data&&data.id){
-    //               const datachatbyid = await dispatch<any>(UserGetChatsSingleById({ id: data.id}));
-    //               if(datachatbyid){
-    //                 setChatSingleIdNew(datachatbyid.payload.data)
-    //               }
-    //             }
-    
-             
-    //           if (data) {
-    //             setScheckRender(data);
-    //             setDataSocket(data);
-    //           }
-
-    //           setTimeout(() => {
-    //             setLoadingsending(false);
-    //             setwordChat('');
-    //           }, 2000);
-    //         });
-    //        return ()=>{
-    //          socket.off('chatWS')
-    //        }
-    //       }
-    //     }
-    //     else{
-    //       if(socket){
-    //         socket.on("chatWS",(data:any)=>{
-    //           console.log(data)
-    //           if(data.message==='Đã gửi lời mời kết bạn'){
-    //             notification['error']({
-    //               message: 'Thông báo',
-    //               description:
-    //                 'Đã gửi lời mời kết bạn trước đó rồi ',
-    //             });
-    //           }
-    //           else{
-    //             setDataSocket(data)
-    //             setScheckRender(data)
-    //           }
-          
-              
-    //         })
-    //        return ()=>{
-    //          socket.off('chatWS')
-    //        }
-    //       }
-
-    //     }
-        
-    //   },[socket]) 
-
       useEffect(()=>{
         if(selectedChat.id){
           setLoadingSelectChat(true)
         }
         setTimeout(() => {
           setLoadingSelectChat(false)
-        }, 3000);
+        }, 5000);
       },[selectedChat.id]
      );
 
@@ -161,15 +143,18 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
         if (event.key === 'Enter') {
             if(chatSingleIdnew){
                 if(socket){
-                  
+                    
                       const sendThread={
                         messages:{
                             message:event.target.value
                           },
-                          chatId:selectedChat.id, 
-                          receiveId:selectedChat.user.id,
+                          chatId:chatSingleIdnew.id, 
+                          receiveId:chatSingleIdnew.user.id,
                         }
-                         socket.emit('sendThread',sendThread)
+                        console.log(selectedChat)
+                  
+                
+                     socket.emit('sendThread',sendThread)
                       }
                 }
 
@@ -182,54 +167,58 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
                       },
                       receiveId:selectedChat.id,
                     }
-                      socket.emit('createChat',Threadcreate)
+                      // socket.emit('createChat',Threadcreate)
                    }
                   }
             setwordChat(event.target.value)
             event.target.value = '';
-            setLoadingsending(true)
+            // setLoadingsending(true)
             setInputValue('')
             socket.off('sendThread')
         }
       };
 
+
+
       const sendReqAddFriend=()=>{
+    
         if(socket){
           if(chatSingleIdnew){
             const sendReqAddFriendHaveChat={
-              receiveId:selectedChat.receiveId
+              receiveId:chatSingleIdnew.receiveId
               ,
-              chatId:selectedChat.id
+              chatId:chatSingleIdnew.id
               ,
             }
+
+            console.log(sendReqAddFriendHaveChat)
             socket.emit('reqAddFriendHaveChat',sendReqAddFriendHaveChat)
           }
           else{
-            if(!chatSingleIdnew){
+            if(!chatSingleIdnew||chatSingleIdnew===null){
               if(socket){
                 const sendReqAddFriend={
-                  receiveId:selectedChat.receiveId
+                  receiveId:selectedChat.id
                   ,
                 }
-                socket.emit('reqAddFriend',sendReqAddFriend)
+                console.log(sendReqAddFriend)
+                 socket.emit('reqAddFriend',sendReqAddFriend)
               }
 
             }
            
           }
-      
-          notification["success"]({
-            message: "Thông báo",
-            description: "đã gửi yêu cầu kết bạn success",
-          });
+      notification['success']({
+            message:'Thông báo',
+            description:'Đã gửi lời mời kết bạn'
+          })
+         
           
         }
 
         return socket.off("reqAddFriend")
       }
-
-      const getSelectUserIsChoose = (selectedChat: any) => {
-       
+      const getSelectUserIsChoose = (selectedChat: any) => {   
         return (
           <>
             <div className='flex justify-between w-full items-center p-1'>
@@ -238,17 +227,18 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
                     <p className='presspreveriose' ><MdKeyboardArrowLeft size={30} className='text-gray-600 cursor-pointer -mr-3' /></p>
                     {selectedChat&&
                     <div className='flex gap-3 bacgroundxe  items-center px-5'>
-                        <img src={`${selectedChat.avatar?selectedChat.avatar:selectedChat.user.avatar}`} className='w-12 h-12 rounded-full' />
+                        <img src={selectedChat && selectedChat.user ? selectedChat.user.avatar : (selectedChat && selectedChat.avatar ? selectedChat.avatar : "")} className='w-12 h-12 rounded-full' />
                         <div>
                         <p className='text-xl font-medium '>{selectedChat.name?selectedChat.name:selectedChat.user.name}</p>
-                        <p style={{fontSize:'12px'}} className='bg-gray-400 border m-0 border-r-2 p-1 rounded-md text-white font-medium'>NGƯỜI LẠ </p>
+                        <p style={{fontSize:'12px'}} className='bg-gray-400 border m-0 border-r-2 p-1 rounded-md text-white font-medium'> {selectedChat.isFriend?<>Bạn bè </>:<>Người Lạ  </>} </p>
                         </div>
                     </div>}
                     </div>
                
                 </div>
               <div className='flex items-center '>
-              <AiOutlineUserAdd size={20}/> <p className='bg-gray-200 border-r-gray-200 cursor-pointer font-medium p-1 rounded-md' onClick={()=>sendReqAddFriend()}>Gửi kết bạn</p>
+              <AiOutlineUserAdd size={20}/> <p className='bg-gray-200 border-r-gray-200 cursor-pointer font-medium p-1 rounded-md'> {selectedChat.
+               requestAdd===true&&selectedChat.isFriend===false?<>Huỷ kết bạn  </>:<p  onClick={()=>sendReqAddFriend()}>Gửi kết bạn </p>}</p>
               </div> 
             </div>
           </>

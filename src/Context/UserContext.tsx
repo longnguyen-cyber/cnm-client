@@ -17,12 +17,14 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const [token,setToken]=useState<string|null>(null);
     const [selectedChat, setselectedChats] = useState<any>([]);
     const [userSelect,setUserSelect]=useState<any>(null);
-    const [checkRender,setScheckRender]=useState<any>(null);
+    const [checkRender,setScheckRender]=useState<any>(false);
+    const [userInvite,setUserInvite]=useState<any>(null);
+    
     useEffect(()=>{
       
       async function connectSocket(){
         const UserLogin:IUser=JSON.parse(userTokenString);
-        console.log(UserLogin)
+      
         const idUser= UserLogin?UserLogin.id:null;
         if(UserLogin){
           navigate('/home')
@@ -51,7 +53,8 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
       socket: socket,
       selectedChat: [selectedChat, setselectedChats],
       userSelect:[userSelect,setUserSelect],
-      checkRender:[checkRender,setScheckRender]
+      checkRender:[checkRender,setScheckRender],
+      userInvite:[userInvite,setUserInvite]
     };
 
     return (

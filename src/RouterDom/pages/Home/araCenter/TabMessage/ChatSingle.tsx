@@ -4,6 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats})=> {
+  console.log(ListSingleChat)
  
   return (
     <div className='flex flex-col-reverse gap-3'>
@@ -14,11 +15,11 @@ export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselec
             <div key={index} className="flex items-center pl-1 cursor-pointer" onClick={()=>{setselectedChats(itemChat)}}>
             <div className="flex-shrink-0">
               <div className="flex flex-wrap w-14 justify-center items-center">
-                  <img key={index} className="w-14 h-14 rounded-full" src={`${itemChat?itemChat.userReceive?.avatar:""}`} alt="Avatar 1" />
+                  <img key={index} className="w-14 h-14 rounded-full" src={`${itemChat&&itemChat.user.avatar?itemChat.user.avatar:"https://media.istockphoto.com/id/1354776457/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=w3OW0wX3LyiFRuDHo9A32Q0IUMtD4yjXEvQlqyYk9O4="}`} alt="Avatar 1" />
               </div>
             </div>
             <div className="flex-grow ml-4">
-              <div className="flex items-center">
+              <div className="flex items-center justify-between">
                 <h4 className="text-lg font-medium">{itemChat.user.name}</h4>
                 {format(new Date(String(itemChat.timeThread)), "HH:mm")}
               </div>

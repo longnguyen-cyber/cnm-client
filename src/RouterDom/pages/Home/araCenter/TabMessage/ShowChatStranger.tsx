@@ -4,13 +4,12 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ShowChatStranger:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats})=> {
-  console.log('day la single chat tranger')
-  console.log(ListSingleChat)
+ 
   return (
     <div className='flex flex-col-reverse gap-3'>
     {
        !Loading?ListSingleChat?.map((itemChat: any, index: number) => (
-        !itemChat.isFriend&&
+        !itemChat.isFriend&&itemChat.threads.length>0 &&
             <div key={index} className="flex items-center pl-1 cursor-pointer" onClick={()=>{setselectedChats(itemChat)}}>
             <div className="flex-shrink-0">
               <div className="flex flex-wrap w-14 justify-center items-center">

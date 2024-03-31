@@ -69,7 +69,7 @@ export const ChatBox = () => {
                         :
                      !selectedChat.users && !selectedChat.isFriend ?
 
-                       <><ChaxBoxNoMustFriend selectedChat={selectedChat}/></>:
+                       <><ChaxBoxNoMustFriend selectedChat={selectedChat} setselectedChats={setselectedChats}/></>:
 
                         selectedChat.users ?
                           <>
