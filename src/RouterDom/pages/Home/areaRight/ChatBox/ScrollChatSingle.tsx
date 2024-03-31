@@ -14,10 +14,6 @@ export const ScrollChatSingle: FunctionComponent<any> = ({ Channelid ,loadingsen
     const [users, setUser] = state.user
     const chatContainerRef = useRef<any>(null);
     const fadeInClass = "fade-in";
-
-
-    console.log('dau la work chat trong chat')
-    console.log(wordchat)
   
     useEffect(() => {
         if (chatContainerRef.current) {

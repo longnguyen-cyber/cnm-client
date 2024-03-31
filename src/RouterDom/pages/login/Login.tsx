@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AiOutlineUser,
   AiFillEyeInvisible,
   AiOutlineEye,
   AiOutlineMail,
 } from "react-icons/ai";
-import { Form, Input, Button, Spin } from "antd";
+import { Form, Input, Button, Spin, notification } from "antd";
 import GoogleLogin from "react-google-login";
 import "./index.css";
+// import FacebookLogin from 'react-facebook-login'
 import ReCAPTCHA from "react-google-recaptcha";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,13 +16,17 @@ import { userLogin } from "../../../feature/user/pathApi";
 import { ILogin } from "../../../Type";
 import { useNavigate } from "react-router-dom";
 import { unwrapResult } from "@reduxjs/toolkit";
+import {gapi} from 'gapi-script'
 import FormModal2Fa from "./Form2fa/FormModal2Fa";
+import UserApi from "../../../api/user";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export default function Login() {
   const [responseRecapCha, setResponeRecapCha] = useState(false);
   const dispatch = useDispatch();
   const loading = useSelector((state: any) => state.Users.loading);
   const [open2FaForm, setOpen2FaForm] = useState(false);
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
+ 
   // i want to create function to open 2fa form
   const handleCancel = () => {
     console.log("Clicked cancel button");
@@ -30,6 +35,24 @@ export default function Login() {
 
   const navigate = useNavigate();
   ///============================= du lieu in sert hoan thanh se chay vao day ==========================///
+ 
+  useEffect(() => {
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    })
+        function start() {
+            gapi.auth2.init({
+            apiKey:'AIzaSyCrEa_AenSOrp7qz7X8GyMPZXYZlqkFwdg',
+            clientId: 
+            '39780276999-23ndjnog9cr448vg0jqcmcf4qq62ufnq.apps.googleusercontent.com',
+            scope:'',
+        plugin_name: 'streamy'
+        });
+        }
+        gapi.load('client:auth2', start);
+}); 
+
   const onFineshInSertLogin = async (value: ILogin) => {
     if (responseRecapCha) {
       const errorRecapCha = document.querySelector(".errorRecapCha");
@@ -49,6 +72,7 @@ export default function Login() {
   ///=============================check RecapCha==========================///
 
   function onChangeReCapch(response: any) {
+     console.log(response)
     if (response) {
       setResponeRecapCha(true);
       const errorRecapCha = document.querySelector(".errorRecapCha");
@@ -63,6 +87,40 @@ export default function Login() {
 
   ///=============================check RecapCha==========================///
 
+  const responseGoogle= async (response:any)=>{
+    setLoadingGoogle(true)
+    // const {Cc}=response
+    // console.log("day la response google",response)
+    // console.log(Cc)
+    const id_token=response.tokenId
+    ;
+    console.log("day la id token",id_token)
+    const userLoginGoogle=await UserApi.userLoginGoogle({tokenId:id_token})
+    if(userLoginGoogle){
+      const {data}=userLoginGoogle
+      if(data){
+        console.log(data)
+        localStorage.setItem("user", JSON.stringify(data));
+        localStorage.setItem(
+          "tokenUser",
+          JSON.stringify(data.token)
+        );
+        setLoadingGoogle(false)
+        notification["success"]({
+          message: "Thông báo",
+          description: "login success",
+        });
+        navigate('/home')
+      }
+    
+    }
+    else{
+      console.log("loi")
+    }
+}
+
+
+
   return (
     <>
       <div className="group-login ">
@@ -72,7 +130,7 @@ export default function Login() {
           <GoogleLogin
             className="btn-google-login"
             clientId="39780276999-23ndjnog9cr448vg0jqcmcf4qq62ufnq.apps.googleusercontent.com"
-            // onSuccess={responseGoogle}
+             onSuccess={responseGoogle}
             // onFailure={responseGoogleFail}
             buttonText="Login with google"
             cookiePolicy={"single_host_origin"}
@@ -119,31 +177,65 @@ export default function Login() {
               color={"gray"}
             />
           </Form.Item>
+          
           <Form.Item
-            name="password"
-            hasFeedback
-            rules={[
-              {
-                required: true,
-                message: "không được để trống ",
-              },
-            ]}
-          >
-            <Input.Password
-              size="large"
-              placeholder="Nhập password"
-              iconRender={(visible) =>
-                visible ? <AiFillEyeInvisible /> : <AiOutlineEye />
+          style={{marginTop:"-20px"}} 
+        
+     
+        name="password"
+        rules={[
+          { required: true, message: "Vui lòng nhập mật khẩu!" },
+          {
+            validator: (_, value) => {
+              if (!value || value.length < 6) {
+                return Promise.reject(
+                  new Error("Mật khẩu phải có ít nhất 6 ký tự!")
+                );
               }
-            />
-          </Form.Item>
+              if (!/(?=.*[A-Z])/.test(value)) {
+                return Promise.reject(
+                  new Error("Mật khẩu phải có ít nhất 1 chữ cái viết hoa!")
+                );
+              }
+              if (!/(?=.*\d)/.test(value)) {
+                return Promise.reject(
+                  new Error("Mật khẩu phải có ít nhất 1 chữ số!")
+                );
+              }
+              if (!/(?=.*[!@#$%^&*])/.test(value)) {
+                return Promise.reject(
+                  new Error("Mật khẩu phải có ít nhất 1 ký tự đặc biệt!")
+                );
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+        validateTrigger="onBlur"
+      >
+        <Input.Password   size="large"  placeholder="Nhập mật khẩu "/>
+      </Form.Item>
 
+        {/* new  6LexYaopAAAAAAvH5Jf_8gJxqz2wnRTDBErTzDmx */}
+      {/* cu  6Lc6HdYgAAAAAIKgwEaw-mAtM1zOtaDW3YP9TJOt */}
           <div className="content-recapCha flex items-center mb-5 justify-center">
-            <ReCAPTCHA
-              sitekey="6Lc6HdYgAAAAAIKgwEaw-mAtM1zOtaDW3YP9TJOt"
-              onChange={onChangeReCapch}
-            />
+                  <ReCAPTCHA
+                sitekey="6LexYaopAAAAAAvH5Jf_8gJxqz2wnRTDBErTzDmx"
+                onChange={onChangeReCapch}
+              />
           </div>
+
+             <div className='login-google-facebook'>
+                                       {/* <FacebookLogin
+                                        appId="369529538654989"
+                                        autoLoad={true}
+                                        cssClass="my-facebook-button-class"
+                                        fields="name,email,picture"
+                                        // onClick={componentClickedFaceBook}
+                                        // callback={responseFacebook}
+                                        icon="fa-facebook"/> */}
+                                    </div>
+                                    
 
           <p
             className="errorRecapCha w-full flex items-center justify-center"
@@ -155,7 +247,7 @@ export default function Login() {
               className="w-full bg-blue-500 h-12 "
               htmlType="submit"
             >
-              {loading && (
+              {loading || loadingGoogle&& (
                 <Spin indicator={antIcon} className="text-white mr-3" />
               )}{" "}
               Login

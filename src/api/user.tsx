@@ -60,6 +60,10 @@ const UserApi={
         const url = `users/verify-email?token=${payload.token}`;
         return axiosClient.get(url);
     },
+    userLoginGoogle:(tokenId:any)=>{
+        const url='/users/google-login';
+        return axiosClient.post(url,tokenId)
+    },
    
 }
 export default UserApi

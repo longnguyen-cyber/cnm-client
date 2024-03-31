@@ -111,11 +111,21 @@ export default function Register() {
           label="Email"
           name="email"
           rules={[
-            { required: true, message: "Vui lòng nhập địa chỉ email!" },
             {
-              pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$/,
-              message: 'Địa chỉ email không hợp lệ!',
-            }
+              required: true,
+              message: "không được để trống ",
+            },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (
+                  !value ||
+                  /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
+                ) {
+                  return Promise.resolve();
+                }
+                return Promise.reject("Vui lòng nhập đúng định dạng email");
+              },
+            }),
           ]}
         >
           <Input/>
