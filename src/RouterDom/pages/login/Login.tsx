@@ -8,7 +8,6 @@ import {
 import { Form, Input, Button, Spin, notification } from "antd";
 import GoogleLogin from "react-google-login";
 import "./index.css";
-// import FacebookLogin from 'react-facebook-login'
 import ReCAPTCHA from "react-google-recaptcha";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +18,8 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import {gapi} from 'gapi-script'
 import FormModal2Fa from "./Form2fa/FormModal2Fa";
 import UserApi from "../../../api/user";
+import FacebookLogin from 'react-facebook-login'
+
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export default function Login() {
   const [responseRecapCha, setResponeRecapCha] = useState(false);
@@ -72,6 +73,7 @@ export default function Login() {
   ///=============================check RecapCha==========================///
 
   function onChangeReCapch(response: any) {
+    
      console.log(response)
     if (response) {
       setResponeRecapCha(true);
@@ -119,7 +121,15 @@ export default function Login() {
     }
 }
 
+          async  function responseFacebook(response:any){           
+            const {accessToken,id}=response
+            const data={
+                userId:id,
+                accessToken
+            }       
+         
 
+          }
 
   return (
     <>
@@ -136,6 +146,23 @@ export default function Login() {
             cookiePolicy={"single_host_origin"}
           />
         </div>
+        <div className="login-google-facebook">
+        <FacebookLogin  
+   
+                                        appId="369529538654989"
+                                        autoLoad={true}
+                                        cssClass="my-facebook-button-class"
+                                        fields="name,email,picture"
+                                        // onClick={componentClickedFaceBook}
+                                        callback={responseFacebook}
+                                        icon="fa-facebook"
+                                       
+                                        
+                                        />
+          
+        </div>
+
+  
 
         <div className="content_meo">
           <p>Mẹo đăng ký nhanh với Google hoặc facebook</p>
@@ -218,23 +245,15 @@ export default function Login() {
 
         {/* new  6LexYaopAAAAAAvH5Jf_8gJxqz2wnRTDBErTzDmx */}
       {/* cu  6Lc6HdYgAAAAAIKgwEaw-mAtM1zOtaDW3YP9TJOt */}
+      {/* 6LerqqopAAAAAOIV79lcJ898ElIaGNNQR5kHJJJt */}
           <div className="content-recapCha flex items-center mb-5 justify-center">
                   <ReCAPTCHA
-                sitekey="6LexYaopAAAAAAvH5Jf_8gJxqz2wnRTDBErTzDmx"
+                sitekey="6LerqqopAAAAAOIV79lcJ898ElIaGNNQR5kHJJJt"
                 onChange={onChangeReCapch}
               />
           </div>
 
-             <div className='login-google-facebook'>
-                                       {/* <FacebookLogin
-                                        appId="369529538654989"
-                                        autoLoad={true}
-                                        cssClass="my-facebook-button-class"
-                                        fields="name,email,picture"
-                                        // onClick={componentClickedFaceBook}
-                                        // callback={responseFacebook}
-                                        icon="fa-facebook"/> */}
-                                    </div>
+            
                                     
 
           <p
@@ -266,7 +285,7 @@ export default function Login() {
             <Button
               type="primary"
               className="w-full mt-4 mb-2 border-r h-12 border-gray-200"
-              onClick={() => setOpen2FaForm(true)}
+              // onClick={() => setOpen2FaForm(true)}
               ghost
             >
               <p className="text-center text-gray-500 cursor-pointer">

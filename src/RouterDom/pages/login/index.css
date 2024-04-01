@@ -51,3 +51,30 @@
 .hror p{
     margin-top: -1px;
 }
+
+.my-facebook-button-class {
+  
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+
+    display: inline-block;
+display: flex;
+color: gray;
+
+align-items: center;
+    font-size: 20px;
+    margin: 4px 2px;
+    cursor: pointer;
+    width: 130%;
+    gap: 5;
+    height: 100%;
+    
+}
+.my-facebook-button-class i{
+    font-size: 22px;
+    margin-right: 0.9rem;
+    color: rgb(39, 39, 113);
+}
