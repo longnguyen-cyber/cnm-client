@@ -52,6 +52,7 @@ const TabLeft: FunctionComponent<{
   const handleOk = () => {
     setModalText("The modal will be closed after two seconds");
     setConfirmLoading(true);
+    // updateUserProfile
     setTimeout(() => {
       setOpen(false);
       setConfirmLoading(false);

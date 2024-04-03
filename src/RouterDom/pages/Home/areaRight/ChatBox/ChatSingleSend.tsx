@@ -87,20 +87,7 @@ export const ChatSingleSend:FunctionComponent<any>=({selectedChat})=> {
         )
       }
      
-      // useEffect(() => {
-      //   if(socket){
-      //     socket.on("updatedSendThread",(data:any)=>{
-      //       setDataSocket(data)
-      //       setTimeout(()=>{
-      //         setLoadingsending(false)
-      //         setwordChat('')
-      //       },3500)
-      //     })
-      //    return ()=>{
-      //      socket.off('updatedSendThread')
-      //    }
-      //   }
-      // },[]) 
+   
       useEffect(()=>{
         if(selectedChat.id){
           setLoadingSelectChat(true)

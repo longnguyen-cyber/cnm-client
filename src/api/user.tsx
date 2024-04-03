@@ -38,6 +38,25 @@ const UserApi={
         const url = `chats`;
         return axiosClient.get(url)
     },
+
+    UserGetAllSingleChatwhitelistFriendAccept:()=>{
+        const url = `friend/whitelistFriendAccept`;
+        return axiosClient.get(url)
+    },
+
+
+    UserGetAllSingleChatfriendwaitlistFriendAccept:()=>{
+        const url = `chats/friend/waitlistFriendAccept`;
+        return axiosClient.get(url)
+    },
+
+    getFriendChatWaittingAccept:(receiveId:string)=>{
+        const url = `chats/${receiveId}/friendChatWaittingAccept`;
+        return axiosClient.get(url)
+
+    },
+
+
     UserGetChannelById:(payload: { id: string })=>{
         console.log(payload)
         const url = `/channels/${payload.id}`;
@@ -64,6 +83,10 @@ const UserApi={
         const url='/users/google-login';
         return axiosClient.post(url,tokenId)
     },
+    updateUserProfile: (payload: any) => {
+        const url = `users/update`;
+        return axiosClient.post(url, payload);
+    }
    
 }
 export default UserApi

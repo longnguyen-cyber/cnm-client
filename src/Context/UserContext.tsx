@@ -19,6 +19,7 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const [userSelect,setUserSelect]=useState<any>(null);
     const [checkRender,setScheckRender]=useState<any>(false);
     const [userInvite,setUserInvite]=useState<any>(null);
+    const [chatReject,setChatReject]=useState<any>(null)
     
     useEffect(()=>{
       
@@ -54,7 +55,8 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
       selectedChat: [selectedChat, setselectedChats],
       userSelect:[userSelect,setUserSelect],
       checkRender:[checkRender,setScheckRender],
-      userInvite:[userInvite,setUserInvite]
+      userInvite:[userInvite,setUserInvite],
+      chatReject:[chatReject,setChatReject]
     };
 
     return (

@@ -64,7 +64,7 @@ export const ScrollChatSingle: FunctionComponent<any> = ({ Channelid ,loadingsen
            
                   {wordchat?(
                 <div className={`flex flex-col items-end w-full ${fadeInClass}`} ref={chatContainerRef}>
-                  <p className="bg-white mt-1 rounded mr-4 p-2 mb-1">
+                  <p className="bg-white mt-1 rounded mr-4 p-2 mb-3">
                     {wordchat}
                     <span className="text-sm text-gray-500">
                       {/* {format(new Date(String(m.timeThread)), "HH:mm")} */}
@@ -89,7 +89,7 @@ export const ScrollChatSingle: FunctionComponent<any> = ({ Channelid ,loadingsen
         <div className='content_Scroll' ref={chatContainerRef}>
                   { wordchat?(
                 <div className={`flex flex-col items-end w-full ${fadeInClass}`} ref={chatContainerRef}>
-                  <p className="bg-white mt-1 rounded mr-4 p-2 mb-1">
+                  <p className="bg-white mt-1 rounded mr-4 p-2 mb-3">
                     {wordchat}
                     <span className="text-sm text-gray-500">
                       {/* {format(new Date(String(m.timeThread)), "HH:mm")} */}

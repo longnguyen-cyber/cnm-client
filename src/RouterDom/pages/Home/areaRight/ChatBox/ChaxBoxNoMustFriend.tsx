@@ -24,8 +24,9 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     const [loadingsending,setLoadingsending]=useState(false);
     const [DataSocket,setDataSocket]=useState<any>(null)
     const [chatSingleIdnew,setChatSingleIdNew]=useState<any>(null)
-    console.log('day la selected chat')
-    console.log(selectedChat)
+    const [chatReject,setChatReject]=state.chatReject
+    // console.log('day la selected chat')
+    // console.log(selectedChat)
     // console.log('day la wordk chat')
     // console.log(wordchat)
  
@@ -38,6 +39,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
       if(selectedChat){
         const data=await dispatch<any>(UserGetChatsSingleById({ id: selectedChat.id }));
         // console.log("day la data check")
+        // console.log(data)
         if(data.error){
           setChatSingleIdNew(null)
         }
@@ -72,7 +74,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     useEffect(() => {
       if(socket){
         socket.on("chatWS",async(payload:any)=>{
-          console.log(payload)
+        
     
           const {data}=payload
       
@@ -89,30 +91,50 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
               
             }
           }
+          if(payload.message==="Accept friend success"){
+                     
+            setselectedChats(payload.data.chat);
+           
+        }
 
+          if(payload&&payload.message==='Accept friend success'){
+            if(data&&data.chat){
+              ListSingleChat.map((value: any) => {
+             if (value.id === data.chat.id) {
+               // Tạo một bản sao của đối tượng và cập nhật thuộc tính
+               console.log('vao day 2data gui ve khi sendmessage')
+               setselectedChats({ ...value, isFriend: true ,requestAdd:false});
 
-          if(data&&data.chat){
-                 ListSingleChat.map((value: any) => {
-                if (value.id === data.chat.id) {
-                  // Tạo một bản sao của đối tượng và cập nhật thuộc tính
-                  console.log('vao day 2data gui ve khi sendmessage')
-                  setselectedChats({ ...value, isFriend: true ,requestAdd:false});
+             }
+             // Trả về đối tượng không thay đổi nếu không đáp ứng điều kiện
+           });
+         setDataSocket(data.user)
+     }
 
-                }
-                // Trả về đối tượng không thay đổi nếu không đáp ứng điều kiện
-              });
-            setDataSocket(data.user)
+   }
+       
+
+        if(payload&&payload.message==='Unrequest friend success'){
+         
+          setselectedChats({ ...selectedChat, isFriend: false ,requestAdd:false});
+
         }
          if(payload&&payload.message==='Đã gửi lời mời kết bạn'){
           notification['error']({
             message:'Thông báo',
-            description:'Đã gửi lời mời kết bạn'
+            description:'Bạn  Đã gửi lời mời kết bạn với người này rồi '
           })
-       
         }
 
         if(payload&&payload.message==='Request friend success'){
-          setselectedChats({ ...selectedChat, isFriend: false ,requestAdd:true});
+          setselectedChats({...payload.data.chat,user:{...selectedChat}});
+        }
+        if(payload&&payload.message==="Reject friend success"){
+          console.log('vao day')
+          // console.log(payload.data)
+          setselectedChats(user)
+          // setDataSocket(payload)
+
         }
 
         
@@ -167,7 +189,9 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
                       },
                       receiveId:selectedChat.id,
                     }
-                      // socket.emit('createChat',Threadcreate)
+                    console.log('deno')
+                    console.log(Threadcreate)
+                    socket.emit('createChat',Threadcreate)
                    }
                   }
             setwordChat(event.target.value)
@@ -190,8 +214,6 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
               chatId:chatSingleIdnew.id
               ,
             }
-
-            console.log(sendReqAddFriendHaveChat)
             socket.emit('reqAddFriendHaveChat',sendReqAddFriendHaveChat)
           }
           else{
@@ -205,20 +227,41 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
                  socket.emit('reqAddFriend',sendReqAddFriend)
               }
 
+              notification['success']({
+                message:'Thông báo',
+                description:'Đã gửi lời mời kết bạn'
+              })
             }
            
           }
-      notification['success']({
-            message:'Thông báo',
-            description:'Đã gửi lời mời kết bạn'
-          })
+    
          
           
         }
 
         return socket.off("reqAddFriend")
       }
+
+      const cancelFriend=(selectedChat:any)=>{
+   
+        if(selectedChat&&selectedChat.id){
+          if(socket){
+            const cancelFriend={
+              chatId:selectedChat.id
+              ,
+            }
+         
+            socket.emit('unReqAddFriend',cancelFriend)
+            notification['success']({
+              message:'Thông báo',
+              description:'Đã huỷ lời mời kết bạn'
+            })
+          }
+        }
+
+      }
       const getSelectUserIsChoose = (selectedChat: any) => {   
+       
         return (
           <>
             <div className='flex justify-between w-full items-center p-1'>
@@ -229,16 +272,16 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
                     <div className='flex gap-3 bacgroundxe  items-center px-5'>
                         <img src={selectedChat && selectedChat.user ? selectedChat.user.avatar : (selectedChat && selectedChat.avatar ? selectedChat.avatar : "")} className='w-12 h-12 rounded-full' />
                         <div>
-                        <p className='text-xl font-medium '>{selectedChat.name?selectedChat.name:selectedChat.user.name}</p>
-                        <p style={{fontSize:'12px'}} className='bg-gray-400 border m-0 border-r-2 p-1 rounded-md text-white font-medium'> {selectedChat.isFriend?<>Bạn bè </>:<>Người Lạ  </>} </p>
+                        <p className='text-xl font-medium '>{selectedChat&&selectedChat.name?selectedChat.name:selectedChat.user.name}</p>
+                        <p style={{fontSize:'12px'}} className='bg-gray-400 border m-0 border-r-2 p-1 rounded-md text-white font-medium'> {selectedChat&&selectedChat.isFriend?<>Bạn bè </>:<>Người Lạ  </>} </p>
                         </div>
                     </div>}
                     </div>
                
                 </div>
               <div className='flex items-center '>
-              <AiOutlineUserAdd size={20}/> <p className='bg-gray-200 border-r-gray-200 cursor-pointer font-medium p-1 rounded-md'> {selectedChat.
-               requestAdd===true&&selectedChat.isFriend===false?<>Huỷ kết bạn  </>:<p  onClick={()=>sendReqAddFriend()}>Gửi kết bạn </p>}</p>
+              <AiOutlineUserAdd size={20}/> <p className='bg-gray-200 border-r-gray-200 cursor-pointer font-medium p-1 rounded-md'> {selectedChat&&selectedChat.
+               requestAdd===true&&selectedChat.isFriend===false?<p onClick={()=>cancelFriend(selectedChat)}>Huỷ kết bạn  </p>:<p  onClick={()=>sendReqAddFriend()}>Gửi kết bạn </p>}</p>
               </div> 
             </div>
           </>

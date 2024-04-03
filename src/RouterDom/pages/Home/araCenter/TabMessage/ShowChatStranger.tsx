@@ -9,11 +9,11 @@ export const ShowChatStranger:FunctionComponent<any>=({ListSingleChat,Loading,se
     <div className='flex flex-col-reverse gap-3'>
     {
        !Loading?ListSingleChat?.map((itemChat: any, index: number) => (
-        !itemChat.isFriend&&itemChat.threads.length>0 &&
+        !itemChat.isFriend &&
             <div key={index} className="flex items-center pl-1 cursor-pointer" onClick={()=>{setselectedChats(itemChat)}}>
             <div className="flex-shrink-0">
               <div className="flex flex-wrap w-14 justify-center items-center">
-                  <img key={index} className="w-14 h-14 rounded-full" src={`${itemChat?itemChat.user.avatar:""}`} alt="Avatar 1" />
+                  <img key={index} className="w-14 h-14 rounded-full" src={`${itemChat&&itemChat.user.avatar?itemChat.user.avatar:""}`} alt="Avatar 1" />
               </div>
             </div>
             <div className="flex-grow ml-4">

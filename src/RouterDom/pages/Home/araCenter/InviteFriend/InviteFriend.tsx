@@ -9,10 +9,13 @@ import { Spin, notification } from 'antd'
 import { AiOutlineUserAdd } from 'react-icons/ai'
 import { LoadingOutlined } from '@ant-design/icons';
 import { UserGetAllSingleChat } from '../../../../../feature/chat/pathApi'
+import UserApi from '../../../../../api/user'
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export default function InviteFriend() {
     var ListSingleChat=useSelector((state:any)=>state.Chats.chatSingleSlide)
-    console.log(ListSingleChat)
+    const [waitlistFriendAccept,setwaitlistFriendAccept]=useState<any>(null)
+    console.log(waitlistFriendAccept)
+ 
     const dispatch=useDispatch()
     const [LoadingSingle,setLoadingSingle]=useState<any>(false)
     const UserContexts = useContext(UserContext);
@@ -21,37 +24,50 @@ export default function InviteFriend() {
     const { socket } = state
       const [selectedChat, setselectedChats] = state.selectedChat;
       const [checkRender,setScheckRender]=state.checkRender
-      console.log(selectedChat)
      const [dataSocket,setDataSocket]=useState<any>(null)
+     const [loadingReject,setLoadingReject]=useState<any>(false)
+     const [chatReject,setChatReject]=state.chatReject
+
+     useEffect(()=>{
+    async function  getdatawatingFriendAccept(){
+        const data=await UserApi.UserGetAllSingleChatfriendwaitlistFriendAccept()
+        if(data){
+         
+            setwaitlistFriendAccept(data.data)
+        }
+
+      }
+      getdatawatingFriendAccept()
+    
+     },[dataSocket])
     useEffect(()=>{
         if(socket){
-            socket.on("chatWS",(data:any)=>{     
-                console.log('chatWS')
-                console.log(data)
-                console.log(data.message) 
-                         
+            socket.on("chatWS",(data:any)=>{      
                     if(data.message==="Request friend success"){
                         setDataSocket(data.data.user)
                         setScheckRender(false)
                     }
                     else if(data.message==="Accept friend success"){
-                        console.log("Accept friend success")
-                        console.log(data.data.chat) 
-                        dispatch<any>(UserGetAllSingleChat())
-                      ListSingleChat.map((value: any) => {
-                            if (value.id === data.data.chat.id) {
-                              // Tạo một bản sao của đối tượng và cập nhật thuộc tính
-                              setselectedChats({ ...value, isFriend: true ,requestAdd:false});
-                              
-                           
-                            }
-                            // Trả về đối tượng không thay đổi nếu không đáp ứng điều kiện
-                          });
+                     
+                        setselectedChats(data.data.chat);
                         setDataSocket(data.user)
+                    }
+                    else if(data.message==="Unrequest friend success"){
+                     
+                        setDataSocket(data)
+                        setselectedChats({ ...selectedChat, isFriend: false ,requestAdd:false});
+                    }
+                    else if(data.message==="Reject friend success"){
+                      
+                        // setselectedChats({ ...chatReject, isFriend: false ,requestAdd:false});
+                   
+                        setDataSocket(data)
+                        setLoadingReject(false)
+                     
                     }
             })
         }
-    },[socket])
+    },[socket,chatReject])
 
     useEffect(()=>{
         dispatch<any>(UserGetAllSingleChat())
@@ -69,7 +85,16 @@ export default function InviteFriend() {
           });
         }
     }
-    const RevokeRequest=(value:any)=>{}
+
+
+    const RevokeRequest=(value:any)=>{
+      setLoadingReject(true)
+      setChatReject(value)
+      
+      if(socket){
+        socket.emit('rejectAddFriend',{chatId:value.id})
+      }
+    }
    
   return (
     <div>
@@ -84,9 +109,9 @@ export default function InviteFriend() {
        <div  className='rqFriend p-5'>
 
       
-       {ListSingleChat && ListSingleChat.map((item:any, index:any) => {
+       {waitlistFriendAccept && waitlistFriendAccept.map((item:any, index:any) => {
   // Determine if the current user is the sender
-  const isSender = user.id=== item.
+  const isSender = item.user.id === item.
   receiveId
   ;
   
@@ -106,17 +131,17 @@ export default function InviteFriend() {
           <div className='m-auto'>
             {isSender ? (
               // Show "Revoke" button for the sender
-              <button className='w-full text-black bg-gray-200 p-2 rounded-md' onClick={() => RevokeRequest(item)}>
+              <button className='w-full text-black bg-gray-200 p-2 rounded-md'>
                 Thu hồi lời mời
               </button>
             ) : (
               // Show "Accept" and "Decline" buttons for the receiver
               <>
                 <button className='bg-gray-200 text-black p-2 rounded-md mr-5' onClick={() => AcceptChat(item)}>
-                  Đồng ý
+               {LoadingSingle&&<Spin indicator={antIcon} className="text-white mr-3" /> }  Đồng ý
                 </button>
-                <button className='bg-red-500 text-white p-2 rounded-md'>
-                  Từ chối
+                <button className='bg-red-500 text-white p-2 rounded-md' onClick={() => RevokeRequest(item)}>
+                 {loadingReject&&<Spin indicator={antIcon} className="text-white mr-3" />} Từ chối
                 </button>
               </>
             )}
@@ -127,11 +152,9 @@ export default function InviteFriend() {
   }
 })}
 
-        </div>
-
-        <div>
-
-        </div>
+              </div>
+            <div>
+         </div>
     </div>
   )
 }
