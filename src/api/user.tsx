@@ -86,6 +86,10 @@ const UserApi={
     updateUserProfile: (payload: any) => {
         const url = `users/update`;
         return axiosClient.post(url, payload);
+    },
+    updateProfileUser: (payload: any) => {
+        const url = `users/update`;
+        return axiosClient.put(url, payload);
     }
    
 }
