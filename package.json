@@ -24,6 +24,7 @@
     "npm": "^10.5.1",
     "query-string": "^8.1.0",
     "react": "^18.2.0",
+    "react-audio-voice-recorder": "^2.2.0",
     "react-dom": "^18.2.0",
     "react-facebook-login": "^4.1.1",
     "react-google-login": "^5.2.2",
