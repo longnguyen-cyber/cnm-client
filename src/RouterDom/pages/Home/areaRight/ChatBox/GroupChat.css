@@ -10,17 +10,20 @@
 .no-outline:focus {
     outline: none;
   }
-  .content_Scroll {
-    width: 100%;
-    max-height: 85vh;
-    overflow-y: scroll;
-  }
+
   
 .content_Scroll::-webkit-scrollbar-track{
     display: none;
-  
 }
-
+.hoverEffect{
+  width: 25px;
+  height: 25px;
+}
+.hoverEffect:hover {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
 .content_Scroll::-webkit-scrollbar{
     display: none;
     width: 8px;
@@ -47,3 +50,20 @@
     }
   }
   
+  .inputparant{
+    position: relative;
+    width: 100%;
+
+    
+  }
+  .file{
+    position: absolute;
+    right: 0;
+    margin-right: 10px;
+    margin-top: 18px;
+
+
+  
+  
+  }
+

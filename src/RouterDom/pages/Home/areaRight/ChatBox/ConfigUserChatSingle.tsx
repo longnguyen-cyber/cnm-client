@@ -5,11 +5,12 @@
 import { IUser } from "../../../../../Type";
 
 export const isSameSenderMargin = (messages:any, m:any, i:any, userId:string) => {
+  
 
   // console.log(i === messages.length - 1);
 
   if (
-    i < messages.length - 1 &&
+    messages[messages.length - 1].typeMsg !=='recall'&& i < messages.length - 1 &&
     messages[i + 1].user.id === m.user.id&&
     messages[i].user.id !== userId
   )
@@ -27,7 +28,7 @@ export const isSameSenderMargin = (messages:any, m:any, i:any, userId:string) =>
 export const isSameSender = (messages:any, m:any, i:any, userId:any) => {
 
   return (
-    i < messages.length - 1 &&
+    messages[messages.length - 1].typeMsg !=='recall' &&  i < messages.length - 1 &&
     (messages[i + 1].user.id !== m.user.id||
       messages[i + 1].user.id=== undefined) &&
     messages[i].user.id !== userId
