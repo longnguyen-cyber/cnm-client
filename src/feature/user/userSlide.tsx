@@ -7,6 +7,7 @@ import {
   UserCreateChannel,
   UserCreateSingleChat,
   UserVerifyEmail,
+  updateProfile,
 } from "./pathApi";
 import { IInitialStateUser, IUser } from "../../Type";
 import { message, notification } from "antd";
@@ -157,11 +158,29 @@ const userSlide = createSlice({
       state.loading = false;
       // if(data.message==="Verify user success"){
       // navigate('/login')
-    
+
       // state.accessTokenToGen2fa = action.payload.data.accessToken;
       notification["success"]({
         message: "Thông báo",
         description: "Xác thực thành công",
+      });
+    });
+    // update profile
+    builder.addCase(updateProfile.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(updateProfile.rejected, (state, action) => {
+      state.loading = false;
+      notification["error"]({
+        message: "Thông báo",
+        description: "Cập nhật thất bại",
+      });
+    });
+    builder.addCase(updateProfile.fulfilled, (state, action) => {
+      state.loading = false;
+      notification["success"]({
+        message: "Thông báo",
+        description: "Cập nhật thành công",
       });
     });
   },

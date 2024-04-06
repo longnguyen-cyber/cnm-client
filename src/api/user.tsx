@@ -92,6 +92,7 @@ const UserApi={
         const url = `users/update`;
         return axiosClient.post(url, payload);
     },
+<<<<<<< HEAD
 
         userUploadImage: (formData:any) => {
             const url = `/upload`;
@@ -102,6 +103,12 @@ const UserApi={
             });
         }
  
+=======
+    updateProfileUser: (payload: any) => {
+        const url = `users/update`;
+        return axiosClient.put(url, payload);
+    }
+>>>>>>> d8aab7baeed9f85bb49b79d48c0c8a76e5015264
    
 }
 export default UserApi

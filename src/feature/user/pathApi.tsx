@@ -38,3 +38,8 @@ export const UserVerifyEmail=createAsyncThunk("UserVerifyEmail",async (payload: 
   const dataUser = UserApi.UserVerifyEmail(payload);
   return dataUser;
 })
+
+export const updateProfile=createAsyncThunk("updateProfile",async (payload: {data: any, token: any})=>{
+  const dataUser = UserApi.updateProfileUser(payload);
+  return dataUser;
+})

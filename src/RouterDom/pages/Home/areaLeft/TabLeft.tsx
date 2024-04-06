@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { FaFileImage, FaRegEdit, FaToolbox, FaUserEdit } from "react-icons/fa";
+import { UploadOutlined } from "@ant-design/icons";
 import {
   AiOutlineMessage,
   AiFillContacts,
@@ -12,6 +13,10 @@ import { Navigate, useNavigate } from "react-router";
 import "./TabLeft.css";
 import UserApi from "../../../../api/user";
 import { IRegister } from "../../../../Type";
+import { useDispatch } from "react-redux";
+import { updateProfile } from "../../../../feature/user/pathApi";
+import Upload from "antd/es/upload/Upload";
+import { set } from "date-fns";
 const TabLeft: FunctionComponent<{
   setTabCurrent: React.Dispatch<React.SetStateAction<string>>;
 }> = ({ setTabCurrent }) => {
@@ -19,35 +24,28 @@ const TabLeft: FunctionComponent<{
   const [openModalImage, setOpenModalImage] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [modalText, setModalText] = useState("Content of the modal");
+  const storedUser = localStorage.getItem("user");
+  const userInfor = storedUser ? JSON.parse(storedUser) : null;
+  const dispatch = useDispatch();
+  const [imageUrl, setImageUrl] = useState(null);
 
   const showModal = () => {
     setOpen(true);
   };
   const showModalImage = () => {
     setOpenModalImage(true);
-  }
-  const handleUpdateImage = ()=>{
-    // async (values: IRegister) => {
-    //   // delete values.confirmPassword;
-    //   try {
-    //     const response = await UserApi.UserUpdate({
-    //       name: values.name,
-    //       password: values.password,
-    //       email: values.email,
-    //       avatar: {
+  };
+  const handleUpload = (info: any) => {
+    setImageUrl(info.file[0]);
+  };
 
-    //       }
-    //     });
-    //     if (response) {
-    //       navigate("/");
-    //     }
-    //     console.log(response);
-      
-    //   } catch (error) {
-    //     // Handle the error here
-    //   }
-    // };
-  }
+  const handleUpdateImage = () => {
+    userInfor["avatar"] = imageUrl;
+    const data = {
+      data: userInfor,
+      token: userInfor?.token,
+    };
+  };
 
   const handleOk = () => {
     setModalText("The modal will be closed after two seconds");
@@ -65,10 +63,7 @@ const TabLeft: FunctionComponent<{
   };
   const handelCancelImage = () => {
     setOpenModalImage(false);
-  }
-
-  const storedUser = localStorage.getItem("user");
-  const userInfor = storedUser ? JSON.parse(storedUser) : null;
+  };
 
   const [openlogOut, setOpenLogOut] = useState(false);
   const navigate = useNavigate();
@@ -201,9 +196,11 @@ const TabLeft: FunctionComponent<{
         onCancel={handleCancel}
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
-          {/* <OkBtn/> */}
+            {/* <OkBtn/> */}
             <Button className="bg-blue-500">Cập nhật</Button>
-            <Button onClick={handleCancel} className="">Hủy</Button>
+            <Button onClick={handleCancel} className="">
+              Hủy
+            </Button>
           </>
         )}
       >
@@ -244,22 +241,40 @@ const TabLeft: FunctionComponent<{
           </div>
           {/* info */}
           <div style={{ borderTop: "4px solid #ccc" }}>
-            <h3  className="text-lg font-bold mb-2">Thông tin người dùng</h3>
+            <h3 className="text-lg font-bold mb-2">Thông tin người dùng</h3>
             <p>Số điện thoại: {userInfor?.phone}</p>
             <p>Email: {userInfor?.email}</p>
           </div>
         </div>
-        
       </Modal>
       <Modal
-         width={400}
-         title="Hồ sơ"
-         open={openModalImage}
-         onOk={handleUpdateImage}
-         confirmLoading={confirmLoading}
-         onCancel={handelCancelImage}
+        width={400}
+        title="Hồ sơ"
+        open={openModalImage}
+        onOk={handleUpdateImage}
+        confirmLoading={confirmLoading}
+        onCancel={handelCancelImage}
       >
-        <input type="file" name="avatar" />
+        <Upload
+          name="avatar"
+          action="/your-upload-url"
+          listType="picture"
+          onChange={handleUpload}
+          // You may customize additional props as per your requirements
+        >
+          <Button icon={<UploadOutlined />}>Click to Upload</Button>
+        </Upload>
+        {/* Display uploaded image preview */}
+        {imageUrl && (
+          <div style={{ width: "200px", height: "200px" }}>
+            <h2>Preview:</h2>
+            <img
+              src={imageUrl}
+              alt="Uploaded Avatar"
+              style={{ minWidth: "200px", minHeight: "200px" }}
+            />
+          </div>
+        )}
       </Modal>
     </>
   );
