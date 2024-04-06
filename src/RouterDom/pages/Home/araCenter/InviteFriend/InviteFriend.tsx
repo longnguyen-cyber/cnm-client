@@ -45,22 +45,38 @@ export default function InviteFriend() {
             socket.on("chatWS",(data:any)=>{      
                     if(data.message==="Request friend success"){
                         setDataSocket(data.data.user)
-                        setScheckRender(false)
+                        // setScheckRender(false)
                     }
                     else if(data.message==="Accept friend success"){
                      
-                        setselectedChats(data.data.chat);
-                        setDataSocket(data.user)
+                        //  setselectedChats(data.data.chat);
+                        setDataSocket(data)
+                        // notification['success']({
+                        //   message: 'Success',
+                        //   description:
+                        //     'Chấp nhận  kết bạn thành công',
+                        // });
+                        setLoadingSingle(false)
+                        
                     }
                     else if(data.message==="Unrequest friend success"){
                      
                         setDataSocket(data)
                         setselectedChats({ ...selectedChat, isFriend: false ,requestAdd:false});
+                        // notification['success']({
+                        //     message: 'Success',
+                        //     description:
+                        //       'Hủy kết bạn thành công',
+                        //   });
                     }
                     else if(data.message==="Reject friend success"){
                       
                         // setselectedChats({ ...chatReject, isFriend: false ,requestAdd:false});
-                   
+                        notification['success']({
+                          message: 'Success',
+                          description:
+                            'Từ chối  kết bạn thành công',
+                        });
                         setDataSocket(data)
                         setLoadingReject(false)
                      

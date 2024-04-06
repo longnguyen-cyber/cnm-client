@@ -2,6 +2,11 @@ import { ILogin, IRegister } from "../Type";
 import axiosClient from "./axiosClient";
 
 const UserApi={
+    getUserById:(id:string)=>{
+        const url=`/users/${id}`
+        return axiosClient.get(url)
+
+    },
     getAllUser:()=>{
         const url='/users'
         return axiosClient.get(url);
@@ -87,10 +92,23 @@ const UserApi={
         const url = `users/update`;
         return axiosClient.post(url, payload);
     },
+<<<<<<< HEAD
+
+        userUploadImage: (formData:any) => {
+            const url = `/upload`;
+            return axiosClient.post(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+        }
+ 
+=======
     updateProfileUser: (payload: any) => {
         const url = `users/update`;
         return axiosClient.put(url, payload);
     }
+>>>>>>> d8aab7baeed9f85bb49b79d48c0c8a76e5015264
    
 }
 export default UserApi
