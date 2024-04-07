@@ -21,6 +21,7 @@ import { Button, Upload, Image, message } from "antd";
 import UserApi from "../../../../../api/user";
 import AudioRecorderComponent from "./AudioRecorderComponent";
 import { MdAttachFile } from "react-icons/md";
+// import VideoRecorderComponent from "./VideoRecorderComponent";
 
 // import { ScrollChatSingle } from './ScrollChatSingle'
 export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
@@ -161,26 +162,26 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
       socket.on("updatedEmojiThread", (data: any) => {
         console.log("emoji data tra ve");
         console.log(data);
-        if (data.typeEmoji === "add") {
+        if (data?.typeEmoji === "add") {
           if (
             chatSingleIdnew &&
             typeof chatSingleIdnew === "object" &&
             chatSingleIdnew !== null
           ) {
-            const threadschat = chatSingleIdnew.threads;
-            const index = threadschat.findIndex(
+            const threadschat = chatSingleIdnew?.threads;
+            const index = threadschat?.findIndex(
               (item: any) => item.stoneId === data.stoneId
             );
             if (index !== 0) {
-              const emoji = [...threadschat[index].emojis, data];
+              const emoji = [...threadschat[index]?.emojis, data];
               const newThreadschatItem = {
                 ...threadschat[index],
                 emojis: emoji,
               };
               const newTheardupdate = [
-                ...threadschat.slice(0, index),
+                ...threadschat?.slice(0, index),
                 newThreadschatItem,
-                ...threadschat.slice(index + 1),
+                ...threadschat?.slice(index + 1),
               ];
               setChatSingleIdNew({
                 ...chatSingleIdnew,
@@ -237,6 +238,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
   const unFriend = async (selectedChat: any) => {
     setLoadingUnfriend(true);
     if (socket) {
+      console.log("selectedChat", selectedChat.user.id);
       socket.emit("unfriend", {
         chatId: selectedChat.user.id,
       });
@@ -246,6 +248,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
       });
     }
     setLoadingUnfriend(false);
+    setOpenModalUserChat(false);
   };
 
   const modalToUnfriend = (selectedChat: any) => {
@@ -260,7 +263,12 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
         footer={(_, { OkBtn, CancelBtn }) => (
           <>
             {/* <OkBtn/> */}
-            <Button className="bg-red-500">Hủy kết bạn</Button>
+            <Button
+              className="bg-red-500"
+              onClick={() => unFriend(selectedChat)}
+            >
+              Hủy kết bạn
+            </Button>
             <Button
               className="bg-blue-500"
               onClick={() => setOpenModalUserChat(false)}
@@ -460,6 +468,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
                   className=""
                   selectedChat={selectedChat}
                 />
+             
               </div>
             </div>
             <div></div>

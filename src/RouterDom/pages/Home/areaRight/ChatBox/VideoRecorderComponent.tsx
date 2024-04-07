@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useContext, useState } from "react";
-import { AudioRecorder } from "react-audio-voice-recorder";
 import UserApi from "../../../../../api/user";
 import { UserContext } from "../../../../../Context/UserContext";
+import VideoRecorder  from "react-video-recorder";
 // import { AudioRecorder } from 'react-audio-voice-recorder';
 
-const AudioRecorderComponent:FunctionComponent<any>=({selectedChat})=> {
+const VideoRecorderComponent: FunctionComponent<any> = ({ selectedChat }) => {
   const [audioDetails, setAudioDetails] = useState();
   const contextUser = useContext(UserContext);
   const { state } = contextUser;
@@ -17,7 +17,6 @@ const AudioRecorderComponent:FunctionComponent<any>=({selectedChat})=> {
   const handleAudioUpload = () => {
     // console.log(audioDetails);
     console.log("---------audioDetails------------>", audioDetails);
-
   };
 
   // const handleRest = () => {
@@ -33,24 +32,23 @@ const AudioRecorderComponent:FunctionComponent<any>=({selectedChat})=> {
   //   };
   //   setAudioDetails(reset);
   // };
-  
+
   const beforeUpload = async (file: any) => {
     const formData = new FormData();
     formData.append("files", file); // Chú ý là "files" nếu server dùng AnyFilesInterceptor()
 
     try {
       const response = await UserApi.userUploadImage(formData);
-      console.log(response)
+      console.log(response);
       const Thread = {
         chatId: selectedChat.id,
         receiveId: selectedChat.user.id,
         fileCreateDto: response.data,
       };
-      console.log(Thread)
+      console.log(Thread);
       if (socket) {
         socket.emit("sendThread", Thread);
       }
-
     } catch (error) {
       console.error(error);
     }
@@ -66,23 +64,19 @@ const AudioRecorderComponent:FunctionComponent<any>=({selectedChat})=> {
     setAudioDetails(blob);
     // const formData = new FormData();
     beforeUpload(blob);
-
   };
 
   return (
     <div className="mt-2">
-      <AudioRecorder
-        onRecordingComplete={addAudioElement}
-        audioTrackConstraints={{
-          noiseSuppression: true,
-          echoCancellation: true,
+      {/* <VideoRecorder
+        onRecordingComplete={(videoBlob: File) => {
+          // Do something with the video...
+          console.log("videoBlob", videoBlob);
         }}
-        downloadOnSavePress={true}
-        downloadFileExtension="mp3"
-        showVisualizer={true}
-      />
+      /> */}
+      hihi
     </div>
   );
 };
 
-export default AudioRecorderComponent;
+export default VideoRecorderComponent;
