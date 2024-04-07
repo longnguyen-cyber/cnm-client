@@ -41,7 +41,6 @@ export const SearchUserAddChat: FunctionComponent<any> = ({ searchValue }) => {
 
     useEffect(() => {
         if (searchValue) {
-            
           
                 dispatch<any>(userSeach({ name: searchValue }));
           

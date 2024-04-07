@@ -25,10 +25,11 @@ export const ShowChatStranger:FunctionComponent<any>=({ListSingleChat,Loading,se
                  
               {itemChat.lastedThread ?
               <div className='flex justify-between'>
-            {itemChat.lastedThread.messages.message
-                              && itemChat.lastedThread.messages.message.length > 30 ?
-                              itemChat.lastedThread.messages.message.substring(0, 51) + "..." :
-                              itemChat.lastedThread.messages.message}
+                 {itemChat.lastedThread.messages?
+
+                    itemChat.lastedThread.messages.message.length > 30 ?
+                    itemChat.lastedThread.messages.message.substring(0, 51) + "..." :
+                    itemChat.lastedThread.messages.message:"Có file được gửi "}
                 <div></div>
 
                 

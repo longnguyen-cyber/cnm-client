@@ -12,6 +12,8 @@ import { UserGetAllChannel, UserGetAllSingleChat } from '../../../../../feature/
 import {ChatSingle} from './ChatSingle';
 import ShowChatMessage from './ChatChannelMessage';
 import ShowChatStranger from './ShowChatStranger';
+import UserApi from '../../../../../api/user';
+import { Socket } from 'engine.io-client';
 
 export default function Tabmessage() {
   const [stateType, setType] = useState(false)
@@ -23,27 +25,82 @@ export default function Tabmessage() {
    const {state}=UserContexts;
    const [user,setUser]=state.user;
    const [token,setToken]=state.token
+    const {socket}=state
    const [selectedChat, setselectedChats] = state.selectedChat;
+
+   const [ListSingleChatnew,setListSingleChatnew]=useState<any>([])
+    const [ListChannelnew,setListChannelnew]=useState<any>([])
   
-   const dispatch=useDispatch()
-   const dispatchUserGetAllChannel = useCallback(() => {
-    dispatch<any>(UserGetAllChannel());
-  }, [dispatch]);
+
+    useEffect(()=>{
+    async function  UserGetAllSingleChat(){
+      const data=await UserApi.UserGetAllSingleChat()
+
+      if(data){
+        setListSingleChatnew(data.data)
+      }
+
+      }
+      UserGetAllSingleChat()
+      
+    },[])
+
+
+
+
+
+
+
+    useEffect(()=>{
+      async function  UserGetAllChannelChat(){
+        const data=await UserApi.UserGetAllChannel()
   
-  useEffect(() => {
-    dispatchUserGetAllChannel();
-  },[dispatchUserGetAllChannel]);
+        if(data){
+          setListChannelnew(data.data)
+        }
+  
+        }
+        UserGetAllChannelChat()
+        
+      },[])
+
+      useEffect(()=>{
+        socket.on("updatedSendThread", async (data: any) => {
+       
+          setListSingleChatnew((prev:any)=>{
+            return prev.map((item:any)=>{
+              if(item.id===data.chatId){
+                return {...item,lastedThread:data}
+              }
+              return item
+            })
+          })
+      const datas=await UserApi.UserGetAllChannel()
+  
+        if(data){
+          setListChannelnew(datas.data)
+        }
+  
+
+        })
+
+
+      },[socket,ListSingleChatnew])
+
+      useEffect(
+        ()=>{
+        socket.on("chatWS", async (data: any) => {
+          const datas=await UserApi.UserGetAllChannel()
+          if(data){
+            setListChannelnew(datas.data)
+           }
+          })
+        },[socket,ListSingleChatnew])
 
 
 
-  const dispatchUserGetAllSingleChat = useCallback(() => {
-    dispatch<any>(UserGetAllSingleChat());
-  },[dispatch])
-
-  useEffect(()=>{
-    dispatchUserGetAllSingleChat()
-  },[dispatchUserGetAllSingleChat])
-
+  
+  
   return (
     <>
     {user?
@@ -52,13 +109,13 @@ export default function Tabmessage() {
         <div className='flex-1 flex-shrink-0 '>
           <Tabs >
             <TabPane tab="Bạn bè" className=' w-full' key="1">
-              <ChatSingle ListSingleChat={ListSingleChat} Loading={LoadingSingle} setselectedChats={setselectedChats}/>
+              <ChatSingle ListSingleChat={ListSingleChatnew} Loading={LoadingSingle} setselectedChats={setselectedChats}/>
             </TabPane>
             <TabPane tab="Chat nhóm " key="2">
-            <ShowChatMessage ListChannel={ListChannel} Loading={LoadingChannels} setselectedChats={setselectedChats} />
+            <ShowChatMessage ListChannel={ListChannelnew} Loading={LoadingChannels} setselectedChats={setselectedChats} />
             </TabPane>
             <TabPane tab="Người lạ " key="3">
-            <ShowChatStranger ListSingleChat={ListSingleChat} Loading={LoadingSingle} setselectedChats={setselectedChats} />
+            <ShowChatStranger ListSingleChat={ListSingleChatnew} Loading={LoadingSingle} setselectedChats={setselectedChats} />
             </TabPane>
           </Tabs>
         </div>

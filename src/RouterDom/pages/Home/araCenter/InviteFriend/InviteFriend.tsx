@@ -70,13 +70,10 @@ export default function InviteFriend() {
                         //   });
                     }
                     else if(data.message==="Reject friend success"){
+                        console.log(data)
                       
                         // setselectedChats({ ...chatReject, isFriend: false ,requestAdd:false});
-                        notification['success']({
-                          message: 'Success',
-                          description:
-                            'Từ chối  kết bạn thành công',
-                        });
+                       
                         setDataSocket(data)
                         setLoadingReject(false)
                      

@@ -9,7 +9,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { UserGetAllSingleChat, UserGetChatsSingleById } from '../../../../../feature/chat/pathApi'
 import { LoadingOutlined } from '@ant-design/icons';
 import { AiOutlineUserAdd } from "react-icons/ai";
-import UserApi from '../../../../../api/user'
+import { CameraOutlined } from "@ant-design/icons";
+import { Button, Upload, Image, message } from "antd";
+import UserApi from "../../../../../api/user";
+import AudioRecorderComponent from "./AudioRecorderComponent";
+import { MdAttachFile } from "react-icons/md";
 export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselectedChats})=> {
   var ListSingleChat=useSelector((state:any)=>state.Chats.chatSingleSlide)
     const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
@@ -26,6 +30,9 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     const [DataSocket,setDataSocket]=useState<any>(null)
     const [chatSingleIdnew,setChatSingleIdNew]=useState<any>(null)
     const [chatReject,setChatReject]=state.chatReject
+    const [openImage, setOpenImage] = useState(false);
+    const [imageUpload, setImageUpload] = useState<any>([]);
+    console.log(chatSingleIdnew);
   
 
     
@@ -53,15 +60,46 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
       if(socket){
         socket.on("updatedSendThread",(data:any)=>{
           console.log('updatedSendThread')
-         if(data&&chatSingleIdnew){
-          console.log('updatedSendThread array')
-          const newThreads = [...chatSingleIdnew.threads, data];
-          setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads });
-         
-          setwordChat("")
-     
-          // setLoadingsending(false)
-        }
+          if (data.typeMsg === "recall") {
+            if (
+              chatSingleIdnew &&
+              typeof chatSingleIdnew === "object" &&
+              chatSingleIdnew !== null
+            ) {
+              const threadschat = chatSingleIdnew.threads;
+              const index = threadschat.findIndex(
+                (item: any) => item.stoneId === data.stoneId
+              );
+              if (index !== 0) {
+                const newThreadschatItem = {
+                  ...threadschat[index],
+                  messages: {
+                    ...threadschat[index].messages,
+                    message: "Tin nhắn đã bị thu hồi",
+                  },
+                };
+                const newTheardupdate = [
+                  ...threadschat.slice(0, index),
+                  newThreadschatItem,
+                  ...threadschat.slice(index + 1),
+                ];
+                setChatSingleIdNew({
+                  ...chatSingleIdnew,
+                  threads: newTheardupdate,
+                });
+              }
+              // Tiếp tục xử lý với newThreads
+            }
+          } else if (data.typeEmoji === "add") {
+           
+          } else {
+            if (data && chatSingleIdnew) {
+              const newThreads = [...chatSingleIdnew.threads, data];
+              setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads });
+              setwordChat("")
+              setLoadingsending(false)
+            }
+          }
           
         })
       }
@@ -96,7 +134,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
               if(datachatbyid){
                    setChatSingleIdNew(datachatbyid.payload.data)
                }
-              console.log('vao day 2data gui ve khi sendmessage')
+              
               setselectedChats({...payload.data.chat, isFriend: true ,requestAdd:false,user:{...userId.data}});
              }
            
@@ -121,10 +159,18 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
           setselectedChats({...payload.data.chat,user:{...selectedChat}});
         }
         if(payload&&payload.message==="Reject friend success"){
-          // console.log(payload.data)
-          setselectedChats(user)
-          // setDataSocket(payload)
-        }
+          console.log(payload)
+           console.log(payload.data.chat.receiveId)
+          const userId=await (UserApi.getUserById(payload.data.chat.
+            receiveId
+            ));
+
+     
+            
+          
+          setselectedChats(userId.data)
+        
+            }
         })
        return ()=>{
          socket.off('chatWS')
@@ -151,7 +197,23 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
         if (event.key === 'Enter') {
             if(chatSingleIdnew){
                 if(socket){
-                    
+                  if(imageUpload)
+                    {
+                      const sendThread={
+                        messages:{
+                            message:event.target.value
+                          },
+                          chatId:chatSingleIdnew.id, 
+                          receiveId:chatSingleIdnew.user.id,
+                          fileCreateDto: imageUpload,
+                        }
+                     
+                      socket.emit("sendThread", sendThread);
+                      setOpenImage(false);
+                      setImageUpload(null);
+
+                    }
+                    else{
                       const sendThread={
                         messages:{
                             message:event.target.value
@@ -159,25 +221,42 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
                           chatId:chatSingleIdnew.id, 
                           receiveId:chatSingleIdnew.user.id,
                         }
-                     
-                  
-                
-                     socket.emit('sendThread',sendThread)
+                        socket.emit('sendThread',sendThread)
+                    }
+                    
                       }
                 }
 
                 if(!chatSingleIdnew){
             
                   if(socket){
-                    const Threadcreate={
-                      messages:{
-                        message:event.target.value
-                      },
-                      receiveId:selectedChat.id,
+                    if(imageUpload){
+                      const Threadcreate={
+                        messages:{
+                          message:event.target.value
+                        },
+                        receiveId:selectedChat.id,
+                        fileCreateDto: imageUpload,
+                      }
+                      socket.emit('createChat',Threadcreate)
+                      setOpenImage(false);
+                      setImageUpload(null);
                     }
+                    else{
+                      const Threadcreate={
+                        messages:{
+                          message:event.target.value
+                        },
+                        receiveId:selectedChat.id,
+                      }
+                      
+                      socket.emit('createChat',Threadcreate)
+                     }
+                    }
+                   
                     
-                    socket.emit('createChat',Threadcreate)
-                   }
+                   
+                   
                   }
             setwordChat(event.target.value)
             event.target.value = '';
@@ -187,12 +266,35 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
         }
       };
 
-
+      const beforeUploaddoc = async (file:any) => {
+        const formData = new FormData();
+        formData.append("files", file); // Use "files" if your server uses AnyFilesInterceptor()
+    
+        try {
+          const response = await UserApi.userUploadImage(formData);
+          const { data } = response;
+          if (data) {
+            // Handle successful upload here
+            const Thread = {
+              chatId: selectedChat.id,
+              receiveId: selectedChat.user.id,
+              fileCreateDto: data,
+            };
+            if (socket) {
+              socket.emit("sendThread", Thread);
+            }
+          }
+        } catch (error) {
+          // Handle upload error here
+          console.error("Upload failed:", error);
+        }
+      };
 
       const sendReqAddFriend=()=>{
     
         if(socket){
           if(chatSingleIdnew){
+            
             const sendReqAddFriendHaveChat={
               receiveId:chatSingleIdnew.receiveId
               ,
@@ -279,6 +381,23 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
         )
       }
 
+      const beforeUpload = async (file: any) => {
+        const formData = new FormData();
+        formData.append("files", file); // Chú ý là "files" nếu server dùng AnyFilesInterceptor()
+    
+        try {
+          const response = await UserApi.userUploadImage(formData);
+    
+          const { data } = response;
+          if (data) {
+            setImageUpload(data);
+            setOpenImage(true);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
   return (
     <div className="flex flex-col h-screen bg-gray-300  relative">
     <div className='flex items-center h-16 w-full bg-white shadow-md'>
@@ -290,15 +409,71 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
         className='text-black text-4xl m-auto justify-center self-center  ' /> :<div>
          <ScrollChatSingle Channelid={chatSingleIdnew} loadingsending={loadingsending} wordchat={wordchat}/>
       {/* {isTyPing?<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""}  */}
-          <Input
-                onChange={(e) => {setInputValue(e.target.value)}}
+      <div className="flex">
+              <Input
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                }}
                 onKeyPress={handleKeyPress}
-                placeholder='Nhập @, tin nhắn mới ???'
+                placeholder="Nhập @, tin nhắn mới ???"
                 value={inputValue}
-                className='rounded-none h-14 w-full  placeholder-gray-500 to-black'
+                className="rounded-none h-14 w-full relative inputparant  placeholder-gray-500 to-black"
               />
-            </div>}
-       
+
+              <div className=" right-0 flex   absolute gap-1">
+              <Upload
+                beforeUpload={beforeUpload}
+                className="cursor-pointer  h-36 "
+                fileList={[]}
+                name="avatar"
+                accept=".jpg, .jpeg, .png"
+              
+                // listType="listTyp"
+              >
+                <Button
+                  icon={<CameraOutlined />}
+                  type="dashed"
+                  className="h-16"
+                  // loading={loading}
+                >
+               
+                </Button>
+              </Upload>
+
+              <Upload
+                    beforeUpload={beforeUploaddoc}
+                    className="cursor-pointer h-36"
+                    fileList={[]}
+                    accept=".pdf,.doc,.docx" // Accept PDF, Word (.doc, .docx) files
+                    name="files"
+                  >
+                    <Button icon={<MdAttachFile />} type="dashed" className="h-16">
+                     
+                    </Button>
+                </Upload>
+
+
+              <AudioRecorderComponent className="" selectedChat={selectedChat}/>
+
+              
+
+              
+              </div>
+             
+            </div>
+            </div>
+            }
+        {imageUpload && openImage && (
+          <div className="bg-white w-full">
+            <p className="font-medium mt-4 mb-4">1 ảnh </p>
+            <img
+              src={`${
+                imageUpload && imageUpload[0] ? imageUpload[0].path : ""
+              }`}
+              style={{ width: "100px", height: "100px" }}
+            />
+          </div>
+        )}
     </div>
   </div>
   )

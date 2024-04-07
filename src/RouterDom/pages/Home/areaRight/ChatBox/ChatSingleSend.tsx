@@ -20,6 +20,7 @@ import { CameraOutlined } from "@ant-design/icons";
 import { Button, Upload, Image, message } from "antd";
 import UserApi from "../../../../../api/user";
 import AudioRecorderComponent from "./AudioRecorderComponent";
+import { MdAttachFile } from "react-icons/md";
 
 // import { ScrollChatSingle } from './ScrollChatSingle'
 export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
@@ -44,6 +45,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
 
   const handleAudioStop = (data : any) => {
     setAudioData(data);
+    
     console.log("Audio data:", data);
   };
 
@@ -111,41 +113,47 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
             // Tiếp tục xử lý với newThreads
           }
         } else if (data.typeEmoji === "add") {
-          if (data.emoji === "smile") {
-            // const threadschat = chatSingleIdnew.threads
-            // const index = threadschat.findIndex((item: any) => item.stoneId === data.stoneId);
-            // if (index !== 0) {
-            //   const newThreadschatItem = { ...threadschat[index], messages: { ...threadschat[index].messages, message: "Tin nhắn đã bị thu hồi" } };
-            //    const newTheardupdate=[...threadschat.slice(0,index),newThreadschatItem,...threadschat.slice(index+1)]
-            //     setChatSingleIdNew({ ...chatSingleIdnew, threads: newTheardupdate });;
-            // }
-          }
+         
         } else {
           if (data && chatSingleIdnew) {
-            // const newThreads = [...chatSingleIdnew.threads, data];
-            // setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads });
-            // setwordChat("")
-            // setLoadingsending(false)
+            const newThreads = [...chatSingleIdnew.threads, data];
+            setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads });
+            setwordChat("")
+            setLoadingsending(false)
           }
         }
       });
     }
   }, [socket, chatSingleIdnew]);
-  // const uploadFileProfileUser=(dataUser:any)=>{
-  //   // if(socket){
-  //     // const data={
-  //     //   avatar:dataUser.filesUploaded[0].url
-  //     // }
-  //     if(dataUser){
-  //       setImageUpload([...imageUpload,dataUser.filesUploaded[0].url])
-  //       setOpenImage(true)
-  //       setIsPicker(false)
-  //     }
 
-  //     // socket.emit('updateProfilePicker',data)
-  //   }
-  //   // return ()=>socket.off("updateProfilePicker")
+  useEffect(() => {
+    if(socket){
+      socket.on('updatedEmojiThread',(data:any)=>{
+        console.log('emoji data tra ve')
+        console.log(data);
+        if(data.typeEmoji==='add'){
+          if(chatSingleIdnew&&typeof chatSingleIdnew==='object'&&chatSingleIdnew!==null){
+            const threadschat = chatSingleIdnew.threads;
+            const index = threadschat.findIndex((item:any)=>item.stoneId===data.stoneId)
+            if(index!==0){
+            
 
+              const emoji=[...threadschat[index].emojis,data]
+              const newThreadschatItem = {...threadschat[index],emojis:emoji}
+              const newTheardupdate = [...threadschat.slice(0,index),newThreadschatItem,...threadschat.slice(index+1)]
+              setChatSingleIdNew({...chatSingleIdnew,threads:newTheardupdate})
+              
+            
+            }
+          }
+        }
+      })
+
+    }
+  },[socket,chatSingleIdnew])
+
+  
+ 
   const beforeUpload = async (file: any) => {
     const formData = new FormData();
     formData.append("files", file); // Chú ý là "files" nếu server dùng AnyFilesInterceptor()
@@ -162,6 +170,31 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
       console.error(error);
     }
   };
+
+  const beforeUploaddoc = async (file:any) => {
+    const formData = new FormData();
+    formData.append("files", file); // Use "files" if your server uses AnyFilesInterceptor()
+
+    try {
+      const response = await UserApi.userUploadImage(formData);
+      const { data } = response;
+      if (data) {
+        // Handle successful upload here
+        const Thread = {
+        chatId: selectedChat.id,
+        receiveId: selectedChat.user.id,
+        fileCreateDto:data,
+      };
+      if (socket) {
+        socket.emit("sendThread", Thread);
+      }
+      }
+    } catch (error) {
+      // Handle upload error here
+      console.error("Upload failed:", error);
+    }
+  };
+
 
   const getSelectUserIsChoose = (selectedChat: any) => {
     return (
@@ -202,6 +235,8 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
       setLoadingSelectChat(false);
     }, 3000);
   }, [selectedChat.id]);
+
+
 
   const handleKeyPress = async (event: any) => {
     if (event.key === "Enter") {
@@ -247,32 +282,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
     }
   };
 
-  // //send voice chat
-  // const handleSendAudio = async (audioBlob : any) => {
-  //   console.log("Sending audio:", audioBlob)
-  //   try {
-  //     // Example: Sending audio data to the server using Socket.io
-  //     if (socket) {
-  //       // Emit an event to the server with the audio data
-  //       socket.emit("sendAudio", {
-  //         audioBlob,
-  //         chatId: selectedChat.id, // Assuming you have a way to identify the chat
-  //         userId: user.id, // Assuming you have the user's ID
-  //       });
-  
-  //       // Handle UI state if needed (e.g., show a loading spinner)
-  //       setLoadingsending(true);
-        
-  //       // Reset the audio data after sending
-  //       setAudioData(null);
-  //     } else {
-  //       console.error("Socket not available");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error sending audio:", error);
-  //   }
-  // };
-  
+
 
   return (
     <div className="flex flex-col h-screen bg-gray-300  relative">
@@ -305,12 +315,15 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
                 value={inputValue}
                 className="rounded-none h-14 w-full relative inputparant  placeholder-gray-500 to-black"
               />
+
+              <div className=" right-0 flex   absolute gap-1">
               <Upload
                 beforeUpload={beforeUpload}
-                className="cursor-pointer absolute right-0  h-36 "
+                className="cursor-pointer  h-36 "
                 fileList={[]}
                 name="avatar"
                 accept=".jpg, .jpeg, .png"
+              
                 // listType="listTyp"
               >
                 <Button
@@ -319,15 +332,33 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
                   className="h-16"
                   // loading={loading}
                 >
-                  Tải ảnh lên
+               
                 </Button>
               </Upload>
-              {/* <div>
-                <AudioRecorderComponent />
-              </div> */}
+
+              <Upload
+                    beforeUpload={beforeUploaddoc}
+                    className="cursor-pointer h-36"
+                    fileList={[]}
+                    accept=".pdf,.doc,.docx" // Accept PDF, Word (.doc, .docx) files
+                    name="files"
+                  >
+                    <Button icon={<MdAttachFile />} type="dashed" className="h-16">
+                     
+                    </Button>
+                </Upload>
+
+
+              <AudioRecorderComponent className="" selectedChat={selectedChat}/>
+
+              
+
+              
+              </div>
+             
             </div>
             <div>
-              <AudioRecorderComponent/>
+             
             </div>
           </div>
         )}

@@ -1,11 +1,37 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect, useState } from 'react'
 import { IUser } from '../../../../../Type'
 import { CiWarning } from 'react-icons/ci'
-import { MdDelete } from 'react-icons/md'
+import { MdDelete, MdFileDownload } from 'react-icons/md'
 import { IoIosLogOut } from 'react-icons/io'
 import { RiUserAddFill } from 'react-icons/ri'
+import { UserGetChatsSingleById } from "../../../../../feature/chat/pathApi";
+import { useDispatch } from 'react-redux'
+import { FaFilePdf } from 'react-icons/fa'
 
+import './GroupChat.css'
 export const InformationChat:FunctionComponent<any>=({selectedChat,user})=> {
+  const dispatch=useDispatch()
+  const [chatSingleIdnew, setChatSingleIdNew] = useState<any>(null);
+  console.log(chatSingleIdnew)
+  useEffect(() => {
+    async function getData() {
+      if (selectedChat) {
+        const data = await dispatch<any>(
+          UserGetChatsSingleById({ id: selectedChat.id })
+        );
+        // console.log("day la data check")
+        if (data.error) {
+          setChatSingleIdNew(null);
+        }
+
+        if (data && data.payload && data.payload.data) {
+          setChatSingleIdNew(data.payload.data);
+        }
+      }
+    }
+    getData();
+  }, [selectedChat]);
+
   return (
   
     <div className='col-md-2 h-full overflow-y-auto relative'>
@@ -21,13 +47,21 @@ export const InformationChat:FunctionComponent<any>=({selectedChat,user})=> {
               <div className='flex gap-3 items-center px-5'>
                 <img src={`${selectedChat.user ? selectedChat.user.avatar : ""}`} className='w-16 h-16 mt-8 rounded-full' />
                 <div>
+                  
                 </div>
               </div> :
-                   !selectedChat.receiveId &&      !selectedChat.users ?
-      
-               <div className='flex gap-3 items-center px-5'>
-                           <img src={`${selectedChat ? selectedChat.avatar : ""}`} className='w-16 h-16 mt-8 rounded-full' />
-               </div>
+                   !selectedChat.receiveId && !selectedChat.users ?
+      <div>
+            <div className='flex gap-3 items-center px-5'>
+                                      <img src={`${selectedChat ? selectedChat.avatar : ""}`} className='w-16 h-16 mt-8 rounded-full' />
+
+                                      
+                          </div>
+
+
+                        
+      </div>
+               
                    :
               <>
                 <div className="flex flex-wrap w-24  justify-center mt-8  items-center">
@@ -44,6 +78,66 @@ export const InformationChat:FunctionComponent<any>=({selectedChat,user})=> {
         {selectedChat.receiveId ?
           <>
             <p style={{ fontSize: '25px', fontWeight: "500px" }} className='text-center mt-2 font-semibold'>{selectedChat.user.name}</p>
+
+            <p> Tat ca File đã gửi </p>
+                        <div>
+
+                          {chatSingleIdnew && chatSingleIdnew.threads && chatSingleIdnew.threads.map((m: any, index: number) => {
+                            return(
+                              <div className='flex-container'>
+
+              {m.files ? m.files.map((value: any) => {
+                // Kiểm tra và hiển thị audio
+                if (value.filename === 'blob') {
+                  return (
+                    <div className="flex-item">
+                      <audio key={value.filename} controls src={value.path} style={{ width: '100px', height: '50px' }} />
+                    </div>
+                  );
+                } else {
+                  // Tách và kiểm tra extension của file
+                  const extension = value.filename.split('.').pop().toLowerCase();
+
+                  // Các điều kiện để hiển thị PDF, Word hoặc ảnh
+                  if (extension === 'pdf') {
+                    return (
+                      <div className="flex-item flex" key={value.filename}>
+                        <FaFilePdf size={30} style={{ marginRight: '5px', color: 'red', width: '50px' }} /> {/* PDF icon */}
+                        <embed src={value.path} type="application/pdf" style={{ width: '100%', height: '20px' }} />
+                        <a href={value.path} download={value.filename}>Download PDF</a>
+                      </div>
+                    );
+                  } else if (extension === 'docx' || extension === 'doc') {
+                    return (
+                      <div className="flex-item" key={value.filename}>
+                        <iframe src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(value.path)}`} style={{ width: '100px', height: '100px' }} title="Word Document Viewer" />
+                        <a href={value.path} download={value.filename}>Download Word</a>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div className="flex-item" key={value.filename}>
+                        <img src={value.path} style={{ width: '100px', height: '100px' }} />
+                      </div>
+                    );
+                  }
+                }
+              }) : m.fileCreateDto ? m.fileCreateDto.map((value: any) => {
+                // Tương tự như trên cho m.fileCreateDto...
+              }) : ""}
+            </div>
+
+     
+                
+                
+               )
+
+
+              })}
+            
+             
+
+            </div>
             <div className='absolute bottom-1 p-2'>
               <p className='text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2'><CiWarning />Xóa lịch sử nhóm chat </p>
               <p className='text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2'><MdDelete /> Xóa nhóm</p>

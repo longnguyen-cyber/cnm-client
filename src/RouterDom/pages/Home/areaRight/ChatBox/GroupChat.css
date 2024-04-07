@@ -67,3 +67,15 @@
   
   }
 
+  .flex-container {
+    display: flex;
+
+    margin-left: -2px; /* Khoảng cách âm để các items có thể "đè" lên nhau */
+    margin-top: -2px;
+  }
+  
+  .flex-item {
+    padding-left: 2px; /* Padding bù lại khoảng cách âm */
+    padding-top: 2px;
+  }
+  

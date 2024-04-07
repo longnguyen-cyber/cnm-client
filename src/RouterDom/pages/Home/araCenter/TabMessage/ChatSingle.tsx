@@ -4,7 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats})=> {
-  console.log(ListSingleChat)
+  // console.log(ListSingleChat)
  
   return (
     <div className='flex flex-col-reverse gap-3'>
@@ -27,10 +27,11 @@ export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselec
                    
               {itemChat.lastedThread ?
               <div className='flex justify-between'>
-            {itemChat.lastedThread.messages.message
-                              && itemChat.lastedThread.messages.message.length > 30 ?
+            {itemChat.lastedThread.messages?
+
+                               itemChat.lastedThread.messages.message.length > 30 ?
                               itemChat.lastedThread.messages.message.substring(0, 51) + "..." :
-                              itemChat.lastedThread.messages.message}
+                              itemChat.lastedThread.messages.message:"Có file được gửi "}
                 <div></div>
 
                 

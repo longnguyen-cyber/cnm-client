@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { FunctionComponent, useContext, useState } from "react";
 import { AudioRecorder } from "react-audio-voice-recorder";
 import UserApi from "../../../../../api/user";
+import { UserContext } from "../../../../../Context/UserContext";
 // import { AudioRecorder } from 'react-audio-voice-recorder';
 
-const AudioRecorderComponent = () => {
+const AudioRecorderComponent:FunctionComponent<any>=({selectedChat})=> {
   const [audioDetails, setAudioDetails] = useState();
-
+  const contextUser = useContext(UserContext);
+  const { state } = contextUser;
+  const [user, setUser] = state.user;
+  const { socket } = state;
   const handleAudioStop = (data: any) => {
     console.log(data);
     setAudioDetails(data);
@@ -36,6 +40,16 @@ const AudioRecorderComponent = () => {
 
     try {
       const response = await UserApi.userUploadImage(formData);
+      console.log(response)
+      const Thread = {
+        chatId: selectedChat.id,
+        receiveId: selectedChat.user.id,
+        fileCreateDto: response.data,
+      };
+      console.log(Thread)
+      if (socket) {
+        socket.emit("sendThread", Thread);
+      }
 
     } catch (error) {
       console.error(error);
@@ -56,7 +70,7 @@ const AudioRecorderComponent = () => {
   };
 
   return (
-    <div>
+    <div className="mt-2">
       <AudioRecorder
         onRecordingComplete={addAudioElement}
         audioTrackConstraints={{
