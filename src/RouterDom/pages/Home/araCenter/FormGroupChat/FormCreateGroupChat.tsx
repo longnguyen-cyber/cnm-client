@@ -31,17 +31,7 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
   const {socket}=state
   const [loading, setLoading] = useState(false);
   const navigate=useNavigate()
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
-  // useEffect(() => {
-  //   if (submitSuccess) {
-  //     // Gọi các hành động bạn muốn thực hiện khi submit thành công
-  //     dispatch<any>(UserGetAllChannel());
-  //     // Có thể thực hiện các hành động khác tại đây
-  //     setSubmitSuccess(false); // Đặt lại trạng thái submit thành công để tránh lặp lại
-  //   }
-  // }, [submitSuccess, dispatch]);
-  
+ 
   const bagTag = [
     'bg-blue-400',
     'bg-red-400',
@@ -64,35 +54,35 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
 
   useEffect(() => {
     if (search) {
-      const result = dispatch<any>(userSeach({ name: search }));
+       dispatch<any>(userSeach({ name: search }));
     }
   }, [search])
 
+ 
+
   useEffect(() => {
+     const handleData=async (data:any)=>{
+      if (data && data.message==='Create channel success') { // Kiểm tra xem thông báo đã được hiển thị hay chưa
+        // setShowSuccessNotification(true); // Đánh dấu rằng thông báo đã được hiển thị
+        notification["success"]({
+          message: "Thông báo",
+          description: "Tạo nhóm thành công",
+        });
+        formRef.current?.resetFields();
+        setselectedUsers([]);
+        setSearch('')
+     
+        setLoading(false);
+ 
+      }
+     }
+      socket.on('channelWS',handleData)
     return () => {
-      setShowSuccessNotification(false);
+      socket.off('channelWS', handleData);
     };
-  }, []);
 
 
-  useEffect(() => {
-    if (socket) {
-      socket.on('channelWS', (data: any) => {
-        console.log(data);
-        if (data && !showSuccessNotification) { // Kiểm tra xem thông báo đã được hiển thị hay chưa
-          setShowSuccessNotification(true); // Đánh dấu rằng thông báo đã được hiển thị
-          notification["success"]({
-            message: "Thông báo",
-            description: "Tạo nhóm thành công",
-          });
-          formRef.current?.resetFields();
-          dispatch<any>(UserGetAllChannel());
-          setLoading(false);
-          setSubmitSuccess(true);
-        }
-      });
-    }
-  }, [socket, showSuccessNotification]);
+  }, [socket]);
 
   const CreateGroup = async (value: any) => {
     setLoading(true)
@@ -101,7 +91,7 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
         name: value.name,
         status: value.isPublic === 'true' ? true : false,
         userCreated: user ? user.id : '',
-        members: selectedUsers.map((item: IUser) => item.id),
+        members: selectedUsers.map((item: any) => item.user.id),
       };
       if(socket){
         socket.emit('createChannel',channel)
@@ -111,24 +101,24 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
 
   const handleRemoveUser = (userRemove: IUser) => {
     const userRemoveSelect = [...selectedUsers];
-    const index = userRemoveSelect.findIndex((va) => va.id === userRemove.id);
+    const index = userRemoveSelect.findIndex((va:any) => va.id === userRemove.id);
     if (index !== -1) {
       userRemoveSelect.splice(index, 1);
       setselectedUsers(userRemoveSelect);
     }
   };
 
-  const handleClickFunction = (users: IUser) => {
+  const handleClickFunction = (users: any) => {
     
     if (selectedUsers) {
-      const check = selectedUsers.every(usercheck => usercheck.id != users.id)
+      const check = selectedUsers.every((usercheck:any) => usercheck.user.id != users.user.id)
       if (check) {
         setselectedUsers([...selectedUsers, users])
-        if (selectedUsers.length < 1) {
+        if (selectedUsers.length < 2) {
           form.setFields([
             {
               name: 'SearchUser',
-              errors: ['Nhóm phải có ít nhất 2 người.'],
+              errors: ['Nhóm phải có ít nhất 3 người.'],
             },
           ]);
         } else {
@@ -180,25 +170,6 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
         </Form.Item>
 
 
-        <Form.Item
-          name="isPublic"
-          label="Trạng thái Group : "
-          {...formItemLayout}
-          initialValue={'true'}
-        >
-          <Select
-            showSearch
-            placeholder="Tỉnh/Thành phố"
-            defaultValue={'true'}
-          >
-            <Option value={'true'}>
-              {'Public'}
-            </Option>
-            <Option value={'false'}>
-              {'Private'}
-            </Option>
-          </Select>
-        </Form.Item>
 
 
         <Form.Item
@@ -215,12 +186,22 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
           />
         </Form.Item>
         <div className='mb-3 flex flex-wrap gap-3 items-center'>
-           {selectedUsers?.map((value: IUser, index) => (
-            <p key={index} className={`border border-gray-300 flex items-center justify-center gap-2  rounded-xl text-white w-32 text-md ${bagTag[Math.floor(Math.random() * bagTag.length)]}`}>{value.name}
-              <span><AiOutlineClose color={"white"} className="cursor-pointer" onClick={() => handleRemoveUser(value)} /></span>
-            </p>
-          ))}
-        </div>
+            {selectedUsers?.map((value: any, index) => (
+              <div key={index} className={`flex items-center justify-between gap-2 p-2 rounded-xl text-white bg-gradient-to-r ${bagTag[Math.floor(Math.random() * bagTag.length)]}`}>
+                {/* Hình ảnh người dùng */}
+                <img src={value.user.avatar} alt="User" className="w-6 h-6 rounded-full object-cover" />
+                
+                {/* Tên người dùng */}
+                <p className='text-sm md:text-md flex-grow'>{value.user.name}</p>
+                
+                {/* Nút xóa */}
+                <span onClick={() => handleRemoveUser(value)} className="ml-2 cursor-pointer rounded-full bg-white bg-opacity-20 p-1 hover:bg-opacity-40">
+                  <AiOutlineClose color="white" />
+                </span>
+              </div>
+            ))}
+          </div>
+
           {
             search && search.length > 0 ? ListUsersSeach.length > 0 ? ListUsersSeach.slice(0, 5).map((value: IUser, index: number) => (<div className='flex flex-col gap-5' key={index}>
               {<UserListItem value={value} index={index} handleClickFunction={() => handleClickFunction(value)} selectedUsers={selectedUsers} />}

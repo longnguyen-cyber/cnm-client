@@ -27,7 +27,6 @@ export const SearchUserAddChat: FunctionComponent<any> = ({ searchValue }) => {
     const [DataSocket,setDataSocket]=useState<any>(null)
     const [selectedChat, setselectedChats] = state.selectedChat;
     const ListSingleChat=useSelector((state:any)=>state.Chats.chatSingleSlide)
-//    console.log(ListSingleChat)
    
     useEffect(()=>{
         dispatch<any>(UserGetAllSingleChat());

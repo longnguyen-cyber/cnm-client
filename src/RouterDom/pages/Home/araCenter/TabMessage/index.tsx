@@ -16,17 +16,16 @@ import UserApi from '../../../../../api/user';
 import { Socket } from 'engine.io-client';
 
 export default function Tabmessage() {
-  const [stateType, setType] = useState(false)
    const UserContexts=useContext(UserContext);
-   const ListChannel=useSelector((state:any)=>state.Chats.channelsSlide)
-   const ListSingleChat=useSelector((state:any)=>state.Chats.chatSingleSlide)
+  
    const LoadingSingle=useSelector((state:any)=>state.Chats.loadingSingChat)
-   const LoadingChannels=useSelector((state:any)=>state.Chats.loadingChannelChat)
    const {state}=UserContexts;
    const [user,setUser]=state.user;
    const [token,setToken]=state.token
     const {socket}=state
    const [selectedChat, setselectedChats] = state.selectedChat;
+
+   const [LoadingChatChannel,setLoadingchatChannel]=useState(false)
 
    const [ListSingleChatnew,setListSingleChatnew]=useState<any>([])
     const [ListChannelnew,setListChannelnew]=useState<any>([])
@@ -42,28 +41,21 @@ export default function Tabmessage() {
 
       }
       UserGetAllSingleChat()
-      
     },[])
-
-
-
-
-
-
 
     useEffect(()=>{
       async function  UserGetAllChannelChat(){
+        setLoadingchatChannel(true)
         const data=await UserApi.UserGetAllChannel()
-  
         if(data){
           setListChannelnew(data.data)
+          setLoadingchatChannel(false)
         }
   
         }
         UserGetAllChannelChat()
         
       },[])
-
       useEffect(()=>{
         socket.on("updatedSendThread", async (data: any) => {
        
@@ -99,6 +91,31 @@ export default function Tabmessage() {
 
 
 
+        ///socket cho chat Channel
+        useEffect(() => {
+          const handleData = async (data:any) => {
+            if (data && data.message === 'Create channel success') {
+            
+              setLoadingchatChannel(true);
+              // Cập nhật state bằng cách sử dụng hàm callback để đảm bảo rằng
+              // bạn luôn có giá trị mới nhất của state đó
+              setListChannelnew((currentListChannelnew:any) => [...currentListChannelnew, data.data]);
+              setLoadingchatChannel(false);
+              return socket.off('channelWS');
+            }
+          };
+        
+          socket.on('channelWS', handleData);
+        
+          // Đảm bảo hủy đăng ký sự kiện khi component unmount
+          return () => {
+            socket.off('channelWS', handleData);
+          };
+        }, [socket]);
+        
+
+
+
   
   
   return (
@@ -112,7 +129,7 @@ export default function Tabmessage() {
               <ChatSingle ListSingleChat={ListSingleChatnew} Loading={LoadingSingle} setselectedChats={setselectedChats}/>
             </TabPane>
             <TabPane tab="Chat nhóm " key="2">
-            <ShowChatMessage ListChannel={ListChannelnew} Loading={LoadingChannels} setselectedChats={setselectedChats} />
+            <ShowChatMessage ListChannel={ListChannelnew} Loading={LoadingChatChannel} setselectedChats={setselectedChats} />
             </TabPane>
             <TabPane tab="Người lạ " key="3">
             <ShowChatStranger ListSingleChat={ListSingleChatnew} Loading={LoadingSingle} setselectedChats={setselectedChats} />

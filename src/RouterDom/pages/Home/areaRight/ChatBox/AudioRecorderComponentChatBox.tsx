@@ -4,7 +4,7 @@ import UserApi from '../../../../../api/user'
 import { UserContext } from '../../../../../Context/UserContext'
 // import { AudioRecorder } from 'react-audio-voice-recorder';
 
-const AudioRecorderComponent: FunctionComponent<any> = ({ selectedChat }) => {
+const AudioRecorderComponentChatBox: FunctionComponent<any> = ({ selectedChat }) => {
   const [audioDetails, setAudioDetails] = useState()
   const contextUser = useContext(UserContext)
   const { state } = contextUser
@@ -26,8 +26,9 @@ const AudioRecorderComponent: FunctionComponent<any> = ({ selectedChat }) => {
     try {
       const response = await UserApi.userUploadImage(formData)
       const Thread = {
-        chatId: selectedChat.id,
-        receiveId: selectedChat.user.id,
+        channelId: selectedChat.id,
+        userId: user.id,
+        senderId:user.id,
         fileCreateDto: response.data,
       }
       if (socket) {
@@ -65,4 +66,4 @@ const AudioRecorderComponent: FunctionComponent<any> = ({ selectedChat }) => {
   )
 }
 
-export default AudioRecorderComponent
+export default AudioRecorderComponentChatBox
