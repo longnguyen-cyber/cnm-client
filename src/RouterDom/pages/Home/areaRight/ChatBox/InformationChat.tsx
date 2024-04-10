@@ -107,6 +107,13 @@ export const InformationChat: FunctionComponent<any> = ({
                 </p>
               </div>
             </>
+
+
+
+
+
+      /// rời nhóm chat xóa nhóm chát xóa lịch sử nhóm chat
+
           ) : !selectedChat.receiveId && !selectedChat.users ? (
             <>
               <p
@@ -128,6 +135,14 @@ export const InformationChat: FunctionComponent<any> = ({
                 </p>
               </div>
             </>
+
+
+
+
+
+
+
+/// thêm thanh viên vào
           ) : (
             <div>
               <p
@@ -154,6 +169,8 @@ export const InformationChat: FunctionComponent<any> = ({
                   placeholder="tìm kiếm thành viên "
                 />
               </div>
+
+              {/* danh sách nhóm  */}
               <div className="h-72 overflow-y-scroll">
                 {selectedChat.users.length > 0 &&
                   selectedChat.users.map((value: IUser, index: number) => {

@@ -66,7 +66,7 @@ export const ScrollChatSingle: FunctionComponent<any> = ({
     }
     if (socket) {
       // console.log('bat dau recall')
-      socket.emit('recallSendThread', dataRecall)
+      // socket.emit('recallSendThread', dataRecall)
     }
   }
 

@@ -42,7 +42,6 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
   const [imageUpload, setImageUpload] = useState<any>([])
   const [loadingUnfriend, setLoadingUnfriend] = useState<any>(false)
   const [audioData, setAudioData] = useState(null)
-
   const [openModalUserChat, setOpenModalUserChat] = useState(false)
 
   const handleAudioStop = (data: any) => {

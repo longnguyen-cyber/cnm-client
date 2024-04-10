@@ -54,9 +54,27 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   useEffect(() => {
 
     const handleData=async(data:any)=>{
-      
-    
-        if (data) {
+      console.log('data socker recall')
+      console.log(data)
+          if(data.typeMsg==='recall'&&data.type==='channel'){
+           
+            console.log('data stondeid')
+            const index = channelIdNew.threads.findIndex((item:any)=>item.stoneId===data.stoneId)
+            if(index!==-1){
+              
+              
+              const newThreads = [...channelIdNew.threads]
+              newThreads[index].messages
+              ={...newThreads[index].messages,message:'Tin nhắn đã được thu hồi'}
+              console.log('newThreads' ,newThreads)
+              setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
+              return
+            }
+            // setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
+            return
+          }
+          else if (data) {
+           
           const newThreads = [...channelIdNew.threads, data]
           setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
           setwordChat('')
@@ -64,10 +82,40 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         }
     }
 
+    //emoji
+
+    const handleDataEmoji=async(data:any)=>{
+      console.log('data emoji')
+      console.log(data)
+      //emojis
+
+      if(data&&data.type==='channel'&&data.typeEmoji==='add'){
+        console.log('data emoji add')
+        console.log(data)
+        const index = channelIdNew.threads.findIndex((item:any)=>item.stoneId===data.stoneId)
+        if(index!==-1){
+          const newThreads = [...channelIdNew.threads]
+          newThreads[index].emojis=[...newThreads[index].emojis,data]
+          setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
+         
+          return
+        }
+
+      }
+      
+
+    }
+
+
+
+
+
       socket.on('updatedSendThread',handleData)
+      socket.on('updatedEmojiThread',handleDataEmoji)
 
       return () => {
         socket.off('updatedSendThread',handleData)
+        socket.off('updatedEmojiThread',handleDataEmoji)
       }
   }, [socket,channelIdNew])
 
