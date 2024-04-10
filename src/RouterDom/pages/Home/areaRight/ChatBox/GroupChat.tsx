@@ -1,4 +1,4 @@
-import { Button, Input, Spin, Upload } from 'antd'
+import { Button, Input, Modal, Spin, Upload } from 'antd'
 import React, { FunctionComponent, useContext, useEffect, useState } from 'react'
 import { LoadingOutlined } from '@ant-design/icons';
 import './GroupChat.css'
@@ -13,6 +13,7 @@ import AudioRecorderComponent from './AudioRecorderComponent';
 import { RcFile } from 'antd/es/upload';
 import { MdClose } from "react-icons/md";
 import AudioRecorderComponentChatBox from './AudioRecorderComponentChatBox';
+import { CiVideoOn } from "react-icons/ci";
 export const GroupChat: FunctionComponent<any> = ({ }) => {
   const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
   const Channelid = useSelector((state: any) => state.Chats.channelId)
@@ -30,6 +31,9 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   
   const [openImage, setOpenImage] = useState(false)
   const [imageUpload, setImageUpload] = useState<any>([])
+
+  const [loadingvidieo,setLoadingVideo]=useState(false)
+
   console.log(channelIdNew)
 
 /// get thong tin doan chat
@@ -54,8 +58,7 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   useEffect(() => {
 
     const handleData=async(data:any)=>{
-      console.log('data socker recall')
-      console.log(data)
+  
           if(data.typeMsg==='recall'&&data.type==='channel'){
            
             console.log('data stondeid')
@@ -97,18 +100,10 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
           const newThreads = [...channelIdNew.threads]
           newThreads[index].emojis=[...newThreads[index].emojis,data]
           setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
-         
           return
         }
-
       }
-      
-
     }
-
-
-
-
 
       socket.on('updatedSendThread',handleData)
       socket.on('updatedEmojiThread',handleDataEmoji)
@@ -183,6 +178,44 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
     }
   }
 
+  ////upload video
+
+  const beforeUploadvideo = async (file: RcFile, fileList: RcFile[]) => {
+    setLoadingVideo(true)
+    try {
+      const formData = new FormData();
+      fileList.forEach(file => {
+        formData.append('files', file);
+        console.log('File', file);
+      });
+  
+      // Gửi FormData chứa tất cả các tệp đến server để xử lý
+      const response = await UserApi.userUploadImage(formData); // Modify API endpoint for video uploads
+      const { data } = response;
+      console.log('data tra ve sau khi upload');
+      console.log(data);
+      const Thread = {
+        channelId: selectedChat.id,
+        userId: user.id,
+        senderId:user.id,
+        fileCreateDto: data,
+      }
+      if (data) {
+        // Xử lý sau khi tải lên thành công
+        socket.emit('sendThread', Thread)
+        setLoadingVideo(false)
+       
+    
+      }
+
+      
+    } catch (error) {
+      console.error(error);
+    }
+  
+    return false; // Trả về false để ngăn chặn Upload component tự động tải lên tệp
+  };
+
   //remove value upload
   const removeValueUploade=(value:any)=>{
     const newValue=imageUpload.filter((item:any)=>item.path!==value.path)
@@ -237,8 +270,22 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
       }
     }
 
+    const modalToUnfriend = () => {
+ 
+      return (
+       
+      
+       
+      <Modal className=' mt-80 flex justify-center w-28 h-20 items-center' title="" open={loadingvidieo}>
+        <p className='mt-14'>Đang upload video ....</p>
+       <Spin indicator={antIcon} style={{ fontSize: '100px',marginTop:'-70px' }} className=' ml-14'  /> 
+      </Modal>
+      )
+    }
+
   return (
     <>
+    {modalToUnfriend()}
 
       <div>
         {
@@ -264,6 +311,18 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
 
                 <div className="right-0 flex absolute gap-1">
                 <Upload
+                  beforeUpload={beforeUploadvideo}
+                  className="cursor-pointer mt-3"
+                  fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
+                  name="video"
+                  accept=".mp4, .avi, .mov" // Accept video formats (modify as needed)
+                  multiple // Cho phép người dùng chọn nhiều video
+                >
+                  <Button icon={<CiVideoOn  size={20}/>} className="border-none"></Button>
+                </Upload>
+
+                
+                <Upload
                   beforeUpload={beforeUpload}
                   className="cursor-pointer mt-3"
                   fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
@@ -274,6 +333,8 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
                 >
                   <Button icon={<CameraOutlined />} className="border-none"></Button>
                 </Upload>
+
+
 
 
                   <Upload

@@ -73,15 +73,6 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
     }
 
 
-
-
-
-
-
-
-
-
-
     const modalToUnfriend = () => {
       console.log('modal',selectedUserReaction)
       return (
@@ -202,7 +193,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                   className='flex flex-col gap-3 dothovergroup cursor-pointer'
                  
                 >
-              
+              {/* https://workchatprod.s3.ap-southeast-1.amazonaws.com/0318.mp4 */}
 
                     {m.files
                     ? m.files.map((value: any) => {
@@ -235,7 +226,19 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                                {<ShowWord file={value}/>}
                               </div>
                             )
-                          } else {
+                          }
+                          else if(extension==='mp4'||extension==="mov"){
+                            return (
+                              <video
+                              key={value.filename}
+                              controls
+                              src={`${value.path}`}
+                              style={{ width: '300px', height: '250px' }}
+                            />
+                            )
+
+                          }
+                           else {
                             return (
                               <img
                                 // onClick={() => openModal(value.path)}
@@ -278,7 +281,17 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                                   {<ShowWord file={value}/>}
                               </div>
                             )
-                          } else {
+                          } else if(extension==='mp4'||extension==="mov"){
+                            return (
+                              <video
+                              key={value.filename}
+                              controls
+                              src={`${value.path}`}
+                              style={{ width: '300px', height: '250px' }}
+                            />
+                            )
+
+                          }else {
                             return (
                               <img
                                 // onClick={() => openModal(value.path)}
