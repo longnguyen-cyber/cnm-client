@@ -5,7 +5,6 @@
 import { IUser } from "../../../../../Type";
 
 export const isSameSenderMargin = (messages:any, m:any, i:any, userId:string) => {
-  // console.log(i === messages.length - 1);
 
   if (
     i < messages.length - 1 &&

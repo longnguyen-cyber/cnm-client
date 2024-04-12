@@ -3,181 +3,177 @@ import React, {
   useContext,
   useEffect,
   useState,
-} from "react";
-import { Input, Modal, Spin, notification } from "antd";
-import { AiOutlineTags } from "react-icons/ai";
-import { MdKeyboardArrowLeft } from "react-icons/md";
-import { UserContext } from "../../../../../Context/UserContext";
-import { useDispatch, useSelector } from "react-redux";
-import { UserGetChatsSingleById } from "../../../../../feature/chat/pathApi";
-import { LoadingOutlined } from "@ant-design/icons";
-import { ScrollChatSingle } from "./ScrollChatSingle";
-import { FaCloudUploadAlt, FaFileImage, FaRegEdit } from "react-icons/fa";
-import { PickerOverlay } from "filestack-react";
-import "./GroupChat.css";
-import ImgCrop from "antd-img-crop";
-import { CameraOutlined } from "@ant-design/icons";
-import { Button, Upload, Image, message } from "antd";
-import UserApi from "../../../../../api/user";
-import AudioRecorderComponent from "./AudioRecorderComponent";
-import { MdAttachFile } from "react-icons/md";
-// import VideoRecorderComponent from "./VideoRecorderComponent";
+} from 'react'
+import { Input, Modal, Spin, notification } from 'antd'
+import { AiOutlineTags } from 'react-icons/ai'
+import { MdKeyboardArrowLeft } from 'react-icons/md'
+import { UserContext } from '../../../../../Context/UserContext'
+import { useDispatch, useSelector } from 'react-redux'
+import { UserGetChatsSingleById } from '../../../../../feature/chat/pathApi'
+import { LoadingOutlined } from '@ant-design/icons'
+import { ScrollChatSingle } from './ScrollChatSingle'
+import { FaCloudUploadAlt, FaFileImage, FaRegEdit } from 'react-icons/fa'
+import { PickerOverlay } from 'filestack-react'
+import './GroupChat.css'
+import ImgCrop from 'antd-img-crop'
+import { CameraOutlined } from '@ant-design/icons'
+import { Button, Upload, Image, message } from 'antd'
+import UserApi from '../../../../../api/user'
+import AudioRecorderComponent from './AudioRecorderComponent'
+import { MdAttachFile } from 'react-icons/md'
 
 // import { ScrollChatSingle } from './ScrollChatSingle'
 export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
-  const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
-  const chatSingleId = useSelector((state: any) => state.Chats.chatSingleId);
-  const dispatch = useDispatch();
-  const [isPicker, setIsPicker] = useState(false);
-  const [inputValue, setInputValue] = useState("");
-  const contextUser = useContext(UserContext);
-  const { state } = contextUser;
-  const [user, setUser] = state.user;
-  const { socket } = state;
-  const [wordchat, setwordChat] = useState("");
-  const [loadingSelectChat, setLoadingSelectChat] = useState(false);
-  const [loadingsending, setLoadingsending] = useState(false);
-  const [DataSocket, setDataSocket] = useState<any>(null);
-  const [chatSingleIdnew, setChatSingleIdNew] = useState<any>(null);
-  const [openImage, setOpenImage] = useState(false);
-  const [imageUpload, setImageUpload] = useState<any>([]);
-  const [loadingUnfriend, setLoadingUnfriend] = useState<any>(false);
-  const [audioData, setAudioData] = useState(null);
-
-  const [openModalUserChat, setOpenModalUserChat] = useState(false);
+  const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />
+  const chatSingleId = useSelector((state: any) => state.Chats.chatSingleId)
+  const dispatch = useDispatch()
+  const [isPicker, setIsPicker] = useState(false)
+  const [inputValue, setInputValue] = useState('')
+  const contextUser = useContext(UserContext)
+  const { state } = contextUser
+  const [user, setUser] = state.user
+  const { socket } = state
+  const [wordchat, setwordChat] = useState('')
+  const [loadingSelectChat, setLoadingSelectChat] = useState(false)
+  const [loadingsending, setLoadingsending] = useState(false)
+  const [DataSocket, setDataSocket] = useState<any>(null)
+  const [chatSingleIdnew, setChatSingleIdNew] = useState<any>(null)
+  const [openImage, setOpenImage] = useState(false)
+  const [imageUpload, setImageUpload] = useState<any>([])
+  const [loadingUnfriend, setLoadingUnfriend] = useState<any>(false)
+  const [audioData, setAudioData] = useState(null)
+  const [openModalUserChat, setOpenModalUserChat] = useState(false)
 
   const handleAudioStop = (data: any) => {
-    setAudioData(data);
+    setAudioData(data)
 
-    console.log("Audio data:", data);
-  };
+    console.log('Audio data:', data)
+  }
 
   const handleSendAudio = (audioBlob: any) => {
     // Handle sending audio data
-    console.log("Sending audio:", audioBlob);
-  };
+    console.log('Sending audio:', audioBlob)
+  }
 
-  console.log(chatSingleIdnew);
+  console.log(chatSingleIdnew)
 
   useEffect(() => {
     async function getData() {
       if (selectedChat) {
         const data = await dispatch<any>(
           UserGetChatsSingleById({ id: selectedChat.id })
-        );
+        )
         // console.log("day la data check")
         if (data.error) {
-          setChatSingleIdNew(null);
+          setChatSingleIdNew(null)
         }
 
         if (data && data.payload && data.payload.data) {
-          setChatSingleIdNew(data.payload.data);
+          setChatSingleIdNew(data.payload.data)
         }
       }
     }
-    getData();
-  }, [selectedChat]);
+    getData()
+  }, [selectedChat])
 
   useEffect(() => {
     if (socket) {
-      socket.on("updatedSendThread", (data: any) => {
-        console.log("emoji data tra ve");
-        console.log(data);
+      socket.on('updatedSendThread', (data: any) => {
+     
 
-        if (data.typeMsg === "recall") {
+        if (data.typeMsg === 'recall') {
           if (
             chatSingleIdnew &&
-            typeof chatSingleIdnew === "object" &&
+            typeof chatSingleIdnew === 'object' &&
             chatSingleIdnew !== null
           ) {
-            const threadschat = chatSingleIdnew.threads;
+            const threadschat = chatSingleIdnew.threads
             const index = threadschat.findIndex(
               (item: any) => item.stoneId === data.stoneId
-            );
+            )
             if (index !== 0) {
               const newThreadschatItem = {
                 ...threadschat[index],
                 messages: {
                   ...threadschat[index]?.messages,
-                  message: "Tin nhắn đã bị thu hồi",
+                  message: 'Tin nhắn đã bị thu hồi',
                 },
-              };
+              }
               const newTheardupdate = [
                 ...threadschat.slice(0, index),
                 newThreadschatItem,
                 ...threadschat.slice(index + 1),
-              ];
+              ]
               setChatSingleIdNew({
                 ...chatSingleIdnew,
                 threads: newTheardupdate,
-              });
+              })
             }
             // Tiếp tục xử lý với newThreads
           }
-        } else if (data.typeMsg === "delete") {
+        } else if (data.typeMsg === 'delete') {
           if (
             chatSingleIdnew &&
-            typeof chatSingleIdnew === "object" &&
+            typeof chatSingleIdnew === 'object' &&
             chatSingleIdnew !== null
           ) {
-            const threadschat = chatSingleIdnew.threads;
+            const threadschat = chatSingleIdnew.threads
             const index = threadschat.findIndex(
               (item: any) => item.stoneId === data.stoneId
-            );
+            )
             if (index !== 0) {
               const newThreadschatItem = {
                 ...threadschat[index],
                 messages: {
                   ...threadschat[index]?.messages,
-                  message: "Tin nhắn đã bị xóa",
+                  message: 'Tin nhắn đã bị xóa',
                 },
-              };
+              }
               const newTheardupdate = [
                 ...threadschat.slice(0, index),
                 newThreadschatItem,
                 ...threadschat.slice(index + 1),
-              ];
+              ]
               setChatSingleIdNew({
                 ...chatSingleIdnew,
                 threads: newTheardupdate,
-              });
+              })
             }
             // Tiếp tục xử lý với newThreads
           }
-        } else if (data.typeEmoji === "add") {
+        } else if (data.typeEmoji === 'add') {
         } else {
           if (data && chatSingleIdnew) {
-            const newThreads = [...chatSingleIdnew.threads, data];
-            setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads });
-            setwordChat("");
-            setLoadingsending(false);
+            const newThreads = [...chatSingleIdnew.threads, data]
+            setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads })
+            setwordChat('')
+            setLoadingsending(false)
           }
         }
-      });
+      })
     }
-  }, [socket, chatSingleIdnew]);
+  }, [socket, chatSingleIdnew])
 
   useEffect(() => {
     if (socket) {
-      socket.on("updatedEmojiThread", (data: any) => {
-        console.log("emoji data tra ve");
-        console.log(data);
-        if (data?.typeEmoji === "add") {
+      socket.on('updatedEmojiThread', (data: any) => {
+      
+        if (data.typeEmoji === 'add') {
           if (
             chatSingleIdnew &&
-            typeof chatSingleIdnew === "object" &&
+            typeof chatSingleIdnew === 'object' &&
             chatSingleIdnew !== null
           ) {
-            const threadschat = chatSingleIdnew?.threads;
-            const index = threadschat?.findIndex(
+            const threadschat = chatSingleIdnew.threads
+            const index = threadschat.findIndex(
               (item: any) => item.stoneId === data.stoneId
-            );
+            )
             if (index !== 0) {
-              const emoji = [...threadschat[index]?.emojis, data];
+              const emoji = [...threadschat[index].emojis, data]
               const newThreadschatItem = {
                 ...threadschat[index],
                 emojis: emoji,
-              };
+              }
               const newTheardupdate = [
                 ...threadschat?.slice(0, index),
                 newThreadschatItem,
@@ -186,70 +182,84 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
               setChatSingleIdNew({
                 ...chatSingleIdnew,
                 threads: newTheardupdate,
-              });
+              })
+            } else {
+              const newThreadschatItem = {
+                ...threadschat[index],
+                emojis: data.emoji,
+              }
+              const newTheardupdate = [
+                ...threadschat.slice(0, index),
+                newThreadschatItem,
+                ...threadschat.slice(index + 1),
+              ]
+              setChatSingleIdNew({
+                ...chatSingleIdnew,
+                threads: newTheardupdate,
+              })
             }
           }
         }
-      });
+      })
     }
-  }, [socket, chatSingleIdnew]);
+  }, [socket, chatSingleIdnew])
 
   const beforeUpload = async (file: any) => {
-    const formData = new FormData();
-    formData.append("files", file); // Chú ý là "files" nếu server dùng AnyFilesInterceptor()
+    const formData = new FormData()
+    formData.append('files', file) // Chú ý là "files" nếu server dùng AnyFilesInterceptor()
 
     try {
-      const response = await UserApi.userUploadImage(formData);
+      const response = await UserApi.userUploadImage(formData)
 
-      const { data } = response;
+      const { data } = response
       if (data) {
-        setImageUpload(data);
-        setOpenImage(true);
+        setImageUpload(data)
+        setOpenImage(true)
       }
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   const beforeUploaddoc = async (file: any) => {
-    const formData = new FormData();
-    formData.append("files", file); // Use "files" if your server uses AnyFilesInterceptor()
+    const formData = new FormData()
+    formData.append('files', file) // Use "files" if your server uses AnyFilesInterceptor()
 
     try {
-      const response = await UserApi.userUploadImage(formData);
-      const { data } = response;
+      const response = await UserApi.userUploadImage(formData)
+      const { data } = response
       if (data) {
         // Handle successful upload here
         const Thread = {
           chatId: selectedChat.id,
           receiveId: selectedChat.user.id,
           fileCreateDto: data,
-        };
+        }
         if (socket) {
-          socket.emit("sendThread", Thread);
+          socket.emit('sendThread', Thread)
         }
       }
     } catch (error) {
       // Handle upload error here
-      console.error("Upload failed:", error);
+      console.error('Upload failed:', error)
     }
-  };
+  }
 
   const unFriend = async (selectedChat: any) => {
-    setLoadingUnfriend(true);
+    setLoadingUnfriend(true)
     if (socket) {
-      console.log("selectedChat", selectedChat.user.id);
-      socket.emit("unfriend", {
-        chatId: selectedChat.user.id,
-      });
-      notification["success"]({
-        message: "Thông báo",
-        description: `Đã kết bạn với ${selectedChat.user.name} thành công`,
-      });
+      socket.emit('unfriend', {
+        chatId: selectedChat.id,
+      })
+      notification['success']({
+        message: 'Thông báo',
+        description: `Đã huy kết bạn với ${selectedChat.user.name} thành công`,
+      })
     }
-    setLoadingUnfriend(false);
-    setOpenModalUserChat(false);
-  };
+    setLoadingUnfriend(false)
+    setOpenModalUserChat(false)
+    window.location.reload()
+  }
 
   const modalToUnfriend = (selectedChat: any) => {
     return (
@@ -290,7 +300,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
                 src={
                   selectedChat
                     ? selectedChat.user?.avatar
-                    : "https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg"
+                    : 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg'
                 }
                 className="rounded-full h-[100px] w-[100px] border border-white "
               />
@@ -302,15 +312,15 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
             </div>
           </div>
           {/* info */}
-          <div style={{ borderTop: "4px solid #ccc" }}>
+          <div style={{ borderTop: '4px solid #ccc' }}>
             <h3 className="text-lg font-bold mb-2">Thông tin người dùng</h3>
             <p>Số điện thoại: {selectedChat.user?.phone}</p>
             <p>Email: {selectedChat?.user.email}</p>
           </div>
         </div>
       </Modal>
-    );
-  };
+    )
+  }
 
   const getSelectUserIsChoose = (selectedChat: any) => {
     return (
@@ -344,20 +354,20 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
         </div>
         {modalToUnfriend(selectedChat)}
       </>
-    );
-  };
+    )
+  }
 
   useEffect(() => {
     if (selectedChat.id) {
-      setLoadingSelectChat(true);
+      setLoadingSelectChat(true)
     }
     setTimeout(() => {
-      setLoadingSelectChat(false);
-    }, 3000);
-  }, [selectedChat.id]);
+      setLoadingSelectChat(false)
+    }, 3000)
+  }, [selectedChat.id])
 
   const handleKeyPress = async (event: any) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       if (imageUpload) {
         const Thread = {
           messages: {
@@ -366,15 +376,15 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
           chatId: selectedChat.id,
           receiveId: selectedChat.user.id,
           fileCreateDto: imageUpload,
-        };
-        if (socket) {
-          socket.emit("sendThread", Thread);
         }
-        setOpenImage(false);
-        setImageUpload(null);
-        setLoadingsending(true);
-        setInputValue("");
-        socket.off("sendThread");
+        if (socket) {
+          socket.emit('sendThread', Thread)
+        }
+        setOpenImage(false)
+        setImageUpload(null)
+        setLoadingsending(true)
+        setInputValue('')
+        socket.off('sendThread')
       } else {
         const Thread = {
           messages: {
@@ -382,23 +392,22 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
           },
           chatId: selectedChat.id,
           receiveId: selectedChat.user.id,
-        };
-
-        console.log(Thread);
-        // console.log(Thread)
-        if (socket) {
-          socket.emit("sendThread", Thread);
         }
 
-        socket.off("sendThread");
+        // console.log(Thread)
+        if (socket) {
+          socket.emit('sendThread', Thread)
+        }
+
+        socket.off('sendThread')
       }
 
-      setwordChat(event.target.value);
-      event.target.value = "";
-      setLoadingsending(true);
-      setInputValue("");
+      setwordChat(event.target.value)
+      event.target.value = ''
+      setLoadingsending(true)
+      setInputValue('')
     }
-  };
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-300  relative">
@@ -409,7 +418,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
         {loadingSelectChat ? (
           <Spin
             indicator={antIcon}
-            style={{ fontSize: "100px" }}
+            style={{ fontSize: '100px' }}
             className="text-black text-4xl m-auto justify-center self-center  "
           />
         ) : (
@@ -424,7 +433,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
             <div className="flex">
               <Input
                 onChange={(e) => {
-                  setInputValue(e.target.value);
+                  setInputValue(e.target.value)
                 }}
                 onKeyPress={handleKeyPress}
                 placeholder="Nhập @, tin nhắn mới ???"
@@ -471,7 +480,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
              
               </div>
             </div>
-            <div></div>
+           
           </div>
         )}
         {imageUpload && openImage && (
@@ -479,13 +488,13 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
             <p className="font-medium mt-4 mb-4">1 ảnh </p>
             <img
               src={`${
-                imageUpload && imageUpload[0] ? imageUpload[0].path : ""
+                imageUpload && imageUpload[0] ? imageUpload[0].path : ''
               }`}
-              style={{ width: "100px", height: "100px" }}
+              style={{ width: '100px', height: '100px' }}
             />
           </div>
         )}
       </div>
     </div>
-  );
-};
+  )
+}

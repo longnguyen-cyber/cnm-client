@@ -20,12 +20,10 @@ const UserApi = {
   },
   UserSearch: (payload: { name: string }) => {
     const url = `users/search/${payload.name}`;
-    // console.log(url)
     return axiosClient.get(url);
   },
   UserCreateChannel: (payload: any) => {
     const url = `channels`;
-    console.log(payload);
     return axiosClient.post(url, payload);
   },
   UserCreateSingleChat: (payload: any) => {
@@ -57,7 +55,6 @@ const UserApi = {
   },
 
   UserGetChannelById: (payload: { id: string }) => {
-    console.log(payload);
     const url = `/channels/${payload.id}`;
     return axiosClient.get(url);
   },

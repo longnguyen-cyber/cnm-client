@@ -28,10 +28,11 @@ const ShowChatMessage: FunctionComponent<any> = ({ ListChannel, Loading ,setsele
              
               {item.lastedThread ?
               <div className='flex justify-between'>
-            {item.lastedThread.messages.message
-                              && item.lastedThread.messages.message.length > 30 ?
-                              item.lastedThread.messages.message.substring(0, 51) + "..." :
-                              item.lastedThread.messages.message}
+            {item.lastedThread.messages?
+
+                  item.lastedThread.messages.message.length > 30 ?
+                  item.lastedThread.messages.message.substring(0, 51) + "..." :
+                  item.lastedThread.messages.message:"Có file được gửi "}
                 <div></div>
 
                 

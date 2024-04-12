@@ -59,7 +59,6 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     useEffect(()=>{
       if(socket){
         socket.on("updatedSendThread",(data:any)=>{
-          console.log('updatedSendThread')
           if (data.typeMsg === "recall") {
             if (
               chatSingleIdnew &&
@@ -159,8 +158,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
           setselectedChats({...payload.data.chat,user:{...selectedChat}});
         }
         if(payload&&payload.message==="Reject friend success"){
-          console.log(payload)
-           console.log(payload.data.chat.receiveId)
+      
           const userId=await (UserApi.getUserById(payload.data.chat.
             receiveId
             ));

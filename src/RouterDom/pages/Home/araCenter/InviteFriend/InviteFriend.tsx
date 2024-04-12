@@ -14,7 +14,6 @@ const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export default function InviteFriend() {
     var ListSingleChat=useSelector((state:any)=>state.Chats.chatSingleSlide)
     const [waitlistFriendAccept,setwaitlistFriendAccept]=useState<any>(null)
-    console.log(waitlistFriendAccept)
  
     const dispatch=useDispatch()
     const [LoadingSingle,setLoadingSingle]=useState<any>(false)
@@ -70,7 +69,6 @@ export default function InviteFriend() {
                         //   });
                     }
                     else if(data.message==="Reject friend success"){
-                        console.log(data)
                       
                         // setselectedChats({ ...chatReject, isFriend: false ,requestAdd:false});
                        
