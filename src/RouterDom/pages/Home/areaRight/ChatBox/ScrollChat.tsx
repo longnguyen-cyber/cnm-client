@@ -148,7 +148,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
     }, [Channelid,wordchat]);
     return (
       <div>
-         {modalToUnfriend()}
+         {!selectedUserReaction?.isRecall&&modalToUnfriend()}
       {Channelid && (
         <div className='content_Scroll' ref={chatContainerRef}  style={{
           width: '100%',
@@ -156,6 +156,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
             imageUpload&&imageUpload.length>0  ? '60vh' : '85vh'
           }`,
           overflowY: 'scroll',
+          overflowX: 'hidden',
         }}>
           {Channelid.threads
             .slice()
@@ -229,12 +230,16 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                           }
                           else if(extension==='mp4'||extension==="mov"){
                             return (
-                              <video
-                              key={value.filename}
-                              controls
-                              src={`${value.path}`}
-                              style={{ width: '300px', height: '250px' }}
-                            />
+                              <div>
+                                
+                                  <video
+                                      key={value.filename}
+                                      controls
+                                      src={value.path} // Đã loại bỏ dấu ` trước và sau value.path
+                                      style={{ width: '300px', height: '250px' }}
+                                  />
+                              </div>
+                             
                             )
 
                           }
@@ -286,9 +291,10 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                               <video
                               key={value.filename}
                               controls
-                              src={`${value.path}`}
+                              src={value.path} // Đã loại bỏ dấu ` trước và sau value.path
                               style={{ width: '300px', height: '250px' }}
                             />
+                           
                             )
 
                           }else {
@@ -308,21 +314,27 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                   
                   <p>{m.messages&&m.messages.message}</p>
                   
-                  :<h3 className='text-center flex flex-col gap-1 bg-red'>
-                  {m.messages&&m.messages.type==='system'&&<p className='bg-gray-400 px-7 py-1 font-medium rounded-md m-auto text-white text-center'>
-                     
-                     
+                  :
+                  <div className=' flex items-center justify-center  '>
+                    
+                  <div className={`text-center flex flex-col gap-1 w-full bg-red ${m&&messagesArray&& m.
+                      id===messagesArray[messagesArray.length-1].
+                      id?'pl-10 ml-4':''}`}>
+                  {m.messages&&m.messages.type==='system'&&<p className={`bg-gray-400 m-auto px-7 py-1 font-medium rounded-md  text-white text-center `}>
                      {m.messages===null?"": moment(m.createdAt).fromNow()} 
+
 
                      
                    </p>}
                     
                  
-                 <p  className=' px-7 py-1 font-medium rounded-md m-auto text-black relative font-medium text-center'>
+                 <p  className=' px-7 py-1 font-medium rounded-md text-center text-black relative font-medium text-center'>
                      {m.messages&&m.messages!==null?m.messages.message:""}
                    
                  </p>
-                    </h3>}
+                    </div>
+                  </div>
+                 }
                    
 
 
@@ -330,8 +342,8 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                     {m.messages&&m.messages.type!=='system'&&<div>
                        {m?.createdAt&&format(new Date(String(m.createdAt)), "HH:mm")}
                     </div>}
-                    <div className='dothover' onClick={() => {setOpenModalUserChat(true); setSelectedUserReaction(m)}}>
-                       <HiOutlineDotsHorizontal size={30} className=' ' />
+                    <div className={`${m.messages.type!=='system'&&'dothover'}`} onClick={() => {setOpenModalUserChat(true); setSelectedUserReaction(m)}}>
+                       {m.messages.type!=='system'&&<HiOutlineDotsHorizontal size={30} className=' ' />}
                     </div>
                     <div
                     className="absolute "
@@ -342,7 +354,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                       marginRight: '5px',
                     }}
                   >
-                    <div className="bg-white flex gap-2 rounded-md p-1 border">
+                    <div className=" flex gap-2  p-1 ">
                       {m.emojis &&
                         m.emojis.length > 0 &&
                         m.emojis.map((value: any) => {

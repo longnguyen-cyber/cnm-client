@@ -1,4 +1,4 @@
-import { Button, Input, Modal, Spin, Upload } from 'antd'
+import { Button, Input, Modal, Spin, Upload, notification } from 'antd'
 import React, { FunctionComponent, useContext, useEffect, useState } from 'react'
 import { LoadingOutlined } from '@ant-design/icons';
 import './GroupChat.css'
@@ -27,16 +27,19 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   const [inputValue, setInputValue] = useState('');
   const [wordchat, setwordChat] = useState('')
   const [loadingSelectChat, setLoadingSelectChat] = useState(false)
-  const [channelIdNew, setChatSingleIdNew] = useState<{ threads: any[] }>({ threads: [] });
-  
+  const [channelIdNew, setChatSingleIdNew] = useState<{ threads: any[], users: any[], name: any ,emojis:any[]}>({ threads: [], users: [], name: String,emojis:[] });
   const [openImage, setOpenImage] = useState(false)
   const [imageUpload, setImageUpload] = useState<any>([])
+  const [loadingvidieo, setLoadingVideo] = useState(false)
 
-  const [loadingvidieo,setLoadingVideo]=useState(false)
+  const [ListSingleChatnew,setListSingleChatnew]=useState<any>([])
+
+  console.log('channelIdNew')
 
   console.log(channelIdNew)
+  console.log('ListSingleChatnew', ListSingleChatnew)
 
-/// get thong tin doan chat
+  /// get thong tin doan chat
   useEffect(() => {
     async function GetChannelById() {
       setLoadingSelectChat(true)
@@ -52,67 +55,142 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
     GetChannelById();
   }, [selectedChat.id]);
 
+  
+  useEffect(()=>{
+    async function  UserGetAllSingleChat(){
+      const data=await UserApi.UserGetAllSingleChat()
 
-//data tra ve khi sendmessage
+      if(data){
+        setListSingleChatnew(data.data)
+      }
+
+      }
+      UserGetAllSingleChat()
+    },[])
+
+
+  //data tra ve khi sendmessage
 
   useEffect(() => {
 
-    const handleData=async(data:any)=>{
-  
-          if(data.typeMsg==='recall'&&data.type==='channel'){
-           
-            console.log('data stondeid')
-            const index = channelIdNew.threads.findIndex((item:any)=>item.stoneId===data.stoneId)
-            if(index!==-1){
-              
-              
-              const newThreads = [...channelIdNew.threads]
-              newThreads[index].messages
-              ={...newThreads[index].messages,message:'Tin nhắn đã được thu hồi'}
-              console.log('newThreads' ,newThreads)
-              setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
-              return
-            }
-            // setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
-            return
-          }
-          else if (data) {
-           
-          const newThreads = [...channelIdNew.threads, data]
+    const handleData = async (data: any) => {
+
+      if (data.typeMsg === 'recall' && data.type === 'channel') {
+
+        console.log('data recall ') 
+        console.log(data)
+        const index = channelIdNew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
+        if (index !== -1) {
+
+
+          const newThreads = [...channelIdNew.threads]
+          newThreads[index].messages
+            = { ...newThreads[index].messages, message: 'Tin nhắn đã được thu hồi' }
+          console.log('newThreads', newThreads)
           setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
-          setwordChat('')
-          setLoadingsending(false)
+          return
         }
+        // setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
+        return
+      }
+      else if (data) {
+        console.log('dau la data sendthread')
+        console.log(data)
+        const dataNew={...data,emojis:[]}
+
+        const newThreads = [...channelIdNew.threads,dataNew ]
+        setChatSingleIdNew({
+          ...channelIdNew,
+          threads: newThreads,
+           // Mặc định là mảng rỗng, hoặc có thể là một mảng các giá trị cụ thể
+      });
+        setwordChat('')
+        setLoadingsending(false)
+      }
     }
 
-    //emoji
+    //---------------------emoji---------------------------
 
-    const handleDataEmoji=async(data:any)=>{
-      console.log('data emoji')
-      console.log(data)
+    const handleDataEmoji = async (data: any) => {
+   
       //emojis
 
-      if(data&&data.type==='channel'&&data.typeEmoji==='add'){
+      if (data && data.type === 'channel' && data.typeEmoji === 'add') {
         console.log('data emoji add')
         console.log(data)
-        const index = channelIdNew.threads.findIndex((item:any)=>item.stoneId===data.stoneId)
-        if(index!==-1){
+        const index = channelIdNew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
+        if (index !== -1) {
           const newThreads = [...channelIdNew.threads]
-          newThreads[index].emojis=[...newThreads[index].emojis,data]
+          newThreads[index].emojis = [...newThreads[index].emojis, data]
           setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
           return
         }
       }
     }
 
-      socket.on('updatedSendThread',handleData)
-      socket.on('updatedEmojiThread',handleDataEmoji)
+    //------------------ channelWS-------------------------
 
-      return () => {
-        socket.off('updatedSendThread',handleData)
-        socket.off('updatedEmojiThread',handleDataEmoji)
+    const HandleChannelData = (data: any) => {
+      console.log('data channelWS')
+      console.log(data)
+      if (data && data.message === 'Add user to channel success') { // Kiểm tra xem thông báo đã được hiển thị hay chưa
+        // setShowSuccessNotification(true); // Đánh dấu rằng thông báo đã được hiển thị
+
+        const { channel } = data.data
+        const { lastedThread } = channel
+        const newThreads = [...channelIdNew.threads, lastedThread]
+        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
+        setselectedChats({ ...selectedChat, users: channel.users })
+
+
+        notification["success"]({
+          message: "Thông báo",
+          description: "Thêm thành viên thành công",
+        });
+
       }
-  }, [socket,channelIdNew])
+      else {
+        notification["error"]({
+          message: "Thông báo",
+          description: "Tạo nhóm Thất bại ",
+        });
+      }
+      if (data && data.message === 'Update channel success') {
+        console.log('data update')
+        console.log(data)
+        const { channel } = data.data
+        const { lastedThread } = channel
+        const newThreads = [...channelIdNew.threads, lastedThread]
+        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, name: channel.name })
+        setselectedChats({ ...selectedChat, name: channel.name })
+
+        notification["error"]({
+          message: "success",
+          description: "edit nhóm   thành công ",
+        });
+        return
+      }
+    }
+    ///-----------------chatWS-------------------------
+    const HandleChatData = (data: any) => {
+      if(data.message==="Request friend success"){
+        console.log('data chatWS ben group chat')
+        console.log(data)
+          // setScheckRender(false)
+      }
+    }
+
+    socket.on('updatedSendThread', handleData)
+    socket.on('updatedEmojiThread', handleDataEmoji)
+    socket.on('channelWS', HandleChannelData)
+    socket.on('chatWS', HandleChatData)
+
+    return () => {
+      socket.off('updatedSendThread', handleData)
+      socket.off('updatedEmojiThread', handleDataEmoji)
+      socket.off('channelWS', HandleChannelData)
+    }
+  }, [socket, channelIdNew])
 
 
 
@@ -144,7 +222,7 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   };
 
 
-  
+
 
   ///------------upload file  to server and get doc url--------------
 
@@ -154,19 +232,19 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
 
     try {
       const response = await UserApi.userUploadImage(formData)
-      
+
       const { data } = response
       console.log(data)
       if (data) {
         // Handle successful upload here
         const Thread = {
-            userId: user.id,
-            channelId: selectedChat.id,
-            senderId:user.id,
-            fileCreateDto: data,
-            messages:null
+          userId: user.id,
+          channelId: selectedChat.id,
+          senderId: user.id,
+          fileCreateDto: data,
+          messages: null
 
-            
+
         }
         if (socket) {
           socket.emit('sendThread', Thread)
@@ -188,7 +266,7 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         formData.append('files', file);
         console.log('File', file);
       });
-  
+
       // Gửi FormData chứa tất cả các tệp đến server để xử lý
       const response = await UserApi.userUploadImage(formData); // Modify API endpoint for video uploads
       const { data } = response;
@@ -197,104 +275,102 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
       const Thread = {
         channelId: selectedChat.id,
         userId: user.id,
-        senderId:user.id,
+        senderId: user.id,
         fileCreateDto: data,
       }
       if (data) {
         // Xử lý sau khi tải lên thành công
         socket.emit('sendThread', Thread)
         setLoadingVideo(false)
-       
-    
       }
 
-      
+
     } catch (error) {
       console.error(error);
     }
-  
+
     return false; // Trả về false để ngăn chặn Upload component tự động tải lên tệp
   };
 
   //remove value upload
-  const removeValueUploade=(value:any)=>{
-    const newValue=imageUpload.filter((item:any)=>item.path!==value.path)
+  const removeValueUploade = (value: any) => {
+    const newValue = imageUpload.filter((item: any) => item.path !== value.path)
     setImageUpload(newValue)
   }
 
-    /// send message to server
+  /// send message to server
 
-    const handleKeyPress = (event: any) => {
-      if (event.key === 'Enter') {
-        if(imageUpload){
-          const Thread = {
-            messages: {
-              message: inputValue,
-             
-            },
-            userId: user.id,
-            senderId:user.id,
-            fileCreateDto:imageUpload,
+  const handleKeyPress = (event: any) => {
+    if (event.key === 'Enter') {
+      if (imageUpload) {
+        const Thread = {
+          messages: {
+            message: inputValue,
 
-            channelId: selectedChat.id,
-            // token:token
-          }
-          if (socket) {
-            socket.emit('sendThread', Thread)
-          }
-          setOpenImage(false)
-          setImageUpload([])
-          setInputValue('')
-          return
+          },
+          userId: user.id,
+          senderId: user.id,
+          fileCreateDto: imageUpload,
+
+          channelId: selectedChat.id,
+          // token:token
         }
-        else{
-          const Thread = {
-            messages: {
-              message: event.target.value
-            },
-            userId: user.id,
-            channelId: selectedChat.id,
-            senderId:user.id,
-          }
-  
-          if (socket) {
-            socket.emit('sendThread', Thread)
-          }
-          // setwordChat(event.target.value)
-          event.target.value = '';
-          setLoadingsending(true)
-          setInputValue('')
-  
+        if (socket) {
+          socket.emit('sendThread', Thread)
         }
-        
+        setOpenImage(false)
+        setImageUpload([])
+        setInputValue('')
+        return
       }
-    }
+      else {
+        const Thread = {
+          messages: {
+            message: event.target.value
+          },
+          userId: user.id,
+          channelId: selectedChat.id,
+          senderId: user.id,
+        }
 
-    const modalToUnfriend = () => {
- 
-      return (
-       
-      
-       
+        if (socket) {
+          socket.emit('sendThread', Thread)
+        }
+        // setwordChat(event.target.value)
+        event.target.value = '';
+        setLoadingsending(true)
+        setInputValue('')
+
+      }
+
+    }
+  }
+
+  const modalToUnfriend = () => {
+
+    return (
+
+
+
       <Modal className=' mt-80 flex justify-center w-28 h-20 items-center' title="" open={loadingvidieo}>
         <p className='mt-14'>Đang upload video ....</p>
-       <Spin indicator={antIcon} style={{ fontSize: '100px',marginTop:'-70px' }} className=' ml-14'  /> 
+        <Spin indicator={antIcon} style={{ fontSize: '100px', marginTop: '-70px' }} className=' ml-14' />
       </Modal>
-      )
-    }
+    )
+  }
 
   return (
     <>
-    {modalToUnfriend()}
+      {modalToUnfriend()}
 
       <div>
         {
           <div className='contentGroupChat flex flex-grow justify-end  flex-col'>
             {loadingSelectChat ? <Spin indicator={antIcon} style={{ fontSize: '100px' }} className='justify-center m-auto' /> : <>
-              <ScrollChat Channelid={channelIdNew} loadingsending={loadingsending} wordchat={wordchat}   imageUpload={imageUpload}/>
+              <ScrollChat Channelid={channelIdNew} loadingsending={loadingsending} wordchat={wordchat} imageUpload={imageUpload} />
               {/* {<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""}  */}
               <div className='relative h-14'>
-              
+
                 <Input
 
                   onKeyPress={handleKeyPress}
@@ -310,29 +386,29 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
 
 
                 <div className="right-0 flex absolute gap-1">
-                <Upload
-                  beforeUpload={beforeUploadvideo}
-                  className="cursor-pointer mt-3"
-                  fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
-                  name="video"
-                  accept=".mp4, .avi, .mov" // Accept video formats (modify as needed)
-                  multiple // Cho phép người dùng chọn nhiều video
-                >
-                  <Button icon={<CiVideoOn  size={20}/>} className="border-none"></Button>
-                </Upload>
+                  <Upload
+                    beforeUpload={beforeUploadvideo}
+                    className="cursor-pointer mt-3"
+                    fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
+                    name="video"
+                    accept=".mp4, .avi, .mov" // Accept video formats (modify as needed)
+                    multiple // Cho phép người dùng chọn nhiều video
+                  >
+                    <Button icon={<CiVideoOn size={20} />} className="border-none"></Button>
+                  </Upload>
 
-                
-                <Upload
-                  beforeUpload={beforeUpload}
-                  className="cursor-pointer mt-3"
-                  fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
-                  name="avatar"
-                  accept=".jpg, .jpeg, .png"
 
-                  multiple // Cho phép người dùng chọn nhiều hình ảnh
-                >
-                  <Button icon={<CameraOutlined />} className="border-none"></Button>
-                </Upload>
+                  <Upload
+                    beforeUpload={beforeUpload}
+                    className="cursor-pointer mt-3"
+                    fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
+                    name="avatar"
+                    accept=".jpg, .jpeg, .png"
+
+                    multiple // Cho phép người dùng chọn nhiều hình ảnh
+                  >
+                    <Button icon={<CameraOutlined />} className="border-none"></Button>
+                  </Upload>
 
 
 
@@ -358,22 +434,22 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
                 </div>
               </div>
             </>}
-        
-            {imageUpload&&openImage&&(
+
+            {imageUpload && openImage && (
               <div className="bg-white w-full">
                 <p className="font-medium mt-4 mb-4">{imageUpload.length} ảnh </p>
-               <div className='flex gap-2 '>
-                  
-               {imageUpload.map((value: any, index: number) => (
-                      <div key={index} className='border relative '>
-                        <img src={value.path} alt={`Image ${index}`} className='w-32  h-36 pb-3'/>
-                        <MdClose  className='absolute top-0 z-50 right-0 cursor-pointer' onClick={()=>{removeValueUploade(value)}} size={30} color='black'/>
-                      </div>
-                    ))}
+                <div className='flex gap-2 '>
 
-                    <div className='h-100 w-32 cursor-pointer border flex items-center justify-center'>
-                      <p className='text-7xl'>+</p>
+                  {imageUpload.map((value: any, index: number) => (
+                    <div key={index} className='border relative '>
+                      <img src={value.path} alt={`Image ${index}`} className='w-32  h-36 pb-3' />
+                      <MdClose className='absolute top-0 z-50 right-0 cursor-pointer' onClick={() => { removeValueUploade(value) }} size={30} color='black' />
                     </div>
+                  ))}
+
+                  <div className='h-100 w-32 cursor-pointer border flex items-center justify-center'>
+                    <p className='text-7xl'>+</p>
+                  </div>
                 </div>
               </div>
             )}

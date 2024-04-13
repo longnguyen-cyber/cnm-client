@@ -22,6 +22,7 @@ export const ChatBox = () => {
   const loadingchanneid = useSelector((state: any) => state.Chats.loadingchanneid)
   const dispatch = useDispatch();
   const { state } = UserContexts;
+  const {socket} = state;
   const [selectedChat, setselectedChats] = state.selectedChat;
   const [submitSuccess, setSubmitSuccess] = useState(null);
   const [user, setUser] = state.user;
@@ -103,7 +104,7 @@ export const ChatBox = () => {
                           </div>
                     }
                   </div>
-                    <InformationChat selectedChat={selectedChat} user={user}/>
+                    <InformationChat selectedChat={selectedChat} user={user} socket={socket}/>
                 </div>
               }
             </div>

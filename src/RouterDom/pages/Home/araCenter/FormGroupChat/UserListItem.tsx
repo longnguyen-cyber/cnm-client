@@ -9,7 +9,7 @@ export const UserListItem: FunctionComponent<any> = ({ value, index,handleClickF
   return (
     <>{isSelected?
 
-      <div className='flex justify-between shadow-sm hover:bg-blue-300 p-1 rounded mb-3 cursor-pointer gap-3 items-center w-full border border-gray-200'>
+      <div style={{pointerEvents:"none", opacity: "0.5"}}  className='flex justify-between shadow-sm hover:bg-blue-300 p-1 rounded mb-3 cursor-pointer gap-3 items-center w-full border border-gray-200'>
      <div onClick={() => handleClickFunction(value)} key={index} className='flex items-center gap-1'>
     <Avatar src={<img src={`${value.user.avatar}`} alt="avatar" />} />
     <div>

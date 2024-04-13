@@ -43,6 +43,7 @@ export default function InviteFriend() {
         if(socket){
             socket.on("chatWS",(data:any)=>{      
                     if(data.message==="Request friend success"){
+                      console.log('add friend success')
                         setDataSocket(data.data.user)
                         // setScheckRender(false)
                     }

@@ -323,11 +323,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
                 description:'Đã gửi lời mời kết bạn'
               })
             }
-           
           }
-    
-         
-          
         }
 
         return socket.off("reqAddFriend")

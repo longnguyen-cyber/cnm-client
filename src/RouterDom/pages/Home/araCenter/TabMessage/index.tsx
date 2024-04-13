@@ -24,13 +24,9 @@ export default function Tabmessage() {
    const [token,setToken]=state.token
     const {socket}=state
    const [selectedChat, setselectedChats] = state.selectedChat;
-
    const [LoadingChatChannel,setLoadingchatChannel]=useState(false)
-
    const [ListSingleChatnew,setListSingleChatnew]=useState<any>([])
-    const [ListChannelnew,setListChannelnew]=useState<any>([])
-  
-
+   const [ListChannelnew,setListChannelnew]=useState<any>([])
     useEffect(()=>{
     async function  UserGetAllSingleChat(){
       const data=await UserApi.UserGetAllSingleChat()
@@ -51,7 +47,6 @@ export default function Tabmessage() {
           setListChannelnew(data.data)
           setLoadingchatChannel(false)
         }
-  
         }
         UserGetAllChannelChat()
         
@@ -72,8 +67,6 @@ export default function Tabmessage() {
         if(data){
           setListChannelnew(datas.data)
         }
-  
-
         })
 
 
@@ -112,6 +105,28 @@ export default function Tabmessage() {
             socket.off('channelWS', handleData);
           };
         }, [socket]);
+
+        // useEffect(() => {
+        //   const handleData = async (data:any) => {
+        //     if (data && data.message === 'Add user to channel success') {
+        //       const {channel}=data.data
+        //       const {lastedThread}=channel
+          
+        //       // Cập nhật state bằng cách sử dụng hàm callback để đảm bảo rằng
+        //       // bạn luôn có giá trị mới nhất của state đó
+        //       setListChannelnew((currentListChannelnew:any) => [...currentListChannelnew, data.data]);
+        //       setLoadingchatChannel(false);
+        //       return socket.off('channelWS');
+        //     }
+        //   };
+        
+        //   socket.on('channelWS', handleData);
+        
+        //   // Đảm bảo hủy đăng ký sự kiện khi component unmount
+        //   return () => {
+        //     socket.off('channelWS', handleData);
+        //   };
+        // },[])
         
 
 

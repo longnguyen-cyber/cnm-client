@@ -7,14 +7,33 @@ import { RiUserAddFill } from 'react-icons/ri'
 import { UserGetChatsSingleById } from '../../../../../feature/chat/pathApi'
 import { useDispatch } from 'react-redux'
 import { FaFilePdf } from 'react-icons/fa'
-
+import { CiEdit } from "react-icons/ci";
+import { LoadingOutlined } from "@ant-design/icons";
 import './GroupChat.css'
+import { AddUserToGroup } from './AddUserToGroup/AddUserToGroup'
+import { Button, Form, Input, Spin, notification } from 'antd'
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+
 export const InformationChat: FunctionComponent<any> = ({
   selectedChat,
   user,
+  socket
 }) => {
   const dispatch = useDispatch()
   const [chatSingleIdnew, setChatSingleIdNew] = useState<any>(null)
+  const [openModalAddUserToGroup, setModalAddUserToGroup] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [editNameGroup, setEditNameGroup] = useState(false)
+  const [loadingUpdate, setLoadingUpdate] = useState(false)
+  const [isFriend, setIsFriend] = useState(false)
+
+  console.log("day la selectedCha trong information", selectedChat)
+
+
+  const HandleOpenModall = () => {
+    setModalAddUserToGroup(true)
+
+  }
   useEffect(() => {
     async function getData() {
       if (selectedChat) {
@@ -34,8 +53,71 @@ export const InformationChat: FunctionComponent<any> = ({
     getData()
   }, [selectedChat])
 
+
+
+  useEffect(() => {
+    const handleData = async (data: any) => {
+      if (data && data.message === 'Add user to channel success') {
+        setModalAddUserToGroup(false)
+        setLoading(false)
+      }
+      else if(data&&data.message==='Update channel success'){
+        setLoadingUpdate(false)
+        setEditNameGroup(false)
+        return ()=>{socket.off('channelWS')}
+      }
+
+     
+    };
+    socket.on('channelWS', handleData);
+
+   
+
+    return () => {
+      socket.off('channelWS', handleData);
+    };
+  }, [socket])
+
+  
+
+
+
+  const HandleUpdate = (value: any) => {
+    const channelUpdate={
+      channelUpdate:value,
+      channelId:selectedChat.id
+     
+
+    }
+   socket.emit('updateChannel',channelUpdate)
+    setLoadingUpdate(true)
+    return () => {socket.off('updateChannel');}
+
+  }
+
+  const addFriendInGroupChat=(user:any)=>{
+    if(socket){
+      const sendReqAddFriend={
+        receiveId:user.id
+        ,
+      }
+       console.log(sendReqAddFriend)
+       socket.emit('reqAddFriend',sendReqAddFriend)
+    }
+
+    notification['success']({
+      message:'Thông báo',
+      description:'Đã gửi lời mời kết bạn'
+    })
+    return ()=>{socket.off('reqAddFriend')}
+  }
+
+
+  
+
   return (
     <div className="col-md-2 h-full overflow-y-auto relative">
+      {openModalAddUserToGroup && <AddUserToGroup selectedChat={selectedChat} openModalAddUserToGroup={openModalAddUserToGroup} setModalAddUserToGroup={setModalAddUserToGroup} loading={loading} setLoading={setLoading} />}
       <div className="flex justify-center items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
         <p className="font-medium text-xl">Thông tin nhóm </p>
       </div>
@@ -112,7 +194,7 @@ export const InformationChat: FunctionComponent<any> = ({
 
 
 
-      /// rời nhóm chat xóa nhóm chát xóa lịch sử nhóm chat
+            /// rời nhóm chat xóa nhóm chát xóa lịch sử nhóm chat
 
           ) : !selectedChat.receiveId && !selectedChat.users ? (
             <>
@@ -135,14 +217,7 @@ export const InformationChat: FunctionComponent<any> = ({
                 </p>
               </div>
             </>
-
-
-
-
-
-
-
-/// thêm thanh viên vào
+            /// thêm thanh viên vào
           ) : (
             <div>
               <p
@@ -151,11 +226,50 @@ export const InformationChat: FunctionComponent<any> = ({
               >
                 {selectedChat.name}
               </p>
-              <div className=" flex justify-center items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
-                <p className="font-medium text-xl">Thành viên </p>
+              <div className=" flex justify-center flex-col items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
+                <p className="font-medium flex gap-2 items-center cursor-pointer text-xl">Thành viên {!editNameGroup&&<CiEdit size={20} className='cursor-pointer' onClick={()=>{setEditNameGroup(true)}}/>} </p>
+              
+              {editNameGroup&& <Form
+                  onFinish={HandleUpdate}
+                  className='flex items-center gap-2'
+                >
+                  <Form.Item
+
+                    name="name"
+                    rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item>
+                    <Button
+                      type="primary"
+                      className=" bg-blue-500 h-10 w-18"
+                      htmlType="submit"
+                    >
+                      {loadingUpdate&&(
+                        <Spin indicator={antIcon} className="text-white mr-2" />
+                      )}{" "}
+                      update
+                    </Button>
+                    <Button
+                      type="primary"
+                      className=" bg-red-500 h-10 w-18"
+                      onClick={() => { setEditNameGroup(false) }}
+                    
+                    >
+
+                      Close
+                    </Button>
+
+
+                  </Form.Item>
+
+
+
+                </Form>} 
               </div>
               <div className="flex justify-center items-center">
-                <button className="btn btn-blue bg-gray-200 p-2 flex items-center gap-2 rounded-sm mt-3">
+                <button className="btn btn-blue bg-gray-200 p-2 flex items-center gap-2 rounded-sm mt-3" onClick={() => { setModalAddUserToGroup(true) }} >
                   {' '}
                   <RiUserAddFill color="gray" /> Thêm thành viên vào nhóm{' '}
                 </button>
@@ -189,7 +303,7 @@ export const InformationChat: FunctionComponent<any> = ({
                                 </p>
                               </div>
                             </div>
-                            <button className="btn bg-blue-100 px-2 rounded-md cursor-pointer text-blue-600 font-bold">
+                            <button onClick={()=>addFriendInGroupChat(value)} className="btn bg-blue-100 px-2 rounded-md cursor-pointer text-blue-600 font-bold">
                               {' '}
                               Kết bạn{' '}
                             </button>
