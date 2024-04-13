@@ -448,10 +448,6 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
 
 
               <AudioRecorderComponent className="" selectedChat={selectedChat}/>
-
-              
-
-              
               </div>
              
             </div>

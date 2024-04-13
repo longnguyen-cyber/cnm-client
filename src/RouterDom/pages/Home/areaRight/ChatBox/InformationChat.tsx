@@ -11,7 +11,9 @@ import { CiEdit } from "react-icons/ci";
 import { LoadingOutlined } from "@ant-design/icons";
 import './GroupChat.css'
 import { AddUserToGroup } from './AddUserToGroup/AddUserToGroup'
-import { Button, Form, Input, Modal, Spin, notification } from 'antd'
+import { Button, Dropdown, Form, Input, MenuProps, Modal, Popover, Space, Spin, message, notification } from 'antd'
+import { TbDotsVertical } from 'react-icons/tb'
+import {UserLeaveGroup} from './AddUserToGroup/UserLeaveGroup'
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const InformationChat: FunctionComponent<any> = ({
@@ -24,6 +26,13 @@ export const InformationChat: FunctionComponent<any> = ({
   const [loading, setLoading] = useState(false);
   const [editNameGroup, setEditNameGroup] = useState(false)
   const [loadingUpdate, setLoadingUpdate] = useState(false)
+  const [loadingDelete, setLoadingDelete] = useState(false)
+  const [valuedelete,setValueDelete]=useState<any>()
+  const [openModalRole,setopenModalRole]=useState(false)
+  const [valueUserRole,setValueRoleUser]=useState<any>()
+  const [loadingRoleUser,setLoadingRoleUser]=useState(false)
+  const [openLeaveGroup,setOpenLeaveGroup]=useState(false)
+ 
 
   
 
@@ -44,13 +53,18 @@ export const InformationChat: FunctionComponent<any> = ({
         setEditNameGroup(false)
         return () => { socket.off('channelWS') }
       }
+      else if(data && data.message==='Remove user from channel success'){
+        setLoadingDelete(false)
+        return () => { socket.off('removeUserFromChannel') }
 
-
+      }
+      if(data&&data.message==='Update role user in channel success'){
+        setLoadingRoleUser(false)
+        return () => { socket.off('updateRoleUserInChannel') }
+       
+      }
     };
     socket.on('channelWS', handleData);
-
-
-
     return () => {
       socket.off('channelWS', handleData);
     };
@@ -94,9 +108,8 @@ export const InformationChat: FunctionComponent<any> = ({
 
 
   const deleteUserInGroupChat=(value:any)=>{
-    // {
-    //   "users":["65bceb94ceda5567efc0b629"],
-    //   "channelId":"661608657dbc20ca88ed9713"
+    setValueDelete(value)
+    
     Modal.confirm({
       title: 'Bạn có chắc chắn muốn xóa người dùng này khỏi nhóm chat?',
       content: 'Hành động này không thể hoàn tác.',
@@ -108,26 +121,63 @@ export const InformationChat: FunctionComponent<any> = ({
       }
     });
     // }
-    const data={
-      users:[value.id],
-      channelId:selectedChat.id
-    }
-
+   
 
   }
   const onDeleteConfirmed = (userId: string, channelId: string) => {
+    setLoadingDelete(true)
     const data = {
-      users: [userId],
+      userId: userId,
       channelId: channelId
     }
-    socket.emit('deleteUserInChannel', data)
+    socket.emit('removeUserFromChannel', data)
 
-    return () => { socket.off('deleteUserInChannel') }
+    return () => { socket.off('removeUserFromChannel') }
   }
 
+ 
+  const PopoverContent = ({ someValue }: { someValue: any }) => {
+   
+  
+    return (
+      <div className='flex gap-1'>
+        {loadingRoleUser&&<Spin/>}
+        {valueUserRole.role==='CO-ADMIN'?<p className='cursor-pointer' onClick={()=>{HandleRoleCoAdmin('MEMBER')}}>Hủy quyền phó nhóm</p>
+      : <p className='cursor-pointer' onClick={()=>{HandleRoleCoAdmin('CO-ADMIN')}}>cấp quyền phó nhóm</p>  
+      }
+      
+       
+      </div>
+    );
+  };
 
+  
+
+
+  const HandleRoleCoAdmin=(value:any)=>{
+    setLoadingRoleUser(true)
+
+      const data={
+        user:{
+          id:valueUserRole.id,
+          role:value
+        },
+        channelId:selectedChat.id
+      }
+      socket.emit('updateRoleUserInChannel',data)
+      return () => { socket.off('updateRoleUserInChannel') }
+  }
+
+  
   return (
     <div className="col-md-2 h-full overflow-y-auto relative">
+      {
+        openLeaveGroup&&<div>
+          <UserLeaveGroup openLeaveGroup={openLeaveGroup}    setOpenLeaveGroup={setOpenLeaveGroup} selectedChat={selectedChat} user={user}/>
+        
+
+        </div>
+      }
       {openModalAddUserToGroup && <AddUserToGroup selectedChat={selectedChat} openModalAddUserToGroup={openModalAddUserToGroup} setModalAddUserToGroup={setModalAddUserToGroup} loading={loading} setLoading={setLoading} />}
       <div className="flex justify-center items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
         <p className="font-medium text-xl">Thông tin nhóm </p>
@@ -268,15 +318,9 @@ export const InformationChat: FunctionComponent<any> = ({
                       onClick={() => { setEditNameGroup(false) }}
 
                     >
-
                       Close
                     </Button>
-
-
                   </Form.Item>
-
-
-
                 </Form>}
               </div>
               <div className="flex justify-center items-center">
@@ -313,25 +357,35 @@ export const InformationChat: FunctionComponent<any> = ({
                                   {value.name}
 
                                 </p>
-                                <p>{value.role === 'ADMIN' && <div>admin</div>}</p>
+                                <p>{<div style={{fontSize:'12px',color:'gray'}}>{value.role==='ADMIN'?<p>Trưởng nhóm</p>:value.role==='CO-ADMIN'?<p>Phó nhóm</p>:<p>Thành viên </p>    }</div>}</p>
                               </div>
                             </div>
 
-                            {value.role === 'ADMIN' && user.id === value.id ? <>
+
+                            {value.role === 'ADMIN' || value.role === 'CO-ADMIN' && user.id === value.id ? <>
                             </> :
                               <div className='flex items-center gap-2'>
 
                                 <button onClick={() => deleteUserInGroupChat(value)} className="btn bg-red-500 px-2 rounded-md cursor-pointer text-white font-bold">
                                   {' '}
-                                  Xóa {' '}
+                                 
+                                 <div>
+                                 {loadingDelete &&value.id===valuedelete.id&&<Spin/>}  <p>Xóa {' '}</p>
+                                  </div>
                                 </button>
                                 <button onClick={() => addFriendInGroupChat(value)} className="btn bg-blue-100 px-2 rounded-md cursor-pointer text-blue-600 font-bold">
                                   {' '}
                                   Thêm {' '}
                                 </button>
-
-
-                              </div>
+                                <Popover
+                                      content={<PopoverContent someValue={value} />}
+                                      title="Cấp quyền "
+                                      trigger="click"
+                                      
+                                    >
+                                      <TbDotsVertical onClick={()=>{setValueRoleUser(value)}} size={30} className="cursor-pointer" />
+                                    </Popover>;
+                                                                  </div>
 
                             }
 
@@ -353,7 +407,7 @@ export const InformationChat: FunctionComponent<any> = ({
                 <p className="text-red-600 flex mt-2 mb-2 gap-2 items-center text-lg cursor-pointer mt-2">
                   <MdDelete /> Xóa nhóm
                 </p>
-                <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
+                <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2" onClick={()=>{setOpenLeaveGroup(true)}}>
                   <IoIosLogOut /> Rời nhóm chat
                 </p>
               </div>

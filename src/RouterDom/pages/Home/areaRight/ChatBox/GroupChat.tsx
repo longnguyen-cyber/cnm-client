@@ -149,12 +149,12 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         });
 
       }
-      else {
-        notification["error"]({
-          message: "Thông báo",
-          description: "Tạo nhóm Thất bại ",
-        });
-      }
+      // else {
+      //   notification["error"]({
+      //     message: "Thông báo",
+      //     description: "Tạo nhóm Thất bại ",
+      //   });
+      // }
       if (data && data.message === 'Update channel success') {
         console.log('data update')
         console.log(data)
@@ -164,12 +164,50 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         setChatSingleIdNew({ ...channelIdNew, threads: newThreads, name: channel.name })
         setselectedChats({ ...selectedChat, name: channel.name })
 
-        notification["error"]({
+        notification["success"]({
           message: "success",
           description: "edit nhóm   thành công ",
         });
         return
       }
+      if(data && data.message==='Remove user from channel success'){
+        const { channel } = data.data
+        const { lastedThread } = channel
+        console.log('data remove user from channel')
+        console.log(data)
+        console.log(lastedThread)
+        const newThreads = [...channelIdNew.threads, lastedThread]
+        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
+        setselectedChats({ ...selectedChat, users: channel.users })
+        notification["success"]({
+          message: "success",
+          description: "Xóa user trong  nhóm   thành công ",
+        });
+
+      
+
+       
+        return () => { socket.off('removeUserFromChannel') }
+
+      }
+
+      if(data&&data.message==='Update role user in channel success'){
+        console.log('data update role user in channel success')
+        console.log(data)
+        const { channel } = data.data
+        console.log('channel update')
+        console.log(channel)
+        const { lastedThread } = channel
+        const newThreads = [...channelIdNew.threads, lastedThread]
+        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
+        setselectedChats({ ...selectedChat, users: channel.users })
+        notification["success"]({
+          message: "success",
+          description: "update role user trong nhóm   thành công ",
+        });
+      }
+
+      
     }
     ///-----------------chatWS-------------------------
     const HandleChatData = (data: any) => {

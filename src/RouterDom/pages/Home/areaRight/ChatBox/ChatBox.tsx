@@ -16,6 +16,7 @@ import {ChatSingleSend} from './ChatSingleSend';
 import { InformationChat } from './InformationChat';
 import { ChaxBoxNoMustFriend } from './ChaxBoxNoMustFriend';
 import InviteFriend from '../../araCenter/InviteFriend/InviteFriend';
+import { TbDotsVertical } from "react-icons/tb";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ChatBox = () => {
   const UserContexts = useContext(UserContext);
