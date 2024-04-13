@@ -93,7 +93,7 @@ const InformationChat: FunctionComponent<any> = ({
   const HandleUpdate = (value: any) => {
     const channelUpdate = {
       channelUpdate: value,
-      channelId: selectedChat.id,
+      channelId: selectedChat?.id,
     };
     socket?.emit("updateChannel", channelUpdate);
     setLoadingUpdate(true);
@@ -130,7 +130,7 @@ const InformationChat: FunctionComponent<any> = ({
       okType: "danger",
       cancelText: "Hủy bỏ",
       onOk() {
-        onDeleteConfirmed(value.id, selectedChat.id);
+        onDeleteConfirmed(value.id, selectedChat?.id);
       },
     });
     // }
@@ -176,7 +176,7 @@ const InformationChat: FunctionComponent<any> = ({
         okType: "danger",
         cancelText: "Hủy bỏ",
         onOk() {
-          onLeaveGroupConfirmed(selectedChat.id);
+          onLeaveGroupConfirmed(selectedChat?.id);
         },
       });
     }
@@ -291,7 +291,7 @@ const InformationChat: FunctionComponent<any> = ({
         id: valueUserRole.id,
         role: value,
       },
-      channelId: selectedChat.id,
+      channelId: selectedChat?.id,
     };
     socket.emit("updateRoleUserInChannel", data);
     return () => {
@@ -327,19 +327,19 @@ const InformationChat: FunctionComponent<any> = ({
         <div className="border border-gray-200 h-44 w-auto ">
           <div className="flex justify-center items-center ">
             {typeof selectedChat === "object" && selectedChat !== null ? (
-              selectedChat.receiveId ? (
+              selectedChat?.receiveId ? (
                 <div className="flex gap-3 items-center px-5">
                   <img
-                    src={`${selectedChat.user ? selectedChat.user.avatar : ""}`}
+                    src={`${selectedChat?.user ? selectedChat?.user.avatar : ""}`}
                     className="w-16 h-16 mt-8 rounded-full"
                   />
                   <div></div>
                 </div>
-              ) : !selectedChat.receiveId && !selectedChat.users ? (
+              ) : !selectedChat?.receiveId && !selectedChat?.users ? (
                 <div>
                   <div className="flex gap-3 items-center px-5">
                     <img
-                      src={`${selectedChat ? selectedChat.avatar : ""}`}
+                      src={`${selectedChat ? selectedChat?.avatar : ""}`}
                       className="w-16 h-16 mt-8 rounded-full"
                     />
                   </div>
@@ -347,8 +347,8 @@ const InformationChat: FunctionComponent<any> = ({
               ) : (
                 <>
                   <div className="flex flex-wrap w-24  justify-center mt-8  items-center">
-                    {selectedChat.users.length > 0 &&
-                      selectedChat.users
+                    {selectedChat?.users.length > 0 &&
+                      selectedChat?.users
                         .slice(0, 3)
                         .map((value: IUser, index: number) => (
                           <img
@@ -358,7 +358,7 @@ const InformationChat: FunctionComponent<any> = ({
                           />
                         ))}
                     <p className="rounded-full text-gray-500  flex items-center justify-center  bg-gray-300 w-10 h-10">
-                      {selectedChat.users.length > 3 - 3}
+                      {selectedChat?.users.length > 3 - 3}
                     </p>
                   </div>
                 </>
@@ -374,7 +374,7 @@ const InformationChat: FunctionComponent<any> = ({
                   style={{ fontSize: "25px", fontWeight: "500px" }}
                   className="text-center mt-2 font-semibold"
                 >
-                  {selectedChat.user.name}
+                  {selectedChat?.user.name}
                 </p>
 
                 <p> Tat ca File đã gửi </p>
@@ -394,13 +394,13 @@ const InformationChat: FunctionComponent<any> = ({
               </>
             ) : /// rời nhóm chat xóa nhóm chát xóa lịch sử nhóm chat
 
-            !selectedChat.receiveId && !selectedChat.users ? (
+            !selectedChat?.receiveId && !selectedChat?.users ? (
               <>
                 <p
                   style={{ fontSize: "25px", fontWeight: "500px" }}
                   className="text-center mt-2 font-semibold"
                 >
-                  {selectedChat.name}
+                  {selectedChat?.name}
                 </p>
                 <div className="absolute bottom-1 p-2">
                   <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
@@ -422,7 +422,7 @@ const InformationChat: FunctionComponent<any> = ({
                   style={{ fontSize: "25px", fontWeight: "500px" }}
                   className="text-center mt-2  mb-4 font-semibold"
                 >
-                  {selectedChat.name}
+                  {selectedChat?.name}
                 </p>
                 <div className=" flex justify-center flex-col items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
                   <p className="font-medium flex gap-2 items-center cursor-pointer text-xl">
@@ -490,7 +490,7 @@ const InformationChat: FunctionComponent<any> = ({
                   </button>
                 </div>
                 <h1 className="font-medium mt-3 mb-3 pl-3">
-                  Danh sách thành viên ({selectedChat.users.length}){" "}
+                  Danh sách thành viên ({selectedChat?.users?.length}){" "}
                 </h1>
                 <div className="p-2">
                   <input
@@ -501,8 +501,8 @@ const InformationChat: FunctionComponent<any> = ({
 
                 {/* danh sách nhóm  */}
                 <div className="h-72 overflow-y-scroll">
-                  {selectedChat.users.length > 0 &&
-                    selectedChat.users.map((value: any, index: number) => {
+                  {selectedChat?.users?.length > 0 &&
+                    selectedChat?.users?.map((value: any, index: number) => {
                       return (
                         <div key={index} className="flex items-center p-1">
                           {value && (
@@ -646,7 +646,7 @@ const InformationChat: FunctionComponent<any> = ({
         {/* get all user but not include user.role = 'ADMIN' */}
         
 
-          { selectedChat.users.map((value: any, index: number) => {
+          { selectedChat?.users?.map((value: any, index: number) => {
             if (value.role !== "ADMIN") {
               return (
                 <div
