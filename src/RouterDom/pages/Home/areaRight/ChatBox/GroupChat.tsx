@@ -187,7 +187,7 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
       
 
        
-        return () => { socket.off('removeUserFromChannel') }
+        return () => { socket?.off('removeUserFromChannel') }
 
       }
 
@@ -233,15 +233,15 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
       }
     }
 
-    socket.on('updatedSendThread', handleData)
-    socket.on('updatedEmojiThread', handleDataEmoji)
-    socket.on('channelWS', HandleChannelData)
-    socket.on('chatWS', HandleChatData)
+    socket?.on('updatedSendThread', handleData)
+    socket?.on('updatedEmojiThread', handleDataEmoji)
+    socket?.on('channelWS', HandleChannelData)
+    socket?.on('chatWS', HandleChatData)
 
     return () => {
-      socket.off('updatedSendThread', handleData)
-      socket.off('updatedEmojiThread', handleDataEmoji)
-      socket.off('channelWS', HandleChannelData)
+      socket?.off('updatedSendThread', handleData)
+      socket?.off('updatedEmojiThread', handleDataEmoji)
+      socket?.off('channelWS', HandleChannelData)
     }
   }, [socket, channelIdNew])
 

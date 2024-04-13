@@ -79,7 +79,7 @@ export const AddUserToGroup:FunctionComponent<any>=({selectedChat,openModalAddUs
    
    
     socket.emit('addUserToChannel',channel)
-    return () => {socket.off('addUserToChannel');}
+    return () => {socket?.off('addUserToChannel');}
   }
   const handleRemoveUser = (userRemove: IUser) => {
     const userRemoveSelect = [...selectedUsers];

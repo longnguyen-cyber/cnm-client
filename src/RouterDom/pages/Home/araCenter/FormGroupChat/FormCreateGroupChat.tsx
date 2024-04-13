@@ -77,7 +77,7 @@ export const FormCreateGroupChat: FunctionComponent<any> = ({ isModalOpen, setIs
  
       }
      }
-      socket.on('channelWS',handleData)
+      socket?.on('channelWS',handleData)
     return () => {
       socket.off('channelWS', handleData);
     };

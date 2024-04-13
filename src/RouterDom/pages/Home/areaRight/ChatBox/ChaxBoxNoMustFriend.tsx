@@ -58,7 +58,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     
     useEffect(()=>{
       if(socket){
-        socket.on("updatedSendThread",(data:any)=>{
+        socket?.on("updatedSendThread",(data:any)=>{
           if (data.typeMsg === "recall") {
             if (
               chatSingleIdnew &&
@@ -108,7 +108,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
     ///khi tao chat 
     useEffect(() => {
       if(socket){
-        socket.on("chatWS",async(payload:any)=>{
+        socket?.on("chatWS",async(payload:any)=>{
           const {data}=payload
           if(data){
             if(data.id){
@@ -171,7 +171,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
             }
         })
        return ()=>{
-         socket.off('chatWS')
+         socket?.off('chatWS')
        }
       }
     },[socket])
@@ -260,7 +260,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
             event.target.value = '';
             // setLoadingsending(true)
             setInputValue('')
-            socket.off('sendThread')
+            socket?.off('sendThread')
         }
       };
 
@@ -326,7 +326,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
           }
         }
 
-        return socket.off("reqAddFriend")
+        return socket?.off("reqAddFriend")
       }
 
       const cancelFriend=(selectedChat:any)=>{

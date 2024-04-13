@@ -52,7 +52,7 @@ export default function Tabmessage() {
         
       },[])
       useEffect(()=>{
-        socket.on("updatedSendThread", async (data: any) => {
+        socket?.on("updatedSendThread", async (data: any) => {
        
           setListSingleChatnew((prev:any)=>{
             return prev.map((item:any)=>{
@@ -74,7 +74,7 @@ export default function Tabmessage() {
 
       useEffect(
         ()=>{
-        socket.on("chatWS", async (data: any) => {
+        socket?.on("chatWS", async (data: any) => {
           const datas=await UserApi.UserGetAllChannel()
           if(data){
             setListChannelnew(datas.data)
@@ -98,7 +98,7 @@ export default function Tabmessage() {
             }
           };
         
-          socket.on('channelWS', handleData);
+          socket?.on('channelWS', handleData);
         
           // Đảm bảo hủy đăng ký sự kiện khi component unmount
           return () => {
@@ -120,7 +120,7 @@ export default function Tabmessage() {
         //     }
         //   };
         
-        //   socket.on('channelWS', handleData);
+        //   socket?.on('channelWS', handleData);
         
         //   // Đảm bảo hủy đăng ký sự kiện khi component unmount
         //   return () => {

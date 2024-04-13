@@ -78,7 +78,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
 
   useEffect(() => {
     if (socket) {
-      socket.on('updatedSendThread', (data: any) => {
+      socket?.on('updatedSendThread', (data: any) => {
      
 
         if (data.typeMsg === 'recall') {
@@ -156,7 +156,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
 
   useEffect(() => {
     if (socket) {
-      socket.on('updatedEmojiThread', (data: any) => {
+      socket?.on('updatedEmojiThread', (data: any) => {
       
         if (data.typeEmoji === 'add') {
           if (
@@ -384,7 +384,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
         setImageUpload(null)
         setLoadingsending(true)
         setInputValue('')
-        socket.off('sendThread')
+        socket?.off('sendThread')
       } else {
         const Thread = {
           messages: {
@@ -399,7 +399,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
           socket.emit('sendThread', Thread)
         }
 
-        socket.off('sendThread')
+        socket?.off('sendThread')
       }
 
       setwordChat(event.target.value)

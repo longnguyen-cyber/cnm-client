@@ -57,7 +57,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
 
 
       }
-      return () => {socket.off('emoji')}
+      return () => {socket?.off('emoji')}
     }
 
     const RecallSendThread=()=>{
@@ -68,7 +68,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
           type: 'channel'
         }
         socket.emit('recallSendThread',data)
-        return ()=>{socket.off('recallSendThread')}
+        return ()=>{socket?.off('recallSendThread')}
      
     }
 
