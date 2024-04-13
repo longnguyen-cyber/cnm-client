@@ -206,8 +206,23 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
           description: "update role user trong nhóm   thành công ",
         });
       }
+      if(data&&data.message==='Leave channel success'){
+        console.log('data update role user in channel success')
+        console.log(data)
+        const { channel } = data.data
+        console.log('channel update')
+        console.log(channel)
+        const { lastedThread } = channel
+        const newThreads = [...channelIdNew.threads, lastedThread]
+        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
+        setselectedChats({ ...selectedChat, users: channel.users })
+        notification["success"]({
+          message: "success",
+          description: "update role user trong nhóm   thành công ",
+        });
+      }
 
-      
+
     }
     ///-----------------chatWS-------------------------
     const HandleChatData = (data: any) => {
