@@ -342,8 +342,8 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                     {m.messages&&m.messages.type!=='system'&&<div>
                        {m?.createdAt&&format(new Date(String(m.createdAt)), "HH:mm")}
                     </div>}
-                    <div className={`${m.messages.type!=='system'&&'dothover'}`} onClick={() => {setOpenModalUserChat(true); setSelectedUserReaction(m)}}>
-                       {m.messages.type!=='system'&&<HiOutlineDotsHorizontal size={30} className=' ' />}
+                    <div className={`${ m.messages&&m.messages.type!=='system'&&'dothover'}`} onClick={() => {setOpenModalUserChat(true); setSelectedUserReaction(m)}}>
+                       {m.messages&&m.messages.type!=='system'&&<HiOutlineDotsHorizontal size={30} className=' ' />}
                     </div>
                     <div
                     className="absolute "
