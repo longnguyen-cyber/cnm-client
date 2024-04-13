@@ -11,7 +11,7 @@ import { CiEdit } from "react-icons/ci";
 import { LoadingOutlined } from "@ant-design/icons";
 import './GroupChat.css'
 import { AddUserToGroup } from './AddUserToGroup/AddUserToGroup'
-import { Button, Form, Input, Spin, notification } from 'antd'
+import { Button, Form, Input, Modal, Spin, notification } from 'antd'
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 export const InformationChat: FunctionComponent<any> = ({
@@ -20,40 +20,18 @@ export const InformationChat: FunctionComponent<any> = ({
   socket
 }) => {
   const dispatch = useDispatch()
-  const [chatSingleIdnew, setChatSingleIdNew] = useState<any>(null)
   const [openModalAddUserToGroup, setModalAddUserToGroup] = useState(false)
   const [loading, setLoading] = useState(false);
   const [editNameGroup, setEditNameGroup] = useState(false)
   const [loadingUpdate, setLoadingUpdate] = useState(false)
-  const [isFriend, setIsFriend] = useState(false)
 
-  console.log("day la selectedCha trong information", selectedChat)
+  
 
-
+  console.log(selectedChat)
   const HandleOpenModall = () => {
     setModalAddUserToGroup(true)
 
   }
-  useEffect(() => {
-    async function getData() {
-      if (selectedChat) {
-        const data = await dispatch<any>(
-          UserGetChatsSingleById({ id: selectedChat.id })
-        )
-        // console.log("day la data check")
-        if (data.error) {
-          setChatSingleIdNew(null)
-        }
-
-        if (data && data.payload && data.payload.data) {
-          setChatSingleIdNew(data.payload.data)
-        }
-      }
-    }
-    getData()
-  }, [selectedChat])
-
-
 
   useEffect(() => {
     const handleData = async (data: any) => {
@@ -61,59 +39,92 @@ export const InformationChat: FunctionComponent<any> = ({
         setModalAddUserToGroup(false)
         setLoading(false)
       }
-      else if(data&&data.message==='Update channel success'){
+      else if (data && data.message === 'Update channel success') {
         setLoadingUpdate(false)
         setEditNameGroup(false)
-        return ()=>{socket.off('channelWS')}
+        return () => { socket.off('channelWS') }
       }
 
-     
+
     };
     socket.on('channelWS', handleData);
 
-   
+
 
     return () => {
       socket.off('channelWS', handleData);
     };
   }, [socket])
 
-  
+
 
 
 
   const HandleUpdate = (value: any) => {
-    const channelUpdate={
-      channelUpdate:value,
-      channelId:selectedChat.id
-     
+    const channelUpdate = {
+      channelUpdate: value,
+      channelId: selectedChat.id
+
 
     }
-   socket.emit('updateChannel',channelUpdate)
+    socket.emit('updateChannel', channelUpdate)
     setLoadingUpdate(true)
-    return () => {socket.off('updateChannel');}
+    return () => { socket.off('updateChannel'); }
 
   }
 
-  const addFriendInGroupChat=(user:any)=>{
-    if(socket){
-      const sendReqAddFriend={
-        receiveId:user.id
+  const addFriendInGroupChat = (user: any) => {
+    
+    if (socket) {
+      const sendReqAddFriend = {
+        receiveId: user.id
         ,
       }
-       console.log(sendReqAddFriend)
-       socket.emit('reqAddFriend',sendReqAddFriend)
+      console.log(sendReqAddFriend)
+      socket.emit('reqAddFriend', sendReqAddFriend)
     }
 
     notification['success']({
-      message:'Thông báo',
-      description:'Đã gửi lời mời kết bạn'
+      message: 'Thông báo',
+      description: 'Đã gửi lời mời kết bạn'
     })
-    return ()=>{socket.off('reqAddFriend')}
+    return () => { socket.off('reqAddFriend') }
   }
 
 
-  
+
+  const deleteUserInGroupChat=(value:any)=>{
+    // {
+    //   "users":["65bceb94ceda5567efc0b629"],
+    //   "channelId":"661608657dbc20ca88ed9713"
+    Modal.confirm({
+      title: 'Bạn có chắc chắn muốn xóa người dùng này khỏi nhóm chat?',
+      content: 'Hành động này không thể hoàn tác.',
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy bỏ',
+      onOk() {
+        onDeleteConfirmed(value.id, selectedChat.id);
+      }
+    });
+    // }
+    const data={
+      users:[value.id],
+      channelId:selectedChat.id
+    }
+
+
+  }
+  const onDeleteConfirmed = (userId: string, channelId: string) => {
+    const data = {
+      users: [userId],
+      channelId: channelId
+    }
+    socket.emit('deleteUserInChannel', data)
+
+    return () => { socket.off('deleteUserInChannel') }
+  }
+
 
   return (
     <div className="col-md-2 h-full overflow-y-auto relative">
@@ -227,9 +238,9 @@ export const InformationChat: FunctionComponent<any> = ({
                 {selectedChat.name}
               </p>
               <div className=" flex justify-center flex-col items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
-                <p className="font-medium flex gap-2 items-center cursor-pointer text-xl">Thành viên {!editNameGroup&&<CiEdit size={20} className='cursor-pointer' onClick={()=>{setEditNameGroup(true)}}/>} </p>
-              
-              {editNameGroup&& <Form
+                <p className="font-medium flex gap-2 items-center cursor-pointer text-xl">Thành viên {!editNameGroup && <CiEdit size={20} className='cursor-pointer' onClick={() => { setEditNameGroup(true) }} />} </p>
+
+                {editNameGroup && <Form
                   onFinish={HandleUpdate}
                   className='flex items-center gap-2'
                 >
@@ -246,7 +257,7 @@ export const InformationChat: FunctionComponent<any> = ({
                       className=" bg-blue-500 h-10 w-18"
                       htmlType="submit"
                     >
-                      {loadingUpdate&&(
+                      {loadingUpdate && (
                         <Spin indicator={antIcon} className="text-white mr-2" />
                       )}{" "}
                       update
@@ -255,7 +266,7 @@ export const InformationChat: FunctionComponent<any> = ({
                       type="primary"
                       className=" bg-red-500 h-10 w-18"
                       onClick={() => { setEditNameGroup(false) }}
-                    
+
                     >
 
                       Close
@@ -266,7 +277,7 @@ export const InformationChat: FunctionComponent<any> = ({
 
 
 
-                </Form>} 
+                </Form>}
               </div>
               <div className="flex justify-center items-center">
                 <button className="btn btn-blue bg-gray-200 p-2 flex items-center gap-2 rounded-sm mt-3" onClick={() => { setModalAddUserToGroup(true) }} >
@@ -287,7 +298,7 @@ export const InformationChat: FunctionComponent<any> = ({
               {/* danh sách nhóm  */}
               <div className="h-72 overflow-y-scroll">
                 {selectedChat.users.length > 0 &&
-                  selectedChat.users.map((value: IUser, index: number) => {
+                  selectedChat.users.map((value: any, index: number) => {
                     return (
                       <div key={index} className="flex items-center p-1">
                         {value && (
@@ -300,13 +311,30 @@ export const InformationChat: FunctionComponent<any> = ({
                               <div>
                                 <p className="text-xl font-medium ">
                                   {value.name}
+
                                 </p>
+                                <p>{value.role === 'ADMIN' && <div>admin</div>}</p>
                               </div>
                             </div>
-                            <button onClick={()=>addFriendInGroupChat(value)} className="btn bg-blue-100 px-2 rounded-md cursor-pointer text-blue-600 font-bold">
-                              {' '}
-                              Kết bạn{' '}
-                            </button>
+
+                            {value.role === 'ADMIN' && user.id === value.id ? <>
+                            </> :
+                              <div className='flex items-center gap-2'>
+
+                                <button onClick={() => deleteUserInGroupChat(value)} className="btn bg-red-500 px-2 rounded-md cursor-pointer text-white font-bold">
+                                  {' '}
+                                  Xóa {' '}
+                                </button>
+                                <button onClick={() => addFriendInGroupChat(value)} className="btn bg-blue-100 px-2 rounded-md cursor-pointer text-blue-600 font-bold">
+                                  {' '}
+                                  Thêm {' '}
+                                </button>
+
+
+                              </div>
+
+                            }
+
                           </div>
                         )}
                       </div>

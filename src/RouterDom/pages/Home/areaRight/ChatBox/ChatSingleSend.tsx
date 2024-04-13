@@ -175,10 +175,10 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
                 emojis: emoji,
               }
               const newTheardupdate = [
-                ...threadschat.slice(0, index),
+                ...threadschat?.slice(0, index),
                 newThreadschatItem,
-                ...threadschat.slice(index + 1),
-              ]
+                ...threadschat?.slice(index + 1),
+              ];
               setChatSingleIdNew({
                 ...chatSingleIdnew,
                 threads: newTheardupdate,
@@ -477,6 +477,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
                   className=""
                   selectedChat={selectedChat}
                 />
+             
               </div>
             </div>
            

@@ -70,16 +70,13 @@ const AudioRecorderComponent: FunctionComponent<any> = ({ selectedChat }) => {
 
   return (
     <div className="mt-2">
-      <AudioRecorder
-        onRecordingComplete={addAudioElement}
-        audioTrackConstraints={{
-          noiseSuppression: true,
-          echoCancellation: true,
+      {/* <VideoRecorder
+        onRecordingComplete={(videoBlob: File) => {
+          // Do something with the video...
+          console.log("videoBlob", videoBlob);
         }}
-        downloadOnSavePress={true}
-        downloadFileExtension="mp3"
-        showVisualizer={true}
-      />
+      /> */}
+      hihi
     </div>
   )
 }
