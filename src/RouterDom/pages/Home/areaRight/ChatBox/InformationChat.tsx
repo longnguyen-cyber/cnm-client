@@ -545,7 +545,7 @@ const InformationChat: FunctionComponent<any> = ({
                                 <div className="flex items-center gap-2">
                                   <button
                                     onClick={() => deleteUserInGroupChat(value)}
-                                    className="btn bg-red-500 px-2 rounded-md cursor-pointer text-white font-bold"
+                                    className="btn bg-red-500 p-2 rounded-md cursor-pointer text-white font-bold"
                                   >
                                     {" "}
                                     <div>
@@ -558,7 +558,7 @@ const InformationChat: FunctionComponent<any> = ({
                                   </button>
                                   <button
                                     onClick={() => addFriendInGroupChat(value)}
-                                    className="btn bg-blue-100 px-2 rounded-md cursor-pointer text-blue-600 font-bold"
+                                    className="btn bg-blue-100 p-2 rounded-md cursor-pointer text-blue-600 font-bold"
                                   >
                                     {" "}
                                     Thêm{" "}
