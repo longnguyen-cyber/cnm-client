@@ -368,7 +368,7 @@ const InformationChat: FunctionComponent<any> = ({
             )}
           </div>
           <div>
-            {selectedChat.receiveId ? (
+            {selectedChat?.receiveId ? (
               <>
                 <p
                   style={{ fontSize: "25px", fontWeight: "500px" }}
@@ -578,7 +578,6 @@ const InformationChat: FunctionComponent<any> = ({
                                       className="cursor-pointer"
                                     />
                                   </Popover>
-                                  ;
                                 </div>
                               )}
                             </div>
