@@ -168,10 +168,6 @@ const InformationChat: FunctionComponent<any> = ({
     console.log("userCurrentId------>", userCurrentId);
     if (userCurrentId.role === "ADMIN" && !userHavePassRoleAdmin) {
       setOpenModalToPassRole(true);
-      console.log(
-        "userHavePassRoleAdminhihi------------------->",
-        userHavePassRoleAdmin
-      );
     } else {
       Modal.confirm({
         title: "Bạn có chắc chắn muốn rời khỏi nhóm chat?",
@@ -191,11 +187,9 @@ const InformationChat: FunctionComponent<any> = ({
       channelId: channelId,
     };
     socket?.emit("leaveChannel", data);
-    socket?.emit("deleteChannel", data);
 
     return () => {
       socket?.off("leaveChannel");
-      socket?.off("deleteChannel");
       notification["success"]({
         message: "Thông báo",
         description: "Đã rời nhóm chat thành công",
@@ -230,6 +224,37 @@ const InformationChat: FunctionComponent<any> = ({
     }
   };
   //------------------LEAVE CHAT FOR ADMIN-------------------------------------
+
+  // ----------------DELETE GROUP CHAT-------------------------------------
+  const handleDeleteGroupChat = (selectedChat1: any) => {
+    
+    Modal.confirm({
+      title: "Bạn có chắc chắn muốn xóa nhóm chat?",
+      content: "Hành động này không thể hoàn tác.",
+      okText: "Xóa",
+      okType: "danger",
+      cancelText: "Hủy bỏ",
+      onOk() {
+        onDeleteGroupConfirmed(selectedChat1.id);
+      },
+    });
+  };
+  const onDeleteGroupConfirmed = (channelId: string) => {
+    setLoadingDelete(true);
+    const data = {
+      channelId: channelId,
+    };
+    socket?.emit("deleteChannel", data);
+
+    return () => {
+      socket?.off("deleteChannel");
+      notification["success"]({
+        message: "Thông báo",
+        description: "Đã xóa nhóm chat thành công",
+      });
+    };
+  };
+  // ----------------DELETE GROUP CHAT-------------------------------------
 
   const PopoverContent = ({ someValue }: { someValue: any }) => {
     return (
@@ -571,7 +596,9 @@ const InformationChat: FunctionComponent<any> = ({
                     <CiWarning />
                     Xóa lịch sử nhóm chat{" "}
                   </p>
-                  <p className="text-red-600 flex mt-2 mb-2 gap-2 items-center text-lg cursor-pointer mt-2">
+                  <p className="text-red-600 flex mt-2 mb-2 gap-2 items-center text-lg cursor-pointer mt-2"
+                    onClick={()=>handleDeleteGroupChat(selectedChat)}
+                  >
                     <MdDelete /> Xóa nhóm
                   </p>
                   <p
@@ -617,39 +644,45 @@ const InformationChat: FunctionComponent<any> = ({
         }
       >
         <div className="flex flex-col gap-2">
-          {selectedChat.users.map((value: any, index: number) => {
-            return (
-              <div
-                key={index}
-                className="flex items-center gap-3 cursor-pointer justify-between"
-              >
-                <img
-                  src={`${value.avatar}`}
-                  className="w-12 h-12 rounded-full"
-                />
-                <p>{value.name}</p>
-                {userHavePassRoleAdmin &&
-                userHavePassRoleAdmin.id === value.id ? (
-                  <button
-                    onClick={() => {
-                      handlePassAdmin(value);
-                    }}
-                    className="btn bg-blue-500 py-2 rounded-md cursor-pointer text-white font-bold"
-                  >
-                    Trưởng nhóm mới
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      handlePassAdmin(value);
-                    }}
-                    className="btn bg-green-500 py-2 rounded-md cursor-pointer text-white font-bold"
-                  >
-                    Chọn làm trưởng nhóm
-                  </button>
-                )}
-              </div>
-            );
+        {/* get all user but not include user.role = 'ADMIN' */}
+        
+
+          { selectedChat.users.map((value: any, index: number) => {
+            if (value.role !== "ADMIN") {
+              return (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 cursor-pointer justify-between"
+                >
+                  <img
+                    src={`${value.avatar}`}
+                    className="w-12 h-12 rounded-full"
+                  />
+                  <p>{value.name}</p>
+                  {userHavePassRoleAdmin &&
+                  userHavePassRoleAdmin.id === value.id ? (
+                    <button
+                      onClick={() => {
+                        handlePassAdmin(value);
+                      }}
+                      className="btn bg-blue-500 py-2 rounded-md cursor-pointer text-white font-bold"
+                    >
+                      Trưởng nhóm mới
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        handlePassAdmin(value);
+                      }}
+                      className="btn bg-green-500 py-2 rounded-md cursor-pointer text-white font-bold"
+                    >
+                      Chọn làm trưởng nhóm
+                    </button>
+                  )}
+                </div>
+              );
+            }
+          
           })}
         </div>
       </Modal>
