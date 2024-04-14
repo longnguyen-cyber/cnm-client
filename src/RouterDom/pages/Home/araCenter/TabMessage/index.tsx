@@ -102,13 +102,12 @@ export default function Tabmessage() {
       console.log(data)
       if (data && data.message === 'Create channel success') {
      
-          setLoadingchatChannel(true);
           data?.data.users.map((item: any) => {
             if(item.id===user.id){
               setListChannelnew((currentListChannelnew: any) => [...currentListChannelnew, data.data]);
             }
           })
-          
+
           // Cập nhật state bằng cách sử dụng hàm callback để đảm bảo rằng
           // bạn luôn có giá trị mới nhất của state đó
         
@@ -166,7 +165,9 @@ export default function Tabmessage() {
       if (data && data.message === 'Leave channel success') {
         const { channel } = data.data;
         setListChannelnew((prev: any) => {
-          return prev.filter((item: any) => item.id !== channel.id);
+          if(data.data.userLeave===user.id){
+            return prev.filter((item: any) => item.id !== channel.id);
+          }
         });
       }
 

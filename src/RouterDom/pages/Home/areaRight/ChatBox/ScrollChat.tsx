@@ -243,23 +243,21 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                               </div>
                             )
                           }
-                          else if(extension==='mp4'||extension==="mov"){
+                          else if(extension==='mp4'||extension==="mov"||extension==='mp3'){
                             return (
-                              <div>
-                                
-                                  <video
-                                      key={value.filename}
-                                      controls
-                                      src={value.path} // Đã loại bỏ dấu ` trước và sau value.path
-                                      style={{ width: '300px', height: '250px' }}
-                                  />
+                              <div className=''>        
+                              <video controls style={{ width: '100%' }}>
+                                  {/* Đường dẫn đến tập tin video */}
+                                  <source src={value.path} />
+                                  {/* Nếu trình duyệt không hỗ trợ định dạng video này */} 
+                              </video>
                               </div>
-                             
                             )
 
                           }
                            else {
                             return (
+
                               <img
                                 onClick={() => openModal(value.path)}
                                 key={value.filename}
@@ -301,14 +299,17 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                                   {<ShowWord file={value}/>}
                               </div>
                             )
-                          } else if(extension==='mp4'||extension==="mov"){
+                          } else if(extension==='mp4'||extension==="mov"||extension==='mp3'){
                             return (
-                              <video
-                              key={value.filename}
-                              controls
-                              src={value.path} // Đã loại bỏ dấu ` trước và sau value.path
-                              style={{ width: '300px', height: '250px' }}
-                            />
+                              <div >
+                               
+                                  <video controls style={{ width: '100%' }}>
+                                  {/* Đường dẫn đến tập tin video */}
+                                  <source src={value.path} />
+                                  {/* Nếu trình duyệt không hỗ trợ định dạng video này */}
+                                 
+                              </video>
+                              </div>
                            
                             )
 
@@ -336,16 +337,10 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                       id===messagesArray[messagesArray.length-1].
                       id?'pl-10 ml-4':''}`}>
                   {m.messages&&m.messages.type==='system'&&<p className={`bg-gray-400 m-auto px-7 py-1 font-medium rounded-md  text-white text-center `}>
-                     {m.messages===null?"": moment(m.createdAt).fromNow()} 
-
-
-                     
+                     {m.messages===null?"": moment(m.createdAt).fromNow()}                    
                    </p>}
-                    
-                 
                  <p  className=' px-7 py-1 font-medium rounded-md text-center text-black relative font-medium text-center'>
                      {m.messages&&m.messages!==null?m.messages.message:""}
-                   
                  </p>
                     </div>
                   </div>
