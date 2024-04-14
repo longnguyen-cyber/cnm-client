@@ -25,12 +25,16 @@ const AudioRecorderComponentChatBox: FunctionComponent<any> = ({ selectedChat })
 
     try {
       const response = await UserApi.userUploadImage(formData)
+     console.log('response auto', response)
+     console.log('response auto data', response.data)
       const Thread = {
         channelId: selectedChat.id,
         userId: user.id,
         senderId:user.id,
         fileCreateDto: response.data,
+        members: selectedChat.users.map((value: any) => value.id)
       }
+      console.log('Thread audito ne', Thread)
       if (socket) {
         socket.emit('sendThread', Thread)
       }

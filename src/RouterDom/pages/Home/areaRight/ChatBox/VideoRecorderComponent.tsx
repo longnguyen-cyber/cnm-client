@@ -44,6 +44,7 @@ const AudioRecorderComponent: FunctionComponent<any> = ({ selectedChat }) => {
         chatId: selectedChat.id,
         receiveId: selectedChat.user.id,
         fileCreateDto: response.data,
+        members: selectedChat.users.map((value: any) => value.id),
       }
       console.log(Thread)
       if (socket) {

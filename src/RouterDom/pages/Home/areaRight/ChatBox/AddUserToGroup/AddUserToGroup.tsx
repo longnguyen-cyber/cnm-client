@@ -74,11 +74,13 @@ export const AddUserToGroup:FunctionComponent<any>=({selectedChat,openModalAddUs
         role: 'MEMBER'
     })),
     channelId: selectedChat.id,
-
     };
+    
    
    
     socket.emit('addUserToChannel',channel)
+
+
     return () => {socket?.off('addUserToChannel');}
   }
   const handleRemoveUser = (userRemove: IUser) => {

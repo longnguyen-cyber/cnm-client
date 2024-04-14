@@ -27,17 +27,16 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   const [inputValue, setInputValue] = useState('');
   const [wordchat, setwordChat] = useState('')
   const [loadingSelectChat, setLoadingSelectChat] = useState(false)
-  const [channelIdNew, setChatSingleIdNew] = useState<{ threads: any[], users: any[], name: any ,emojis:any[]}>({ threads: [], users: [], name: String,emojis:[] });
+  const [channelIdNew, setChatSingleIdNew] = useState<{ id: any, threads: any[], users: any[], name: any, emojis: any[] }>({ id: '', threads: [], users: [], name: String, emojis: [] });
   const [openImage, setOpenImage] = useState(false)
   const [imageUpload, setImageUpload] = useState<any>([])
   const [loadingvidieo, setLoadingVideo] = useState(false)
 
-  const [ListSingleChatnew,setListSingleChatnew]=useState<any>([])
+  const [ListSingleChatnew, setListSingleChatnew] = useState<any>([])
 
   console.log('channelIdNew')
-
   console.log(channelIdNew)
-  console.log('ListSingleChatnew', ListSingleChatnew)
+
 
   /// get thong tin doan chat
   useEffect(() => {
@@ -55,18 +54,18 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
     GetChannelById();
   }, [selectedChat.id]);
 
-  
-  useEffect(()=>{
-    async function  UserGetAllSingleChat(){
-      const data=await UserApi.UserGetAllSingleChat()
 
-      if(data){
+  useEffect(() => {
+    async function UserGetAllSingleChat() {
+      const data = await UserApi.UserGetAllSingleChat()
+
+      if (data) {
         setListSingleChatnew(data.data)
       }
 
-      }
-      UserGetAllSingleChat()
-    },[])
+    }
+    UserGetAllSingleChat()
+  }, [])
 
 
   //data tra ve khi sendmessage
@@ -77,12 +76,10 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
 
       if (data.typeMsg === 'recall' && data.type === 'channel') {
 
-        console.log('data recall ') 
+        console.log('data recall ')
         console.log(data)
         const index = channelIdNew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
         if (index !== -1) {
-
-
           const newThreads = [...channelIdNew.threads]
           newThreads[index].messages
             = { ...newThreads[index].messages, message: 'Tin nhắn đã được thu hồi' }
@@ -94,25 +91,26 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         return
       }
       else if (data) {
-        console.log('dau la data sendthread')
+        console.log('dau la data sendthread trong group chat')
         console.log(data)
-        const dataNew={...data,emojis:[]}
-
-        const newThreads = [...channelIdNew.threads,dataNew ]
-        setChatSingleIdNew({
-          ...channelIdNew,
-          threads: newThreads,
-           // Mặc định là mảng rỗng, hoặc có thể là một mảng các giá trị cụ thể
-      });
-        setwordChat('')
-        setLoadingsending(false)
+        if (channelIdNew.id === data.channelId) {
+          const dataNew = { ...data, emojis: [] }
+          const newThreads = [...channelIdNew.threads, dataNew]
+          setChatSingleIdNew({
+            ...channelIdNew,
+            threads: newThreads,
+            // Mặc định là mảng rỗng, hoặc có thể là một mảng các giá trị cụ thể
+          });
+          setwordChat('')
+          setLoadingsending(false)
+        }
       }
     }
 
     //---------------------emoji---------------------------
 
     const handleDataEmoji = async (data: any) => {
-   
+
       //emojis
 
       if (data && data.type === 'channel' && data.typeEmoji === 'add') {
@@ -137,16 +135,20 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         // setShowSuccessNotification(true); // Đánh dấu rằng thông báo đã được hiển thị
 
         const { channel } = data.data
-        const { lastedThread } = channel
-        const newThreads = [...channelIdNew.threads, lastedThread]
-        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
-        setselectedChats({ ...selectedChat, users: channel.users })
+        if (channel.id === channelIdNew.id) {
+          const { lastedThread } = channel
+          const newThreads = [...channelIdNew.threads, lastedThread]
+          setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
+          setselectedChats({ ...selectedChat, users: channel.users })
 
 
-        notification["success"]({
-          message: "Thông báo",
-          description: "Thêm thành viên thành công",
-        });
+          notification["success"]({
+            message: "Thông báo",
+            description: "Thêm thành viên thành công",
+          });
+
+        }
+
 
       }
       // else {
@@ -159,77 +161,108 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         console.log('data update')
         console.log(data)
         const { channel } = data.data
-        const { lastedThread } = channel
-        const newThreads = [...channelIdNew.threads, lastedThread]
-        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, name: channel.name })
-        setselectedChats({ ...selectedChat, name: channel.name })
+        if (channel.id === channelIdNew.id) {
+          const { lastedThread } = channel
+          const newThreads = [...channelIdNew.threads, lastedThread]
+          setChatSingleIdNew({ ...channelIdNew, threads: newThreads, name: channel.name })
+          setselectedChats({ ...selectedChat, name: channel.name })
 
-        notification["success"]({
-          message: "success",
-          description: "edit nhóm   thành công ",
-        });
+          notification["success"]({
+            message: "success",
+            description: "Có người vừa cập nhật nhóm chát  ",
+          });
+        }
+
         return
       }
-      if(data && data.message==='Remove user from channel success'){
+      if (data && data.message === 'Remove user from channel success') {
         const { channel } = data.data
-        const { lastedThread } = channel
-        console.log('data remove user from channel')
-        console.log(data)
-        console.log(lastedThread)
-        const newThreads = [...channelIdNew.threads, lastedThread]
-        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
-        setselectedChats({ ...selectedChat, users: channel.users })
-        notification["success"]({
-          message: "success",
-          description: "Xóa user trong  nhóm   thành công ",
-        });
+        if (channel.id === channelIdNew.id) {
+          const { lastedThread } = channel
+          console.log('data remove user from channel')
+          console.log(data)
+          console.log(lastedThread)
 
-      
+          const newThreads = [...channelIdNew.threads, lastedThread]
+          setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
+          setselectedChats({ ...selectedChat, users: channel.users })
 
-       
+        }
         return () => { socket?.off('removeUserFromChannel') }
-
       }
 
-      if(data&&data.message==='Update role user in channel success'){
+      if (data && data.message === 'Update role user in channel success') {
         console.log('data update role user in channel success')
         console.log(data)
         const { channel } = data.data
-        console.log('channel update')
-        console.log(channel)
-        const { lastedThread } = channel
-        const newThreads = [...channelIdNew.threads, lastedThread]
-        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
-        setselectedChats({ ...selectedChat, users: channel.users })
-        notification["success"]({
-          message: "success",
-          description: "update role user trong nhóm   thành công ",
-        });
+        if (channel.id === channelIdNew.id) {
+          console.log('channel update')
+          console.log(channel)
+          const { lastedThread } = channel
+          const newThreads = [...channelIdNew.threads, lastedThread]
+          setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
+          setselectedChats({ ...selectedChat, users: channel.users })
+          notification["success"]({
+            message: "success",
+            description: "update role user trong nhóm   thành công ",
+          });
+        }
       }
-      if(data&&data.message==='Leave channel success'){
+      if (data && data.message === 'Leave channel success') {
         console.log('data update role user in channel success')
         console.log(data)
         const { channel } = data.data
+        console.log('day la user')
+        console.log(user.id)
+
+        if (channel.id === channelIdNew.id) {
+          if (data.data.userLeave === user.id) {
+            console.log('day la user')
+            console.log(user.id)
+            setChatSingleIdNew({ id: '', threads: [], users: [], name: String, emojis: [] });
+            setselectedChats(null)
+
+            // window.location.reload();
+          }
+          else {
+            const { lastedThread } = channel
+            const newThreads = [...channelIdNew.threads, lastedThread]
+            setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
+            setselectedChats({ ...selectedChat, users: channel.users })
+            notification["success"]({
+              message: "success",
+              description: "Leave channel success",
+            });
+          }
+        }
         console.log('channel update')
         console.log(channel)
-        const { lastedThread } = channel
-        const newThreads = [...channelIdNew.threads, lastedThread]
-        setChatSingleIdNew({ ...channelIdNew, threads: newThreads, users: channel.users })
-        setselectedChats({ ...selectedChat, users: channel.users })
-        notification["success"]({
-          message: "success",
-          description: "update role user trong nhóm   thành công ",
-        });
+
+      }
+      if (data && data.message === 'Delete channel success') {
+        console.log('data delete role user in channel success')
+        console.log(data)
+        const { channel } = data.data
+        if (channel.id === channelIdNew.id) {
+          console.log('channel update')
+          console.log(channel)
+          setChatSingleIdNew({ id: '', threads: [], users: [], name: String, emojis: [] });
+          setselectedChats(null)
+          notification["success"]({
+            message: "success",
+            description: "Nhóm đã bị giải tán ",
+          });
+        }
       }
 
 
     }
     ///-----------------chatWS-------------------------
     const HandleChatData = (data: any) => {
-      if(data.message==="Request friend success"){
+      if (data.message === "Request friend success") {
         console.log('data chatWS ben group chat')
         console.log(data)
-          // setScheckRender(false)
+        // setScheckRender(false)
       }
     }
 
@@ -295,7 +328,8 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
           channelId: selectedChat.id,
           senderId: user.id,
           fileCreateDto: data,
-          messages: null
+          messages: null,
+          members: selectedChat.users.map((value: any) => value.id)
 
 
         }
@@ -330,6 +364,7 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         userId: user.id,
         senderId: user.id,
         fileCreateDto: data,
+        members: selectedChat.users.map((value: any) => value.id)
       }
       if (data) {
         // Xử lý sau khi tải lên thành công
@@ -355,7 +390,7 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
 
   const handleKeyPress = (event: any) => {
     if (event.key === 'Enter') {
-      if (imageUpload) {
+      if (imageUpload.length > 0) {
         const Thread = {
           messages: {
             message: inputValue,
@@ -364,8 +399,8 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
           userId: user.id,
           senderId: user.id,
           fileCreateDto: imageUpload,
-
           channelId: selectedChat.id,
+          members: selectedChat.users.map((value: any) => value.id)
           // token:token
         }
         if (socket) {
@@ -377,6 +412,8 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         return
       }
       else {
+        console.log('Thread')
+        console.log('Thread')
         const Thread = {
           messages: {
             message: event.target.value
@@ -384,7 +421,12 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
           userId: user.id,
           channelId: selectedChat.id,
           senderId: user.id,
+          members: selectedChat.users.map((value: any) => value.id)
         }
+
+        console.log('Thread')
+        console.log(Thread)
+
 
         if (socket) {
           socket.emit('sendThread', Thread)

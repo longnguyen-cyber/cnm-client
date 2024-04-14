@@ -4,7 +4,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 const ShowChatMessage: FunctionComponent<any> = ({ ListChannel, Loading ,setselectedChats}) => {
- 
+
   return (
     <div className='flex flex-col gap-5 w-full' style={{ width: '100%' }}>
       {
@@ -15,7 +15,7 @@ const ShowChatMessage: FunctionComponent<any> = ({ ListChannel, Loading ,setsele
               {item && item.users.slice(0, 3).map((value: any, index: number) => (
                 <img key={index} className="w-5 h-5 rounded-full" src={`${value?value.avatar:""}`} alt="Avatar 1" />
               ))}
-              <p className='rounded-full text-gray-500 flex items-center justify-center bg-gray-300 w-5 h-5'>{item.users.length - 3}</p>
+              <p className='rounded-full text-gray-500 flex items-center justify-center bg-gray-300 w-5 h-5'>{item.users.length}</p>
             </div>
           </div>
           <div className="flex-grow ml-4">
@@ -24,20 +24,16 @@ const ShowChatMessage: FunctionComponent<any> = ({ ListChannel, Loading ,setsele
               {format(new Date(String(item.timeThread)), "HH:mm")}
             </div>
             <div className="text-gray-500">
-             
-             
+            
+               {/* {item&&item.messages?item.messages?.message&&<p>{item.messages.message}</p>:""} */}
               {item.lastedThread ?
               <div className='flex justify-between'>
-            {item.lastedThread.messages?
-
+                 {item.lastedThread?.messages?
                   item.lastedThread.messages.message.length > 30 ?
                   item.lastedThread.messages.message.substring(0, 51) + "..." :
                   item.lastedThread.messages.message:"Có file được gửi "}
                 <div></div>
-
-                
               </div>
-                
                 :
                 <div className='flex justify-between  w-full inline-flex'>
                   <p className='flex-1' style={{ fontWeight: '450' }}>

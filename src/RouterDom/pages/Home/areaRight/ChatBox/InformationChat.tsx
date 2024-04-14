@@ -54,6 +54,11 @@ const InformationChat: FunctionComponent<any> = ({
   const [openModalToPassRole, setOpenModalToPassRole] =
     useState<boolean>(false);
   const [userHavePassRoleAdmin, setUserHavePassRoleAdmin] = useState<any>();
+  const [loadingLeaveGroup,setLoadingLeaveGroup]=useState(false)
+  const [loadingDeleteGroup,setLoadingDeleteGroup]=useState(false)
+
+  const [loadingLeaveGroupForMembers, setLoadingLeaveGroupForMembers] =
+    useState(false);
   // ----------- user current
   console.log(selectedChat);
   const HandleOpenModall = () => {
@@ -82,6 +87,15 @@ const InformationChat: FunctionComponent<any> = ({
         return () => {
           socket?.off("updateRoleUserInChannel");
         };
+      }
+      if(data&&data.message==='Leave channel success'){
+        setLoadingLeaveGroup(false)
+        setLoadingLeaveGroupForMembers(false)
+        setOpenModalToPassRole(false)
+      }
+      if(data&&data.message==='Delete channel success'){
+
+        setLoadingDeleteGroup(false)
       }
     };
     socket?.on("channelWS", handleData);
@@ -183,6 +197,7 @@ const InformationChat: FunctionComponent<any> = ({
   };
   const onLeaveGroupConfirmed = (channelId: string) => {
     // setLoadingDelete(true);
+    setLoadingLeaveGroupForMembers(true)
     const data = {
       channelId: channelId,
     };
@@ -190,10 +205,7 @@ const InformationChat: FunctionComponent<any> = ({
 
     return () => {
       socket?.off("leaveChannel");
-      notification["success"]({
-        message: "Thông báo",
-        description: "Đã rời nhóm chat thành công",
-      });
+     
     };
   };
 
@@ -201,13 +213,14 @@ const InformationChat: FunctionComponent<any> = ({
 
   //------------------LEAVE CHAT FOR ADMIN-------------------------------------
   const handleLeaveChatForAdmin = (selectedChat1: any) => {
+    setLoadingLeaveGroup(true)
     if (userHavePassRoleAdmin) {
       const data = {
         transferOwner: userHavePassRoleAdmin.id,
         channelId: selectedChat1.id,
       };
       socket?.emit("leaveChannel", data);
-      setOpenModalToPassRole(false);
+   
       return () => {
         socket?.off("leaveChannel");
         setUserHavePassRoleAdmin(null);
@@ -241,6 +254,7 @@ const InformationChat: FunctionComponent<any> = ({
   };
   const onDeleteGroupConfirmed = (channelId: string) => {
     setLoadingDelete(true);
+    setLoadingDeleteGroup(true)
     const data = {
       channelId: channelId,
     };
@@ -358,7 +372,7 @@ const InformationChat: FunctionComponent<any> = ({
                           />
                         ))}
                     <p className="rounded-full text-gray-500  flex items-center justify-center  bg-gray-300 w-10 h-10">
-                      {selectedChat?.users.length > 3 - 3}
+                      {selectedChat?.users.length+1 > 3 - 3}
                     </p>
                   </div>
                 </>
@@ -422,23 +436,23 @@ const InformationChat: FunctionComponent<any> = ({
                   style={{ fontSize: "25px", fontWeight: "500px" }}
                   className="text-center mt-2  mb-4 font-semibold"
                 >
+                  <div className="flex justify-center gap-2 items-center">
                   {selectedChat?.name}
-                </p>
-                <div className=" flex justify-center flex-col items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
-                  <p className="font-medium flex gap-2 items-center cursor-pointer text-xl">
-                    Thành viên{" "}
-                    {!editNameGroup && (
-                      <CiEdit
-                        size={20}
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setEditNameGroup(true);
-                        }}
-                      />
-                    )}{" "}
-                  </p>
-
-                  {editNameGroup && (
+                  {selectedChat?.users.some((users:any) =>
+                    (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
+                        <div>
+                          {!editNameGroup && (
+                            <CiEdit
+                              size={20}
+                              className="cursor-pointer"
+                              onClick={() => setEditNameGroup(true)}
+                            />
+                          )}
+                        </div>
+                      )}
+                  </div>
+                 
+                       {editNameGroup && (
                     <Form
                       onFinish={HandleUpdate}
                       className="flex items-center gap-2"
@@ -477,6 +491,15 @@ const InformationChat: FunctionComponent<any> = ({
                       </Form.Item>
                     </Form>
                   )}
+                </p>
+                <div className=" flex justify-center flex-col items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
+                  <p className="font-medium flex gap-2 items-center cursor-pointer text-xl">
+                    Thành viên{" "}
+
+                   
+                  </p>
+
+               
                 </div>
                 <div className="flex justify-center items-center">
                   <button
@@ -501,8 +524,11 @@ const InformationChat: FunctionComponent<any> = ({
 
                 {/* danh sách nhóm  */}
                 <div className="h-72 overflow-y-scroll">
-                  {selectedChat?.users?.length > 0 &&
-                    selectedChat?.users?.map((value: any, index: number) => {
+                {selectedChat?.users.some((users:any) =>
+                    (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) ? (
+                        <div>
+                         {selectedChat?.users?.length > 0 &&
+                        selectedChat?.users?.map((value: any, index: number) => {
                       return (
                         <div key={index} className="flex items-center p-1">
                           {value && (
@@ -537,25 +563,32 @@ const InformationChat: FunctionComponent<any> = ({
                                 </div>
                               </div>
 
+
+
                               {value.role === "ADMIN" ||
                               (value.role === "CO-ADMIN" &&
                                 user.id === value.id) ? (
                                 <></>
                               ) : (
                                 <div className="flex items-center gap-2">
+                               
+                                   
                                   <button
                                     onClick={() => deleteUserInGroupChat(value)}
                                     className="btn bg-red-500 p-2 rounded-md cursor-pointer text-white font-bold"
                                   >
                                     {" "}
+                                   
                                     <div>
-                                      {loadingDelete &&
-                                        value?.id === valuedelete?.id && (
-                                          <Spin />
-                                        )}{" "}
-                                      <p>Xóa </p>
-                                    </div>
+                                    {loadingDelete &&
+                                      value?.id === valuedelete?.id && (
+                                        <Spin />
+                                      )}{" "}
+                                    <p>Xóa </p>
+                                  </div>
+                                   
                                   </button>
+
                                   <button
                                     onClick={() => addFriendInGroupChat(value)}
                                     className="btn bg-blue-100 p-2 rounded-md cursor-pointer text-blue-600 font-bold"
@@ -563,6 +596,8 @@ const InformationChat: FunctionComponent<any> = ({
                                     {" "}
                                     Thêm{" "}
                                   </button>
+
+
                                   <Popover
                                     content={
                                       <PopoverContent someValue={value} />
@@ -585,20 +620,87 @@ const InformationChat: FunctionComponent<any> = ({
                         </div>
                       );
                     })}
+                        </div>
+                      ):<>
+                      <div>
+                         {selectedChat?.users?.length > 0 &&
+                        selectedChat?.users?.map((value: any, index: number) => {
+                      return (
+                        <div key={index} className="flex items-center p-1">
+                          {value && (
+                            <div className="flex justify-between w-full ">
+                              <div className="flex gap-3 items-center px-5">
+                                <img
+                                  src={`${value.avatar}`}
+                                  className="w-12 h-12 rounded-full"
+                                />
+                                <div>
+                                  <p className="text-xl font-medium ">
+                                    {value.name}
+                                  </p>
+                                  <p>
+                                    {
+                                      <div
+                                        style={{
+                                          fontSize: "12px",
+                                          color: "gray",
+                                        }}
+                                      >
+                                        {value.role === "ADMIN" ? (
+                                          <p>Trưởng nhóm</p>
+                                        ) : value.role === "CO-ADMIN" ? (
+                                          <p>Phó nhóm</p>
+                                        ) : (
+                                          <p>Thành viên </p>
+                                        )}
+                                      </div>
+                                    }
+                                  </p>
+                                </div>
+                              </div>
+                              {value.role === "ADMIN" ||
+                              (value.role === "CO-ADMIN" &&
+                                user.id === value.id) ? (
+                                <></>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => addFriendInGroupChat(value)}
+                                    className="btn bg-blue-100 p-2 rounded-md cursor-pointer text-blue-600 font-bold"
+                                  >
+                                    {" "}
+                                    Thêm{" "}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                        </div>
+                      
+                      
+                      </>}
+
+                  
                 </div>
                 <div className="p-2">
                   <div className=" flex justify-center items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
                     <p className="font-medium text-xl">Tùy chọn </p>
                   </div>
 
-                  <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
-                    <CiWarning />
-                    Xóa lịch sử nhóm chat{" "}
-                  </p>
+                 
                   <p className="text-red-600 flex mt-2 mb-2 gap-2 items-center text-lg cursor-pointer mt-2"
                     onClick={()=>handleDeleteGroupChat(selectedChat)}
                   >
-                    <MdDelete /> Xóa nhóm
+                     {selectedChat?.users.some((users:any) =>
+                    (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
+                        <div className="flex items-center gap-1">
+                    {loadingDeleteGroup&&<Spin/>}    <MdDelete /> Xóa nhóm
+                        </div>
+                      )}
+                    
                   </p>
                   <p
                     className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2"
@@ -607,7 +709,7 @@ const InformationChat: FunctionComponent<any> = ({
                     // }}
                     onClick={() => handleLeaveGroupChat(selectedChat)}
                   >
-                    <IoIosLogOut /> Rời nhóm chat
+                    <IoIosLogOut />{loadingLeaveGroupForMembers&&<Spin/>} Rời nhóm chat
                   </p>
                 </div>
               </div>
@@ -629,7 +731,7 @@ const InformationChat: FunctionComponent<any> = ({
               }}
               className="btn bg-red-500 p-2 rounded-md cursor-pointer text-white font-bold"
             >
-              Rời nhóm
+            {loadingLeaveGroup&&<Spin/>}  Rời nhóm
             </button>
             <button
               onClick={() => {

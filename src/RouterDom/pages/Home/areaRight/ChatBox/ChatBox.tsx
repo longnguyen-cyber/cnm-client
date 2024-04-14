@@ -31,14 +31,14 @@ export const ChatBox = () => {
   const [user, setUser] = state.user;
 
   useEffect(() => {
-    if (selectedChat.id) {
-      dispatch<any>(UserGetChannelById({ id: selectedChat.id }));
+    if (selectedChat?.id) {
+      dispatch<any>(UserGetChannelById({ id: selectedChat?.id }));
     }
-  }, [selectedChat.id, submitSuccess]);
+  }, [selectedChat?.id, submitSuccess]);
 
   useEffect(() => {
-    if (selectedChat.id) {
-      dispatch<any>(UserGetChannelById({ id: selectedChat.id }));
+    if (selectedChat?.id) {
+      dispatch<any>(UserGetChannelById({ id: selectedChat?.id }));
     }
   }, [submitSuccess]);
 

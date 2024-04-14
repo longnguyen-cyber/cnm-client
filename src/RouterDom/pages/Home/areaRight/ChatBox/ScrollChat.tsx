@@ -27,6 +27,7 @@ import imageAngry from '../../../../../image/react/angry-32.png'
 import { MdDeleteOutline } from "react-icons/md";
 import { TbMessageCircleCancel } from "react-icons/tb";
 import { MdSendToMobile } from "react-icons/md"
+import { ImageModal } from './ImageModal';
 // pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 interface PdfViewerProps {
   pdfUrl: string; // Định nghĩa kiểu dữ liệu của prop pdfUrl là string
@@ -42,6 +43,13 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
     const [openModalUserChat, setOpenModalUserChat] = useState(false)
     const [selectedUserReaction, setSelectedUserReaction] = useState<any>(null)
     const [emoJi, setEmoJi] = useState('')
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [currentImage, setCurrentImage] = useState('')
+  
+    const openModal = (imageSrc: any) => {
+      setCurrentImage(imageSrc)
+      setIsModalOpen(true)
+    }
 
     const setSendEmoj = (value: any) => {
       const dataEmoji = {
@@ -57,7 +65,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
 
 
       }
-      return () => {socket?.off('emoji')}
+      return () => {socket.off('emoji')}
     }
 
     const RecallSendThread=()=>{
@@ -68,7 +76,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
           type: 'channel'
         }
         socket.emit('recallSendThread',data)
-        return ()=>{socket?.off('recallSendThread')}
+        return ()=>{socket.off('recallSendThread')}
      
     }
 
@@ -166,7 +174,8 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                 {(isSameSender(messagesArray, m, i, users.id) ||
                   isLastMessage(messagesArray, i, users.id)) && (
                     <>
-                  {m.messages&& m.messages.type!=="system"&& <img
+                  {
+                  <img
                       src={`${m.user&&
                         m.user.avatar
                           ? m.user.avatar
@@ -176,8 +185,14 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                       style={{ marginLeft: '-20px', marginTop: '-10px' }}
                     />}
                     </>
-                   
                 )}
+
+               <ImageModal
+
+                  isOpen={isModalOpen}
+                  onRequestClose={() => setIsModalOpen(false)}
+                  src={currentImage}
+                />
                 <span
                   style={{
                     backgroundColor: `${
@@ -246,7 +261,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                            else {
                             return (
                               <img
-                                // onClick={() => openModal(value.path)}
+                                onClick={() => openModal(value.path)}
                                 key={value.filename}
                                 src={value.path}
                                 style={{ width: '300px', height: '250px' }}
@@ -300,7 +315,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                           }else {
                             return (
                               <img
-                                // onClick={() => openModal(value.path)}
+                                onClick={() => openModal(value.path)}
                                 key={value.filename}
                                 src={value.path}
                                 style={{ width: '300px', height: '250px' }}
@@ -343,7 +358,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                        {m?.createdAt&&format(new Date(String(m.createdAt)), "HH:mm")}
                     </div>}
                     <div className={`${ m.messages&&m.messages.type!=='system'&&'dothover'}`} onClick={() => {setOpenModalUserChat(true); setSelectedUserReaction(m)}}>
-                       {m.messages&&m.messages.type!=='system'&&<HiOutlineDotsHorizontal size={30} className=' ' />}
+                       {m.messages &&m.messages.type!=='system'&&<HiOutlineDotsHorizontal size={30} className=' ' />}
                     </div>
                     <div
                     className="absolute "
