@@ -174,16 +174,17 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                 {(isSameSender(messagesArray, m, i, users.id) ||
                   isLastMessage(messagesArray, i, users.id)) && (
                     <>
-                  {
-                  <img
+                  
+                   {m.user&&m.user.avatar&&<img
                       src={`${m.user&&
                         m.user.avatar
                           ? m.user.avatar
-                          : 'https://media.istockphoto.com/id/1354776457/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=w3OW0wX3LyiFRuDHo9A32Q0IUMtD4yjXEvQlqyYk9O4='
+                          : ''
                       }`}
                       className="w-12 h-12 rounded-full"
                       style={{ marginLeft: '-20px', marginTop: '-10px' }}
-                    />}
+                    />} 
+                  
                     </>
                 )}
 
@@ -352,9 +353,11 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                     {m.messages&&m.messages.type!=='system'&&<div>
                        {m?.createdAt&&format(new Date(String(m.createdAt)), "HH:mm")}
                     </div>}
-                    <div className={`${ m.messages&&m.messages.type!=='system'&&'dothover'}`} onClick={() => {setOpenModalUserChat(true); setSelectedUserReaction(m)}}>
-                       {m.messages &&m.messages.type!=='system'&&<HiOutlineDotsHorizontal size={30} className=' ' />}
+                    <div className='dothover' onClick={() => {setOpenModalUserChat(true); setSelectedUserReaction(m)}}>
+                       {<HiOutlineDotsHorizontal size={30} className=' ' />}
                     </div>
+
+                    
                     <div
                     className="absolute "
                     style={{
