@@ -101,12 +101,21 @@ export default function Tabmessage() {
       console.log('data channelWS')
       console.log(data)
       if (data && data.message === 'Create channel success') {
+     
+          setLoadingchatChannel(true);
+          data?.data.users.map((item: any) => {
+            if(item.id===user.id){
+              setListChannelnew((currentListChannelnew: any) => [...currentListChannelnew, data.data]);
+            }
+          })
+          
+          // Cập nhật state bằng cách sử dụng hàm callback để đảm bảo rằng
+          // bạn luôn có giá trị mới nhất của state đó
+        
+          setLoadingchatChannel(false);
 
-        setLoadingchatChannel(true);
-        // Cập nhật state bằng cách sử dụng hàm callback để đảm bảo rằng
-        // bạn luôn có giá trị mới nhất của state đó
-        setListChannelnew((currentListChannelnew: any) => [...currentListChannelnew, data.data]);
-        setLoadingchatChannel(false);
+      
+     
         return socket.off('channelWS');
       }
       // else {
@@ -129,6 +138,7 @@ export default function Tabmessage() {
       }
       if (data && data.message === 'Remove user from channel success') {
         const { channel } = data.data
+  
         setListChannelnew((prev: any) => {
           return prev.map((item: any) => {
             if (item.id === channel.id) {
