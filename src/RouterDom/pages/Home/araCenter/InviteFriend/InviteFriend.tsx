@@ -42,6 +42,9 @@ export default function InviteFriend() {
     useEffect(()=>{
   
             socket?.on("chatWS",(data:any)=>{      
+              console.log('chatws',data)
+                    console.log(data)
+
                     if(data.message==="Request friend success"){
                       console.log('add friend success')
                         setDataSocket(data.data.user)

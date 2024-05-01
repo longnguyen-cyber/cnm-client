@@ -230,7 +230,10 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
         }
 
         if(payload&&payload.message==='Request friend success'){
-          setselectedChats({...payload.data.chat,user:{...selectedChat}});
+          console.log('payload.data.chat')
+          console.log(payload.data.chat)
+          setselectedChats({...selectedChat,requestAdd:true
+            });
         }
         if(payload&&payload.message==="Reject friend success"){
       
@@ -360,6 +363,7 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
               description:'Đã gửi lời mời kết bạn'
             })
             console.log('sendReqAddFriendHaveChat')
+            console.log(sendReqAddFriendHaveChat)
             
             socket.emit('reqAddFriendHaveChat',sendReqAddFriendHaveChat)
           }
@@ -367,7 +371,8 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
             if(!chatSingleIdnew||chatSingleIdnew===null){
               if(socket){
                 const sendReqAddFriend={
-                  receiveId:selectedChat.id
+                  receiveId:selectedChat.user.id
+                  
                   ,
                 }
                 console.log(sendReqAddFriend)
