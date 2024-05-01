@@ -17,6 +17,7 @@ import InformationChat from "./InformationChat";
 import { ChaxBoxNoMustFriend } from "./ChaxBoxNoMustFriend";
 import InviteFriend from "../../araCenter/InviteFriend/InviteFriend";
 import { TbDotsVertical } from "react-icons/tb";
+import { Cloud } from "./Cloud";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ChatBox = () => {
   const UserContexts = useContext(UserContext);
@@ -68,14 +69,22 @@ export const ChatBox = () => {
                           setselectedChats={setselectedChats}
                         />
                       </>
-                    ) : !selectedChat.users && !selectedChat.isFriend ? (
+                    ) : !selectedChat.users && !selectedChat.isFriend && selectedChat?.type!=='cloud'? (
                       <>
                         <ChaxBoxNoMustFriend
                           selectedChat={selectedChat}
                           setselectedChats={setselectedChats}
                         />
+
                       </>
-                    ) : selectedChat.users ? (
+                    ) 
+                    : selectedChat?.type==='cloud'?(
+                      <><Cloud selectedChat={selectedChat}/></>
+                    )
+                    :
+                    
+                    
+                    selectedChat.users ? (
                       <>
                         <div>
                           <div className="flex items-center p-1">
@@ -140,11 +149,15 @@ export const ChatBox = () => {
                       </div>
                     )}
                   </div>
+                  {selectedChat?.type!=='cloud'
+                  
+                  &&
                   <InformationChat
                     selectedChat={selectedChat}
                     user={user}
                     socket={socket}
                   />
+                  }
                 </div>
               )}
             </div>

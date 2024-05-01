@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 const UserContext=createContext<any>(null);
 const tokenLocal:any=localStorage.getItem('tokenUser');
 const userTokenString:any=localStorage.getItem('user');
+
 const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const dispatch=useDispatch()
     const navigate=useNavigate()
@@ -25,6 +26,7 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
       
       async function connectSocket(){
         const UserLogin:IUser=JSON.parse(userTokenString);
+        console.log(UserLogin)
       
         const idUser= UserLogin?UserLogin.id:null;
         if(UserLogin){

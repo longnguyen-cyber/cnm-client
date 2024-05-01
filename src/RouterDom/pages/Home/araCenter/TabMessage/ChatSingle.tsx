@@ -3,10 +3,24 @@ import React, { FunctionComponent } from 'react'
 import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats})=> {
- 
+export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats,CloudUser})=> {
+ console.log(ListSingleChat)
   return (
     <div className='flex flex-col-reverse gap-3'>
+      <div className='flex items-center gap-4 cursor-pointer' onClick={()=>setselectedChats({...CloudUser,type:'cloud' })}>
+          <img src='https://help.zalo.me/wp-content/uploads/2023/08/z4650065944256_2971e71cc06a5cfcb0aef41782e5f30e.jpg' className='w-14 h-14 rounded-full' alt='Avatar 1' />
+        <div>
+          <h4 className='text-lg font-medium'>Cloud của tôi </h4>
+          <div className='text-gray-500'>
+            <div className='flex justify-between'>
+              <p className='flex-1' style={{ fontWeight: '450' }}>
+                {" thread message "}
+              </p>
+              {/* <p className='ml-auto mr-2 font-bold text rounded-full text-white bg-red-600 flex items-center justify-center w-4 h-4' style={{ fontSize: "12px" }}>N</p> */}
+            </div>
+          </div>
+        </div>
+      </div>
     {
        !Loading?ListSingleChat?.map((itemChat: any, index: number) => (
             itemChat.isFriend&&

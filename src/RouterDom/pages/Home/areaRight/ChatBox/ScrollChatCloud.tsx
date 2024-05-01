@@ -34,7 +34,7 @@ import { Modal } from 'antd'
 import { ShowWord } from './WordAndPdf/ShowWord'
 import { ShowPdf } from './WordAndPdf/ShowPdf'
 
-export const ScrollChatSingle: FunctionComponent<any> = ({
+export const ScrollChatCloud: FunctionComponent<any> = ({
   Channelid,
   loadingsending,
   wordchat,
@@ -54,17 +54,11 @@ export const ScrollChatSingle: FunctionComponent<any> = ({
   const [openModalUserChat, setOpenModalUserChat] = useState(false)
   const [selectedUserReaction, setSelectedUserReaction] = useState<any>(null)
 
+
+
   const handlePinMessage=()=>{
    
-    const dataPin={
-      stoneId: userClick.stoneId,
-      type: 'chat',
-      pin:true,
-      id:Channelid.id
-    }
-
-    socket.emit('updateThread',dataPin)
-     return () => { socket.off('updateThread') }
+    
   }
 
   const openModal = (imageSrc: any) => {
@@ -73,111 +67,30 @@ export const ScrollChatSingle: FunctionComponent<any> = ({
   }
 
 
-  const deletMessage = async (item: any) => {
-    const dataDelete = {
-      stoneId: userClick.stoneId,
-      receiveId: userClick.receiveId,
-      type: 'chat',
-    }
-    if (socket) {
-      // console.log('bat dau recall')
-      socket.emit('deleteThread', dataDelete)
-    }
-  }
+ 
 
 
-  const RecallSendThread = () => {
-    console.log('bat du gui', selectedUserReaction)
-
-    const data = {
-      stoneId: selectedUserReaction.stoneId,
-      type: 'chat'
-    }
-    socket.emit('recallSendThread', data)
-    return () => { socket.off('recallSendThread') }
-
-  }
 
 
-  const setSendEmoj = (value: any) => {
-    const dataEmoji = {
-      stoneId: selectedUserReaction.stoneId,
-      typeEmoji: 'add',
-      emoji: value,
-      type:'chat',
-      quantity: 1,
-      receiveId: selectedUserReaction.receiveId,
-    }
-    console.log('emoji bat dau chat', dataEmoji)
-
-    if (socket) {
-      socket.emit('emoji', dataEmoji)
 
 
-    }
-    return () => { socket.off('emoji') }
-  }
 
   const modalToReactionMessage = () => {
     console.log('modal', selectedUserReaction)
     return (
       <Modal className=' mt-80 flex justify-center items-center' title="" open={openModalUserChat} onOk={() => { setOpenModalUserChat(false) }} onCancel={() => { setOpenModalUserChat(false) }}>
-        <div className="flex items-end justify-center mt-10 items-center w-52 gap-2">
-          {/* Thêm các emoji ở đây */}
-          <p className="text-2xl">
-            <img
-              src={`${imageLike}`}
-              style={{ transition: 'width 0.3s, height 0.3s' }}
-              className="hoverEffect"
-              onClick={() => setSendEmoj('like')}
-            />
-          </p>
-          <p className="text-2xl">
-            <img
-              src={`${imageAngry}`}
-              style={{ transition: 'width 0.3s, height 0.3s' }}
-              className="hoverEffect"
-              onClick={() => setSendEmoj('angry')}
-            />
-          </p>
-          <p className="text-2xl">
-            <img
-              src={`${imageLaugh}`}
-              style={{ transition: 'width 0.3s, height 0.3s' }}
-              className="hoverEffect"
-              onClick={() => setSendEmoj('laugh')}
-            />
-          </p>
-          <p className="text-2xl">
-            <img
-              src={`${imageSad}`}
-              style={{ transition: 'width 0.3s, height 0.3s' }}
-              className="hoverEffect"
-              onClick={() => setSendEmoj('sad')}
-            />
-          </p>
-          <p className="text-2xl">
-            <img
-              src={`${imageThumb}`}
-              style={{ transition: 'width 0.3s, height 0.3s' }}
-              className="hoverEffect"
-              onClick={() => setSendEmoj('love')}
-            />
-          </p>
-
-
-        </div>
+       
+        
 
         <div className='flex items-center justify-center mt-2 gap-2'>
            <IoPinSharp  size={25} className='cursor-pointer text-red-500'  onClick={handlePinMessage}/>
-          
         </div>
 
         {selectedUserReaction && selectedUserReaction.user.id === users?.id &&
           <div className='flex items-center justify-center mt-2 gap-2'>
 
             <MdDeleteOutline size={25} className='cursor-pointer text-red-500' />
-            <TbMessageCircleCancel size={25} className='cursor-pointer text-red-500' onClick={() => { RecallSendThread() }} />
+            {/* <TbMessageCircleCancel size={25} className='cursor-pointer text-red-500' onClick={() => { RecallSendThread() }} /> */}
             <MdSendToMobile size={25} className='cursor-pointer text-red-500' />
             
           </div>
@@ -218,37 +131,20 @@ export const ScrollChatSingle: FunctionComponent<any> = ({
             )
             .map((m: any, i: any, messagesArray: any) => (
               <div style={{ display: 'flex', marginLeft: '20px' }} key={m._id}>
-                {(isSameSender(messagesArray, m, i, users.id) ||
-                  isLastMessage(messagesArray, i, users.id)) && (
-                    <img
-                      src={`${m.user.avatar
-                          ? m.user.avatar
-                          : 'https://media.istockphoto.com/id/1354776457/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=w3OW0wX3LyiFRuDHo9A32Q0IUMtD4yjXEvQlqyYk9O4='
-                        }`}
-                      className="w-12 h-12 rounded-full"
-                      style={{ marginLeft: '-20px', marginTop: '-10px' }}
-                    />
-                  )}
+               
                 <ImageModal
                   isOpen={isModalOpen}
                   onRequestClose={() => setIsModalOpen(false)}
                   src={currentImage}
                 />
 
-                {/* {showOptions && m.id === userClick.id && (
-                  <MessageOptionsForm onClose={() => MessageOptionsForm(m)} />
-                )} */}
+               
                 <span
                   style={{
-                    backgroundColor: `${m.user.senderId === users.id ? 'white' : 'white'
+                    backgroundColor: `${'white'
                       }`,
-                    marginLeft: isSameSenderMargin(
-                      messagesArray,
-                      m,
-                      i,
-                      users.id
-                    ),
-                    marginTop: isSameUser(messagesArray, m, i) ? 5 : 10,
+                    marginLeft: 'auto',
+                    marginTop: 10,
                     borderRadius: '5px',
                     padding: '0px 10px',
                     maxWidth: '75%',
@@ -389,12 +285,12 @@ export const ScrollChatSingle: FunctionComponent<any> = ({
                     {m.user !== null && <HiOutlineDotsHorizontal size={30} className=' ' />}
                   </div>
                   <span className="text-sm text-gray-500 mb-4">
-                    {m.createdAt ? (
+                    {/* {m.createdAt ? (
                       <>{format(new Date(String(m.createdAt)), 'HH:mm')}</>
                     ) : (
                       <>{format(new Date(String(m.timeThread
                       )), 'HH:mm')}</>
-                    )}
+                    )} */}
                   </span>
                   <div
                     className="absolute "

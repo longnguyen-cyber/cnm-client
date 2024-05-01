@@ -3,8 +3,14 @@ import axiosClient from "./axiosClient";
 
 const UserApi = {
   getUserById: (id: string) => {
-    const url = `/users/${id}`;
+    const url = `/users/${id}/profile`;
     return axiosClient.get(url);
+  },
+
+  getMyCloud:()=>{
+    const url = `/users/my-cloud`;
+    return axiosClient.get(url);
+
   },
   getAllUser: () => {
     const url = "/users";
@@ -62,6 +68,11 @@ const UserApi = {
     const url = `/chats/${payload.id}`;
     return axiosClient.get(url);
   },
+
+  UserGetChatsSingleByIdCatche(payload: { id: string }) {
+    const url = `/chats/${payload.id}/updateCache`;
+    return axiosClient.get(url);
+  },
   UserFotGotPassword(payload: any) {
     const url = "users/forgot-password";
     return axiosClient.post(url, payload);
@@ -97,5 +108,9 @@ const UserApi = {
     const url = `users/update`;
     return axiosClient.put(url, payload);
   },
+  updateSetting:(payload:any)=>{
+    const url='users/update-setting'
+    return axiosClient.put(url,payload)
+  }
 };
 export default UserApi;

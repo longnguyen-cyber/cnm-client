@@ -27,19 +27,35 @@ export default function Tabmessage() {
   const [LoadingChatChannel, setLoadingchatChannel] = useState(false)
   const [ListSingleChatnew, setListSingleChatnew] = useState<any>([])
   const [ListChannelnew, setListChannelnew] = useState<any>([])
-  console.log('ListChannelnew')
-  console.log(ListChannelnew)
+  const [CloudUser, setCloudUser] = useState<any>(null)
+  console.log(ListSingleChatnew)
+  // https://help.zalo.me/wp-content/uploads/2023/08/z4650065944256_2971e71cc06a5cfcb0aef41782e5f30e.jpg
+
+
+  //CloudUser
+  useEffect(() => {
+    async function UserGetCloud() {
+      const data = await UserApi.getMyCloud()
+      console.log('data cloud')
+      console.log(data)
+      if (data) {
+        setCloudUser(data.data)
+      }
+    }
+    UserGetCloud()
+  }, [])
+
   useEffect(() => {
     async function UserGetAllSingleChat() {
       const data = await UserApi.UserGetAllSingleChat()
-
       if (data) {
         setListSingleChatnew(data.data)
       }
-
     }
     UserGetAllSingleChat()
   }, [])
+
+  
 
   useEffect(() => {
     async function UserGetAllChannelChat() {
@@ -52,6 +68,40 @@ export default function Tabmessage() {
     }
     UserGetAllChannelChat()
   }, [])
+
+
+
+  ///-----------------------------------------for chatsigle
+  useEffect(() => {
+    const handDataChatWs = async (response: any) => {
+      console.log('resonpose')
+      console.log(response)
+     
+   
+      if (response.message === "Request friend success") {
+        
+
+      }
+      else if (response.message === "Accept friend success") {
+        console.log('accept friend success')
+
+          const data = await UserApi.UserGetAllSingleChat()
+          if (data) {
+            setListSingleChatnew(data.data)
+          }
+      }
+      else if (response.message === "Unrequest friend success") {
+       
+      }
+
+    }
+    socket?.on('chatWS', handDataChatWs)
+    return () => {socket.off('chatWS', handDataChatWs)}
+
+     
+  }, [socket])
+  ///----------------------for chatsigle
+  
   useEffect(() => {
     socket?.on("updatedSendThread", async (data: any) => {
       if(data?.chatId){
@@ -96,7 +146,6 @@ export default function Tabmessage() {
 
   ///socket cho chat Channel
   useEffect(() => {
-
     const handleData = (data: any) => {
       console.log('data channelWS')
       console.log(data)
@@ -224,7 +273,7 @@ export default function Tabmessage() {
             <div className='flex-1 flex-shrink-0 '>
               <Tabs >
                 <TabPane tab="Bạn bè" className=' w-full' key="1">
-                  <ChatSingle ListSingleChat={ListSingleChatnew} Loading={LoadingSingle} setselectedChats={setselectedChats} />
+                  <ChatSingle ListSingleChat={ListSingleChatnew} Loading={LoadingSingle} setselectedChats={setselectedChats} CloudUser={CloudUser}/>
                 </TabPane>
                 <TabPane tab="Chat nhóm " key="2">
                   <ShowChatMessage ListChannel={ListChannelnew} Loading={LoadingChatChannel} setselectedChats={setselectedChats} />

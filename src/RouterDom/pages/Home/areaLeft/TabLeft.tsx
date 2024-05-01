@@ -8,7 +8,7 @@ import {
   AiOutlineCloud,
   AiOutlineSetting,
 } from "react-icons/ai";
-import { Button, Modal } from "antd";
+import { Button, Modal, Spin, notification } from "antd";
 import { Navigate, useNavigate } from "react-router";
 import "./TabLeft.css";
 import UserApi from "../../../../api/user";
@@ -25,9 +25,22 @@ const TabLeft: FunctionComponent<{
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [modalText, setModalText] = useState("Content of the modal");
   const storedUser = localStorage.getItem("user");
-  const userInfor = storedUser ? JSON.parse(storedUser) : null;
+  const userInfors = storedUser ? JSON.parse(storedUser) : null;
   const dispatch = useDispatch();
   const [imageUrl, setImageUrl] = useState(null);
+  const [loadingBlockgest, setLoadingBlockgest] = useState(false);
+  const [loadingNotify, setLoadingNotify] = useState(false);
+  const [userInfor,setuserInfor]=useState<any>(null)
+  useEffect(() => {
+    const fetchUserInfor = async () => {
+      const res = await UserApi.getUserById(userInfors.id);
+      if(res){
+        console.log('res',res.data)
+        setuserInfor(res.data)
+      }
+    }
+    fetchUserInfor()
+  }, [])
 
   const showModal = () => {
     setOpen(true);
@@ -76,6 +89,67 @@ const TabLeft: FunctionComponent<{
     setTabCurrent(value);
   };
 
+  const handleOpenBlockGest = async () => {
+    setLoadingBlockgest(true);
+    const data = {
+      blockGuest: false,
+    };
+    const res = await UserApi.updateSetting(data);
+    console.log('res data update setting1',res)
+    console.log('res data update setting2',res.data)
+    if(res){
+      setLoadingBlockgest(false);
+      if(res.data){
+        setuserInfor({...userInfor,setting:res.data})
+      }
+      notification.success({message:' Đã bật không  nhận tin nhắn từ người lạ '})
+    }
+  }
+
+  const handleCloseBlockGest = async () => {
+    setLoadingBlockgest(true);
+    const data = {
+      blockGuest: true,
+    };
+    const res = await UserApi.updateSetting(data);
+    if(res){
+      if(res.data){
+        setuserInfor({...userInfor,setting:res.data})
+      }
+      setLoadingBlockgest(false);
+
+      notification.success({message:' Đã bật  nhận tin nhắn từ người lạ '})
+    }
+  }
+  const handelOpenNotify = async () => {
+    setLoadingNotify(true);
+    const data = {
+      notify: false,
+    };
+    const res = await UserApi.updateSetting(data);
+    if(res){
+      if(res.data){
+        setuserInfor({...userInfor,setting:res.data})
+      }
+      setLoadingNotify(false);
+      notification.success({message:' Đã bật  không  thông báo khi có tin nhắn '})
+    }
+  }
+  const handelCloseNotify = async () => {
+    setLoadingNotify(true);
+    const data = {
+      notify: true,
+    };
+    const res = await UserApi.updateSetting(data);
+    if(res){
+      if(res.data){
+        setuserInfor({...userInfor,setting:res.data})
+      }
+      setLoadingNotify(false);
+      notification.success({message:' Đã bật  nhận thông báo khi có tin nhắn '})
+    }
+  }
+
   useEffect(() => {
     const listIcon = document.querySelectorAll(".nav_menuall .items_icon");
     listIcon.forEach((element, index) => {
@@ -91,6 +165,7 @@ const TabLeft: FunctionComponent<{
   }, []);
   return (
     <>
+    {  <>
       <div className="  h-full relative " style={{ background: "#0091ff" }}>
         <div className="flex flex-col justify-center nav_menuall  items-center">
           <div className="flex flex-col items-center  gap-5">
@@ -244,6 +319,10 @@ const TabLeft: FunctionComponent<{
             <h3 className="text-lg font-bold mb-2">Thông tin người dùng</h3>
             <p>Số điện thoại: {userInfor?.phone}</p>
             <p>Email: {userInfor?.email}</p>
+            <p>Không chấp nhận tin nhắn từ người lạ</p>
+            <div className="">{loadingBlockgest&&<Spin/>}{userInfor&&userInfor?.setting.blockGuest===true?<Button   onClick={handleOpenBlockGest}>Tắt  </Button>:<Button onClick={handleCloseBlockGest}>Bật  </Button>}</div>
+            <p>Không nhận thông báo khi có tin nhắn </p>
+            <div className="">{loadingNotify&&<Spin/>}{userInfor?.setting.notify===true?<Button   onClick={handelOpenNotify}>Tắt </Button>:<Button onClick={handelCloseNotify}>Bật</Button>}</div>
           </div>
         </div>
       </Modal>
@@ -276,7 +355,9 @@ const TabLeft: FunctionComponent<{
           </div>
         )}
       </Modal>
+    </>}
     </>
+   
   );
 };
 

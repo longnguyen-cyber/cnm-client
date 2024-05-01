@@ -28,6 +28,7 @@ import { MdDeleteOutline } from "react-icons/md";
 import { TbMessageCircleCancel } from "react-icons/tb";
 import { MdSendToMobile } from "react-icons/md"
 import { ImageModal } from './ImageModal';
+import { IoPinSharp } from 'react-icons/io5';
 // pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 interface PdfViewerProps {
   pdfUrl: string; // Định nghĩa kiểu dữ liệu của prop pdfUrl là string
@@ -50,13 +51,27 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
       setCurrentImage(imageSrc)
       setIsModalOpen(true)
     }
+    const handlePinMessage=()=>{
+   
+      const dataPin={
+        stoneId: selectedUserReaction.stoneId,
+        type: 'channel',
+        pin:true,
+        id:Channelid.id
+      }
+   
+      socket.emit('updateThread',dataPin)
+       return () => { socket.off('updateThread') }
+    }
+  
 
     const setSendEmoj = (value: any) => {
       const dataEmoji = {
         stoneId: selectedUserReaction.stoneId,
         typeEmoji: 'add',
         emoji: value,
-        quantity:1
+        quantity:1,
+        type: 'channel'
       }
       console.log('emoji bat dau',dataEmoji)
    
@@ -84,9 +99,6 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
     const modalToUnfriend = () => {
       console.log('modal',selectedUserReaction)
       return (
-       
-      
-       
       <Modal className=' mt-80 flex justify-center items-center' title="" open={openModalUserChat} onOk={()=>{setOpenModalUserChat(false)}} onCancel={()=>{setOpenModalUserChat(false)}}>
         <div className="flex items-end justify-center mt-10 items-center w-52 gap-2">
             {/* Thêm các emoji ở đây */}
@@ -133,8 +145,11 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
 
     
           </div>
-
-          {selectedUserReaction&&selectedUserReaction.senderId===users?.id&&
+          <div className='flex items-center justify-center mt-2 gap-2'>
+           <IoPinSharp  size={25} className='cursor-pointer text-red-500'  onClick={handlePinMessage}/>
+          
+        </div>
+          {selectedUserReaction&&selectedUserReaction.user.id===users?.id&&
           <div className='flex items-center justify-center mt-2 gap-2'>
             
                <MdDeleteOutline size={25} className='cursor-pointer text-red-500'/>
@@ -247,7 +262,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                           else if(extension==='mp4'||extension==="mov"||extension==='mp3'){
                             return (
                               <div className=''>        
-                              <video controls style={{ width: '100%' }}>
+                              <video controls style={{ width: '300px' ,height:'150px'}}>
                                   {/* Đường dẫn đến tập tin video */}
                                   <source src={value.path} />
                                   {/* Nếu trình duyệt không hỗ trợ định dạng video này */} 
@@ -304,7 +319,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                             return (
                               <div >
                                
-                                  <video controls style={{ width: '100%' }}>
+                                  <video controls style={{ width: '300px',height:'150px' }}>
                                   {/* Đường dẫn đến tập tin video */}
                                   <source src={value.path} />
                                   {/* Nếu trình duyệt không hỗ trợ định dạng video này */}

@@ -40,7 +40,7 @@ export default function InviteFriend() {
     
      },[dataSocket])
     useEffect(()=>{
-        if(socket){
+  
             socket?.on("chatWS",(data:any)=>{      
                     if(data.message==="Request friend success"){
                       console.log('add friend success')
@@ -48,6 +48,8 @@ export default function InviteFriend() {
                         // setScheckRender(false)
                     }
                     else if(data.message==="Accept friend success"){
+                      console.log('accept friend success')
+                      console.log(data)
                      
                         //  setselectedChats(data.data.chat);
                         setDataSocket(data)
@@ -78,17 +80,19 @@ export default function InviteFriend() {
                      
                     }
             })
-        }
+            return ()=>{socket.off('chatWS')}
+  
     },[socket,chatReject])
 
     useEffect(()=>{
+      console.log('get all chat single bat dau ghe chat send')
         dispatch<any>(UserGetAllSingleChat())
     },[dataSocket])
 
     const AcceptChat=(item:any)=>{
         setLoadingSingle(true)
         if(socket){
-          socket.emit('acceptAddFriend',{chatId:item.id,receiveId:item.receiveId})
+          socket.emit('acceptAddFriend',{chatId:item.id})
           console.log(item.id,item.receiveId)
           notification['success']({
             message: 'Thông báo',

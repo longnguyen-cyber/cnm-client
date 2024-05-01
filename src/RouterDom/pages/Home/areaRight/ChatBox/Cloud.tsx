@@ -23,10 +23,11 @@ import AudioRecorderComponent from './AudioRecorderComponent'
 import { MdAttachFile } from 'react-icons/md'
 import { CiVideoOn } from 'react-icons/ci'
 import { RcFile } from 'antd/es/upload'
-import { AiOutlineMessage } from "react-icons/ai";
+import { ScrollChatCloud } from './ScrollChatCloud'
+import AudioRecorderComponentCloud from './AudioRecorderComponentCloud'
 
 // import { ScrollChatSingle } from './ScrollChatSingle'
-export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
+export const Cloud: FunctionComponent<any> = ({ selectedChat }) => {
   const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />
   const chatSingleId = useSelector((state: any) => state.Chats.chatSingleId)
   const dispatch = useDispatch()
@@ -47,21 +48,6 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
   const [audioData, setAudioData] = useState(null)
   const [openModalUserChat, setOpenModalUserChat] = useState(false)
   const [loadingvidieo, setLoadingVideo] = useState(false)
-  const [dataPin, setDataPin] = useState<any>([])
-  const [showAllMessages, setShowAllMessages] = useState(false);
-
-  const toggleShowAllMessages = () => {
-    setShowAllMessages(!showAllMessages);
-  };
-
-  useEffect(()=>{
-    const pinnedThreadsData = chatSingleIdnew?.threads.filter((item:any) => item.pin === true);
-   console.log(pinnedThreadsData)
-    setDataPin(pinnedThreadsData)
-
-
-
-  },[chatSingleIdnew?.threads])
 
   const handleAudioStop = (data: any) => {
     setAudioData(data)
@@ -79,16 +65,15 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
   useEffect(() => {
     async function getData() {
       if (selectedChat) {
-        const data = await dispatch<any>(
-          UserGetChatsSingleById({ id: selectedChat.id })
-        )
-        // console.log("day la data check")
-        if (data.error) {
-          setChatSingleIdNew(null)
+        const data = await UserApi.getMyCloud()
+        
+        if(data.data){
+          setChatSingleIdNew(data.data)
+          console.log("day la data check")
+        console.log(data.data)
         }
-
-        if (data && data.payload && data.payload.data) {
-          setChatSingleIdNew(data.payload.data)
+        else{
+          selectedChat(null)
         }
       }
     }
@@ -98,7 +83,9 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
   useEffect(() => {
   
     const handleUpdateSendThread = (data: any) => {
-      if (data.typeMsg === 'recall'&&data.type === 'chat') {
+      console.log('co data')
+      console.log(data)
+      if (data.typeMsg === 'recall'&&data.type === 'cloud') {
         console.log('data recall')
         console.log(data)
         const index = chatSingleIdnew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
@@ -114,52 +101,9 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
         return
           // Tiếp tục xử lý với newThreads
         }
-
-        else if(data.typeMsg === 'update'&&data.type === 'chat' ) {
-          console.log('data update')
-          console.log(data)
-          const index = chatSingleIdnew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
-
-          const datapinnew=dataPin
-          setDataPin([...datapinnew,chatSingleIdnew.threads[index]])
-       
-          // const index = chatSingleIdnew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
-          
-
-        }
       
       
-      else if (data.typeMsg === 'delete') {
-        if (
-          chatSingleIdnew &&
-          typeof chatSingleIdnew === 'object' &&
-          chatSingleIdnew !== null
-        ) {
-          const threadschat = chatSingleIdnew.threads
-          const index = threadschat.findIndex(
-            (item: any) => item.stoneId === data.stoneId
-          )
-          if (index !== 0) {
-            const newThreadschatItem = {
-              ...threadschat[index],
-              messages: {
-                ...threadschat[index]?.messages,
-                message: 'Tin nhắn đã bị xóa',
-              },
-            }
-            const newTheardupdate = [
-              ...threadschat.slice(0, index),
-              newThreadschatItem,
-              ...threadschat.slice(index + 1),
-            ]
-            setChatSingleIdNew({
-              ...chatSingleIdnew,
-              threads: newTheardupdate,
-            })
-          }
-          // Tiếp tục xử lý với newThreads
-        }
-      }
+    
       else if (data.typeEmoji === 'add') {
 
       } 
@@ -167,7 +111,10 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
       else {
         if (data && chatSingleIdnew) {
           console.log('data sendthread', data)
-          if(data.chatId===chatSingleIdnew.id){
+          console.log('chatSingleIdnew', chatSingleIdnew)
+          if(data.cloudId===chatSingleIdnew.id && data.type === 'cloud'){
+            console.log('data chatid array')
+            console.log(data)
             const dataNew = { ...data, emojis: [] }
             const newThreads = [...chatSingleIdnew.threads, dataNew]
             setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads })
@@ -213,10 +160,6 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
       socket?.off('updatedEmojiThread',handleupdatedEmojiThread)
     }
   }, [socket, chatSingleIdnew])
-
-
-
-
   const beforeUpload = async (file: RcFile, fileList: RcFile[]) => {
     const formData = new FormData()
     fileList.forEach(file => {
@@ -247,8 +190,8 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
       if (data) {
         // Handle successful upload here
         const Thread = {
-          chatId: selectedChat.id,
-          receiveId: selectedChat.user.id,
+          cloudId:selectedChat.id,
+         
           fileCreateDto: data,
         }
         if (socket) {
@@ -275,13 +218,13 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
       const { data } = response;
       console.log('data tra ve sau khi upload');
       console.log(data);
-      const Thread = {
-        chatId: selectedChat.id,
-        userId: user.id,
-        senderId: user.id,
-        fileCreateDto: data,
 
-      
+
+
+      const Thread = {
+        cloudId:selectedChat.id,
+        
+        fileCreateDto: data,
       }
       if (data) {
         // Xử lý sau khi tải lên thành công
@@ -296,82 +239,9 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
 
     return false; // Trả về false để ngăn chặn Upload component tự động tải lên tệp
   };
-  const unFriend = async (selectedChat: any) => {
-    setLoadingUnfriend(true)
-    if (socket) {
-      socket.emit('unfriend', {
-        chatId: selectedChat.id,
-      })
-      notification['success']({
-        message: 'Thông báo',
-        description: `Đã huy kết bạn với ${selectedChat.user.name} thành công`,
-      })
-    }
-    setLoadingUnfriend(false)
-    setOpenModalUserChat(false)
-    window.location.reload()
-  }
 
-  const modalToUnfriend = (selectedChat: any) => {
-    return (
-      <Modal
-        width={400}
-        title="Hồ sơ"
-        open={openModalUserChat}
-        // onOk={handleOk}
-        // confirmLoading={confirmLoading}
-        // onCancel={handleCancel}
-        footer={(_, { OkBtn, CancelBtn }) => (
-          <>
-            {/* <OkBtn/> */}
-            <Button
-              className="bg-red-500"
-              onClick={() => unFriend(selectedChat)}
-            >
-              Hủy kết bạn
-            </Button>
-            <Button
-              className="bg-blue-500"
-              onClick={() => setOpenModalUserChat(false)}
-            >
-              Thoát
-            </Button>
-          </>
-        )}
-      >
-        <div className="flex flex-col">
-          {/* Image cover  */}
-          <div className="">
-            <img src="https://cover-talk.zadn.vn/7/a/a/9/3/a72ea6dfb69157c6b987a0ccc1306acb.jpg" />
-          </div>
-          {/* avatar */}
-          <div className="flex items-center mt-5 relative top-[-40px]">
-            <div className="h-[100px]">
-              <img
-                src={
-                  selectedChat
-                    ? selectedChat.user?.avatar
-                    : 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg'
-                }
-                className="rounded-full h-[100px] w-[100px] border border-white "
-              />
-            </div>
-            <div className="flex flex-col">
-              <p className="text-lg font-bold pl-4">
-                {selectedChat.user?.name}
-              </p>
-            </div>
-          </div>
-          {/* info */}
-          <div style={{ borderTop: '4px solid #ccc' }}>
-            <h3 className="text-lg font-bold mb-2">Thông tin người dùng</h3>
-            <p>Số điện thoại: {selectedChat.user?.phone}</p>
-            <p>Email: {selectedChat?.user.email}</p>
-          </div>
-        </div>
-      </Modal>
-    )
-  }
+
+ 
 
   const getSelectUserIsChoose = (selectedChat: any) => {
     return (
@@ -387,23 +257,20 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
             />
           </p>
 
-          {selectedChat && selectedChat.user && (
+          {selectedChat && (
             <div className="flex gap-3 bacgroundxe items-center px-5 cursor-pointer">
               <img
-                src={`${selectedChat.user.avatar}`}
+                src={`${'https://help.zalo.me/wp-content/uploads/2023/08/z4650065944256_2971e71cc06a5cfcb0aef41782e5f30e.jpg'}`}
                 className="w-12 h-12 rounded-full"
               />
               <div>
-                <p className="text-xl font-medium ">{selectedChat.user.name}</p>
-                <div className="flex">
-                  <AiOutlineTags color="gray" className="mt-1" />
-                  <p>Bạn bè</p>
-                </div>
+                <p className='font-medium'> Cloud  của tôi </p>
+               
               </div>
             </div>
           )}
         </div>
-        {modalToUnfriend(selectedChat)}
+       
       </>
     )
   }
@@ -424,8 +291,8 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
           messages: {
             message: event.target.value,
           },
-          chatId: selectedChat.id,
-          receiveId: selectedChat.user.id,
+        
+          cloudId:selectedChat.id,
           fileCreateDto: imageUpload,
         }
         if (socket) {
@@ -441,8 +308,11 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
           messages: {
             message: event.target.value,
           },
-          chatId: selectedChat.id,
-          receiveId: selectedChat.user.id,
+        
+        
+          cloudId:selectedChat.id,
+          
+          
         }
 
         console.log('data send thread', Thread)
@@ -481,39 +351,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
             {modalLoadingvideo()}
       <div className="flex items-center h-16 w-full bg-white shadow-md">
         {getSelectUserIsChoose(selectedChat)}
-       
       </div>
-      <p className='w-full border bg-white p-2 border-collapse'>
-      <>
-        Danh sách ghim ({dataPin && dataPin.length}){' '}
-        <span onClick={toggleShowAllMessages} className="cursor-pointer">
-          {showAllMessages ? 'Ẩn tin nhắn' : 'Hiện tất cả tin nhắn'}
-        </span>
-      </>
-      {showAllMessages ? (
-        dataPin?.map((item:any, index:any) => (
-          <div key={index} className="text-black p-2 items-center flex gap-2">
-            <AiOutlineMessage size={32} className='text-blue-400' />
-            <div className='text-gray-500'>
-              <p className='font-medium'>Tin nhắn</p>
-              <p>{item?.user?.name}: {item.messages.message}</p>
-            </div>
-          </div>
-        ))
-      ) : (
-        // Chỉ hiển thị tin nhắn cuối cùng
-        dataPin&&dataPin.length > 0 && (
-          <div className="text-black p-2 items-center flex gap-2">
-            <AiOutlineMessage size={32} className='text-blue-400' />
-            <div className='text-gray-500'>
-              <p className='font-medium'>Tin nhắn</p>
-              <p>{dataPin[dataPin.length - 1]?.user?.name}: {dataPin[dataPin.length - 1].messages.message}</p>
-            </div>
-          </div>
-        )
-      )}
-    </p>
-  
       <div className="flex flex-col justify-end  flex-grow">
         {loadingSelectChat ? (
           <Spin
@@ -523,7 +361,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
           />
         ) : (
           <div>
-            <ScrollChatSingle
+            <ScrollChatCloud
               Channelid={chatSingleIdnew}
               loadingsending={loadingsending}
               wordchat={wordchat}
@@ -582,11 +420,10 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
                   ></Button>
                 </Upload>
 
-                <AudioRecorderComponent
+                <AudioRecorderComponentCloud
                   className=""
                   selectedChat={selectedChat}
                 />
-
               </div>
             </div>
 

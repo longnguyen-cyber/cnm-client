@@ -14,6 +14,8 @@ import { RcFile } from 'antd/es/upload';
 import { MdClose } from "react-icons/md";
 import AudioRecorderComponentChatBox from './AudioRecorderComponentChatBox';
 import { CiVideoOn } from "react-icons/ci";
+import imageTyping from '../../../../../image/typing.gif'
+import { AiOutlineMessage } from 'react-icons/ai';
 export const GroupChat: FunctionComponent<any> = ({ }) => {
   const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
   const Channelid = useSelector((state: any) => state.Chats.channelId)
@@ -33,9 +35,21 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   const [loadingvidieo, setLoadingVideo] = useState(false)
 
   const [ListSingleChatnew, setListSingleChatnew] = useState<any>([])
+  const [typingcheck,setTypingCheck]=useState<any>(false)
+  const [dataPin, setDataPin] = useState<any>([])
+  const [showAllMessages, setShowAllMessages] = useState(false);
 
   console.log('channelIdNew')
   console.log(channelIdNew)
+
+  useEffect(()=>{
+    const pinnedThreadsData = channelIdNew?.threads.filter((item:any) => item.pin === true);
+   console.log(pinnedThreadsData)
+    setDataPin(pinnedThreadsData)
+
+
+
+  },[channelIdNew?.threads])
 
 
   /// get thong tin doan chat
@@ -89,6 +103,18 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         }
         // setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
         return
+      }
+      else if(data.typeMsg === 'update'&&data.type === 'channel' ) {
+        console.log('data update')
+        console.log(data)
+        const index = channelIdNew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
+
+        const datapinnew=dataPin
+        setDataPin([...datapinnew,channelIdNew.threads[index]])
+     
+        // const index = chatSingleIdnew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
+        
+
       }
       else if (data) {
         console.log('dau la data sendthread trong group chat')
@@ -396,8 +422,8 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
             message: inputValue,
 
           },
-          userId: user.id,
-          senderId: user.id,
+          // userId: user.id,
+          // senderId: user.id,
           fileCreateDto: imageUpload,
           channelId: selectedChat.id,
           members: selectedChat.users.map((value: any) => value.id)
@@ -418,9 +444,9 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
           messages: {
             message: event.target.value
           },
-          userId: user.id,
+          // userId: user.id,
           channelId: selectedChat.id,
-          senderId: user.id,
+          // senderId: user.id,
           members: selectedChat.users.map((value: any) => value.id)
         }
 
@@ -441,12 +467,66 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
     }
   }
 
+  ///su ly typing 
+  const handleChangInputChatFocus=()=>{
+    if(socket){
+        socket.emit('typing',
+        {members: selectedChat.users.map((value: any) =>{
+          if(value.id!==user.id)
+        {
+          return value.id
+        }}),
+          Channelid:selectedChat.id})
+    }
+  }
+
+  const handleChangInputChatBlur=()=>{
+    if(socket){
+        if(socket){
+            socket.emit('typing',{members:[],Channelid:selectedChat.id})
+        }
+    }
+  }
+
+  useEffect(()=>{
+    socket.on('typing',(data:any)=>{
+      console.log('data typing')
+      console.log(data)
+      if(data.members.length>0){
+        if(selectedChat.id===data.Channelid){
+          console.log('data user',user)
+          data.members?.map((value:any)=>{
+            if(value===user.id){
+              setTypingCheck(true)
+            }
+          })
+         
+        
+         
+        }
+        else {
+          // Nếu không phải kênh hiện tại, đặt lại trạng thái đang gõ
+          setTypingCheck(false);
+        }
+
+      
+      }
+      else{
+        setTypingCheck(false)
+      }
+      return ()=>socket.off('typing')
+    }
+     
+  )
+  },[])
+  
+  const toggleShowAllMessages = () => {
+    setShowAllMessages(!showAllMessages);
+  };
+
   const modalToUnfriend = () => {
 
     return (
-
-
-
       <Modal className=' mt-80 flex justify-center w-28 h-20 items-center' title="" open={loadingvidieo}>
         <p className='mt-14'>Đang upload video ....</p>
         <Spin indicator={antIcon} style={{ fontSize: '100px', marginTop: '-70px' }} className=' ml-14' />
@@ -457,19 +537,56 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   return (
     <>
       {modalToUnfriend()}
-
-      <div>
+      
+      <div className='relative '>
+      <p className='w-full border absolute top-0 left-0 right-0 bg-white p-2 border-collapse'>
+      <>
+        Danh sách ghim ({dataPin && dataPin.length}){' '}
+        <span onClick={toggleShowAllMessages} className="cursor-pointer">
+          {showAllMessages ? 'Ẩn tin nhắn' : 'Hiện tất cả tin nhắn'}
+        </span>
+      </>
+      {showAllMessages ? (
+        dataPin?.map((item:any, index:any) => (
+          <div key={index} className="text-black p-2 items-center flex gap-2">
+            <AiOutlineMessage size={32} className='text-blue-400' />
+            <div className='text-gray-500'>
+              <p className='font-medium'>Tin nhắn</p>
+              <p>{item?.user?.name}: {item.messages.message}</p>
+            </div>
+          </div>
+        ))
+      ) : (
+        // Chỉ hiển thị tin nhắn cuối cùng
+        dataPin&&dataPin.length > 0 && (
+          <div className="text-black p-2 items-center flex gap-2">
+            <AiOutlineMessage size={32} className='text-blue-400' />
+            <div className='text-gray-500'>
+              <p className='font-medium'>Tin nhắn</p>
+              <p>{dataPin[dataPin.length - 1]?.user?.name}: {dataPin[dataPin.length - 1].messages.message}</p>
+            </div>
+          </div>
+        )
+      )}
+    </p>
         {
           <div className='contentGroupChat flex flex-grow justify-end  flex-col'>
+           
+           
             {loadingSelectChat ? <Spin indicator={antIcon} style={{ fontSize: '100px' }} className='justify-center m-auto' /> : <>
+            
+             
               <ScrollChat Channelid={channelIdNew} loadingsending={loadingsending} wordchat={wordchat} imageUpload={imageUpload} />
               {/* {<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""}  */}
               <div className='relative h-14'>
 
+               {typingcheck?<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""} 
                 <Input
 
                   onKeyPress={handleKeyPress}
-                  onBlur={() => { }}
+                  onFocus={()=>{handleChangInputChatFocus()}}
+                 
+                  onBlur={()=>{handleChangInputChatBlur()}}
                   onChange={(e) => {
                     setInputValue(e.target.value)
                   }}
@@ -504,9 +621,6 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
                   >
                     <Button icon={<CameraOutlined />} className="border-none"></Button>
                   </Upload>
-
-
-
 
                   <Upload
                     beforeUpload={beforeUploaddoc}

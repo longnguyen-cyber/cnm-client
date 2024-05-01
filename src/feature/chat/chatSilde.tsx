@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserGetAllChannel,UserGetChannelById,UserGetChatsSingleById, UserGetAllSingleChat } from "./pathApi";
+import { UserGetAllChannel,UserGetChannelById,UserGetChatsSingleById, UserGetAllSingleChat ,UserGetChatsSingleByIdCatche} from "./pathApi";
 
 
 const initialState :any={
@@ -66,6 +66,18 @@ const ChatSlide=createSlice({
       state.chatSingleId = action.payload.data
       state.loadingchatSingleId = false;
     })
+    builder.addCase(UserGetChatsSingleByIdCatche.pending, (state, action) => {
+      state.loadingchatSingleId = true;
+
+    })
+    builder.addCase(UserGetChatsSingleByIdCatche.rejected, (state, action) => {
+      state.loadingchatSingleId = false;
+    })
+    builder.addCase(UserGetChatsSingleByIdCatche.fulfilled, (state: any, action) => {
+      state.chatSingleId = action.payload.data
+      state.loadingchatSingleId = false;
+    })
+
 
 
 

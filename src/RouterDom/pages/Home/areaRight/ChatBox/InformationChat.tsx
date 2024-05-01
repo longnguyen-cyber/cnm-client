@@ -358,7 +358,10 @@ const InformationChat: FunctionComponent<any> = ({
                     />
                   </div>
                 </div>
-              ) : (
+              ) :
+              
+            
+              (
                 <>
                   <div className="flex flex-wrap w-24  justify-center mt-8  items-center">
                     {selectedChat?.users.length > 0 &&
@@ -377,7 +380,9 @@ const InformationChat: FunctionComponent<any> = ({
                   </div>
                 </>
               )
-            ) : (
+            ) : 
+            
+            (
               ""
             )}
           </div>
