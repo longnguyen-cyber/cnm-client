@@ -46,6 +46,11 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
     const [emoJi, setEmoJi] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [currentImage, setCurrentImage] = useState('')
+    const messageRefs = useRef<any>({});
+
+    const scrollToMessagess = (id:any) => {
+    
+    };
   
     const openModal = (imageSrc: any) => {
       setCurrentImage(imageSrc)
@@ -173,7 +178,7 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
       <div>
          {!selectedUserReaction?.isRecall&&modalToUnfriend()}
       {Channelid && (
-        <div className='content_Scroll' ref={chatContainerRef}  style={{
+        <div className='content_Scroll' ref={chatContainerRef} style={{
           width: '100%',
           maxHeight: `${
             imageUpload&&imageUpload.length>0  ? '60vh' : '85vh'
@@ -186,22 +191,28 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
             .sort((a:any, b:any) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime())
             .map((m:any, i:any, messagesArray:any) => (
               <div style={{ display: "flex", marginLeft:'20px', paddingLeft:"10px",paddingRight:'10px' }} key={m._id}>
+               {
+               <div>
                 {(isSameSender(messagesArray, m, i, users.id) ||
-                  isLastMessage(messagesArray, i, users.id)) && (
-                    <>
-                  
-                   {m.user&&m.user.avatar&&<img
-                      src={`${m.user&&
-                        m.user.avatar
-                          ? m.user.avatar
-                          : ''
-                      }`}
-                      className="w-12 h-12 rounded-full"
-                      style={{ marginLeft: '-20px', marginTop: '-10px' }}
-                    />} 
-                  
-                    </>
-                )}
+                                isLastMessage(messagesArray, i, users.id)) && (
+                                  <>
+                                
+                                {m.user&&m.user.avatar&&<img
+                                    src={`${m.user&&
+                                      m.user.avatar
+                                        ? m.user.avatar
+                                        : ''
+                                    }`}
+                                    className="w-12 h-12 rounded-full"
+                                    style={{ marginLeft: '-20px', marginTop: '-10px' }}
+                                  />} 
+                                
+                                  </>
+                              )}
+               
+               </div>
+              
+               }
 
                <ImageModal
 
@@ -431,6 +442,9 @@ export const ScrollChat: FunctionComponent<any> = ({ Channelid ,loadingsending,w
                 </span>
               </div>
             ))}
+
+
+            
                   {loadingsending && wordchat ?(
                 <div className={`flex flex-col items-end w-full ${fadeInClass}`} ref={chatContainerRef}>
                   <p className="bg-white mt-1 rounded mr-4 p-2 mb-1">

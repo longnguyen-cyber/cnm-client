@@ -16,6 +16,7 @@ import AudioRecorderComponentChatBox from './AudioRecorderComponentChatBox';
 import { CiVideoOn } from "react-icons/ci";
 import imageTyping from '../../../../../image/typing.gif'
 import { AiOutlineMessage } from 'react-icons/ai';
+import { FaDotCircle } from "react-icons/fa";
 export const GroupChat: FunctionComponent<any> = ({ }) => {
   const antIcon = <LoadingOutlined style={{ fontSize: 30 }} spin />;
   const Channelid = useSelector((state: any) => state.Chats.channelId)
@@ -26,30 +27,44 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   const { socket } = state
   const [selectedChat, setselectedChats] = state.selectedChat;
   const [loadingsending, setLoadingsending] = useState(false);
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState<any>('');
   const [wordchat, setwordChat] = useState('')
   const [loadingSelectChat, setLoadingSelectChat] = useState(false)
-  const [channelIdNew, setChatSingleIdNew] = useState<{ id: any, threads: any[], users: any[], name: any, emojis: any[] }>({ id: '', threads: [], users: [], name: String, emojis: [] });
+  const [channelIdNew, setChatSingleIdNew] = useState<{ id: any, threads: any[], users: any[], name: any, emojis: any[], disableThread: any }>({ id: '', threads: [], users: [], name: String, emojis: [], disableThread: false });
   const [openImage, setOpenImage] = useState(false)
   const [imageUpload, setImageUpload] = useState<any>([])
   const [loadingvidieo, setLoadingVideo] = useState(false)
 
   const [ListSingleChatnew, setListSingleChatnew] = useState<any>([])
-  const [typingcheck,setTypingCheck]=useState<any>(false)
+  const [typingcheck, setTypingCheck] = useState<any>(false)
   const [dataPin, setDataPin] = useState<any>([])
   const [showAllMessages, setShowAllMessages] = useState(false);
+  
+  const [UserSeachData,SetUserSeachData]=useState<any>([]);
 
-  console.log('channelIdNew')
-  console.log(channelIdNew)
+  const [listUserSeachfileCharacter,setListUserSeachfileCharacter]=useState<any>([])
 
-  useEffect(()=>{
-    const pinnedThreadsData = channelIdNew?.threads.filter((item:any) => item.pin === true);
-   console.log(pinnedThreadsData)
+
+  useEffect(() => {
+    const pinnedThreadsData = channelIdNew?.threads.filter((item: any) => item.pin === true);
+    console.log(pinnedThreadsData)
     setDataPin(pinnedThreadsData)
 
 
 
-  },[channelIdNew?.threads])
+  }, [channelIdNew?.threads])
+  
+
+  useEffect(() => {
+    let result = '';
+    listUserSeachfileCharacter.forEach((user:any) => {
+        result += `@${user.name} `;
+    });
+  
+    setInputValue(result);
+}, [listUserSeachfileCharacter]);
+
+
 
 
   /// get thong tin doan chat
@@ -104,19 +119,27 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         // setChatSingleIdNew({ ...channelIdNew, threads: newThreads })
         return
       }
-      else if(data.typeMsg === 'update'&&data.type === 'channel' ) {
+      else if (data.typeMsg === 'update' && data.type === 'channel') {
         console.log('data update')
         console.log(data)
         const index = channelIdNew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
 
-        const datapinnew=dataPin
-        setDataPin([...datapinnew,channelIdNew.threads[index]])
-     
+        const datapinnew = dataPin
+        setDataPin([...datapinnew, channelIdNew.threads[index]])
+
         // const index = chatSingleIdnew.threads.findIndex((item: any) => item.stoneId === data.stoneId)
-        
+
 
       }
       else if (data) {
+        data.members
+        ?.map((value: any) => {
+          console.log(value)
+          if (value !== user.id&&channelIdNew.id !== data.channelId) {
+            const circleSymbol = '●'; // Sử dụng ký tự Unicode để biểu thị có thông báo mới
+            document.title = `${circleSymbol} Có tin nhắn mới chưa đọc `;
+          }
+        })
         console.log('dau la data sendthread trong group chat')
         console.log(data)
         if (channelIdNew.id === data.channelId) {
@@ -190,8 +213,8 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         if (channel.id === channelIdNew.id) {
           const { lastedThread } = channel
           const newThreads = [...channelIdNew.threads, lastedThread]
-          setChatSingleIdNew({ ...channelIdNew, threads: newThreads, name: channel.name })
-          setselectedChats({ ...selectedChat, name: channel.name })
+          setChatSingleIdNew({ ...channelIdNew, threads: newThreads, name: channel.name, disableThread: channel?.disableThread })
+          setselectedChats({ ...selectedChat, name: channel.name, disableThread: channel?.disableThread })
 
           notification["success"]({
             message: "success",
@@ -245,7 +268,7 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
           if (data.data.userLeave === user.id) {
             console.log('day la user')
             console.log(user.id)
-            setChatSingleIdNew({ id: '', threads: [], users: [], name: String, emojis: [] });
+            setChatSingleIdNew({ id: '', threads: [], users: [], name: String, emojis: [], disableThread: false });
             setselectedChats(null)
 
             // window.location.reload();
@@ -272,7 +295,7 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
         if (channel.id === channelIdNew.id) {
           console.log('channel update')
           console.log(channel)
-          setChatSingleIdNew({ id: '', threads: [], users: [], name: String, emojis: [] });
+          setChatSingleIdNew({ id: '', threads: [], users: [], name: String, emojis: [], disableThread: false });
           setselectedChats(null)
           notification["success"]({
             message: "success",
@@ -468,58 +491,62 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   }
 
   ///su ly typing 
-  const handleChangInputChatFocus=()=>{
-    if(socket){
-        socket.emit('typing',
-        {members: selectedChat.users.map((value: any) =>{
-          if(value.id!==user.id)
+  const handleChangInputChatFocus = () => {
+
+ 
+    if (socket) {
+      socket.emit('typing',
         {
-          return value.id
-        }}),
-          Channelid:selectedChat.id})
+          members: selectedChat.users.map((value: any) => {
+            if (value.id !== user.id) {
+              return value.id
+            }
+          }),
+          Channelid: selectedChat.id
+        })
     }
   }
 
-  const handleChangInputChatBlur=()=>{
-    if(socket){
-        if(socket){
-            socket.emit('typing',{members:[],Channelid:selectedChat.id})
-        }
+  const handleChangInputChatBlur = () => {
+    if (socket) {
+      if (socket) {
+        socket.emit('typing', { members: [], Channelid: selectedChat.id })
+      }
     }
   }
 
-  useEffect(()=>{
-    socket.on('typing',(data:any)=>{
+  useEffect(() => {
+    socket.on('typing', (data: any) => {
       console.log('data typing')
       console.log(data)
-      if(data.members.length>0){
-        if(selectedChat.id===data.Channelid){
-          console.log('data user',user)
-          data.members?.map((value:any)=>{
-            if(value===user.id){
+      if (data.members.length > 0) {
+        if (selectedChat.id === data.Channelid) {
+          console.log('data user', user)
+          data.members?.map((value: any) => {
+            if (value === user.id) {
               setTypingCheck(true)
             }
           })
-         
-        
-         
+
+
+
         }
         else {
           // Nếu không phải kênh hiện tại, đặt lại trạng thái đang gõ
           setTypingCheck(false);
         }
 
-      
+
       }
-      else{
+      else {
         setTypingCheck(false)
       }
-      return ()=>socket.off('typing')
+      return () => socket.off('typing')
     }
-     
-  )
-  },[])
-  
+
+    )
+  }, [])
+
   const toggleShowAllMessages = () => {
     setShowAllMessages(!showAllMessages);
   };
@@ -533,114 +560,255 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
       </Modal>
     )
   }
+  const handleOnchangeData = (event:any) => {
+    const inputValue = event.target.value;
+    setInputValue(inputValue); 
+    const ListUser = [...selectedChat.users];
+    const userLogin = user.id; 
+    if (inputValue.includes('@') && inputValue.length > 1) {
+        const searchTerm = inputValue.substring(inputValue.indexOf('@') + 1);
+        const filteredUsers = ListUser.filter(user => 
+            user.name.includes(searchTerm) && user.id !== userLogin
+        );
+        if(filteredUsers.length > 0){
+          
+          SetUserSeachData(filteredUsers);
+        } else {
+           
+          SetUserSeachData([]);
+        }
+    } else if (inputValue === '@') {
+        const filteredUsers = ListUser.filter(user => user.id !== userLogin);
+       
+        SetUserSeachData(filteredUsers);
+    }
+    else {
+      SetUserSeachData([]);
+    }
+}
+
+const PushDataSearch=(value:any)=>{
+  console.log('value data ')
+  console.log(value)
+  if(value){
+    const listUser = [...listUserSeachfileCharacter]
+    listUser.push(value)
+    setListUserSeachfileCharacter(listUser)
+  }
+}
+
+
+  
 
   return (
     <>
       {modalToUnfriend()}
-      
+
       <div className='relative '>
-      <p className='w-full border absolute top-0 left-0 right-0 bg-white p-2 border-collapse'>
-      <>
-        Danh sách ghim ({dataPin && dataPin.length}){' '}
-        <span onClick={toggleShowAllMessages} className="cursor-pointer">
-          {showAllMessages ? 'Ẩn tin nhắn' : 'Hiện tất cả tin nhắn'}
-        </span>
-      </>
-      {showAllMessages ? (
-        dataPin?.map((item:any, index:any) => (
-          <div key={index} className="text-black p-2 items-center flex gap-2">
-            <AiOutlineMessage size={32} className='text-blue-400' />
-            <div className='text-gray-500'>
-              <p className='font-medium'>Tin nhắn</p>
-              <p>{item?.user?.name}: {item.messages.message}</p>
-            </div>
-          </div>
-        ))
-      ) : (
-        // Chỉ hiển thị tin nhắn cuối cùng
-        dataPin&&dataPin.length > 0 && (
-          <div className="text-black p-2 items-center flex gap-2">
-            <AiOutlineMessage size={32} className='text-blue-400' />
-            <div className='text-gray-500'>
-              <p className='font-medium'>Tin nhắn</p>
-              <p>{dataPin[dataPin.length - 1]?.user?.name}: {dataPin[dataPin.length - 1].messages.message}</p>
-            </div>
-          </div>
-        )
-      )}
-    </p>
+        <p className='w-full border absolute top-0 left-0 right-0 bg-white p-2 border-collapse'>
+          <>
+            Danh sách ghim ({dataPin && dataPin.length}){' '}
+            <span onClick={toggleShowAllMessages} className="cursor-pointer">
+              {showAllMessages ? 'Ẩn tin nhắn' : 'Hiện tất cả tin nhắn'}
+            </span>
+          </>
+          {showAllMessages ? (
+            dataPin?.map((item: any, index: any) => (
+              <div key={index} className="text-black p-2 items-center flex gap-2">
+                <AiOutlineMessage size={32} className='text-blue-400' />
+                <div className='text-gray-500'>
+                  <p className='font-medium'>Tin nhắn</p>
+                  <p>{item?.user?.name}: {item.messages.message}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            // Chỉ hiển thị tin nhắn cuối cùng
+            dataPin && dataPin.length > 0 && (
+              <div className="text-black p-2 items-center flex gap-2">
+                <AiOutlineMessage size={32} className='text-blue-400' />
+                <div className='text-gray-500'>
+                  <p className='font-medium'>Tin nhắn</p>
+                  <p>{dataPin[dataPin.length - 1]?.user?.name}: {dataPin[dataPin.length - 1].messages.message}</p>
+                </div>
+              </div>
+            )
+          )}
+        </p>
         {
           <div className='contentGroupChat flex flex-grow justify-end  flex-col'>
-           
-           
+
+
             {loadingSelectChat ? <Spin indicator={antIcon} style={{ fontSize: '100px' }} className='justify-center m-auto' /> : <>
-            
-             
+
+
               <ScrollChat Channelid={channelIdNew} loadingsending={loadingsending} wordchat={wordchat} imageUpload={imageUpload} />
               {/* {<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""}  */}
               <div className='relative h-14'>
 
-               {typingcheck?<img src={`${imageTyping}` } className='w-6 h-6 rounded-3xl'/>:""} 
-                <Input
+                {typingcheck ? <div className='flex items-center'><img src={`${imageTyping}`} className='w-6 h-6 rounded-3xl' /> <span className='text-black'> </span> </div>: ""}
+              {channelIdNew.disableThread===false?
+              <div className='relative'>
+                {UserSeachData&&UserSeachData.length>0&&
+                <div className='absolute bg-white rounded-md  left-3 p-2 bottom-1'>
+                 {UserSeachData.map((user:any) => {
+                        return (
+                            <div className='flex gap-2 mt-2 items-center cursor-pointer' onClick={() => PushDataSearch(user)} key={user.id}>
+                                <img src={user.avatar} className='w-8 h-8 rounded-full'/>
+                                <p>{user.name}</p>
+                            </div>
+                        );
+                    })}
 
-                  onKeyPress={handleKeyPress}
-                  onFocus={()=>{handleChangInputChatFocus()}}
-                 
-                  onBlur={()=>{handleChangInputChatBlur()}}
-                  onChange={(e) => {
-                    setInputValue(e.target.value)
-                  }}
+                  
+                </div>}
 
-                  placeholder='Nhập @, tin nhắn mới ???'
-                  value={inputValue}
-                  className='rounded-none absolute h-14 w-full  placeholder-gray-500 to-black'
-                />
+                
+                  <Input
 
+                    onKeyPress={handleKeyPress}
+                    onFocus={() => { handleChangInputChatFocus() }}
 
-                <div className="right-0 flex absolute gap-1">
-                  <Upload
-                    beforeUpload={beforeUploadvideo}
-                    className="cursor-pointer mt-3"
-                    fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
-                    name="video"
-                    accept=".mp4, .avi, .mov" // Accept video formats (modify as needed)
-                    multiple // Cho phép người dùng chọn nhiều video
-                  >
-                    <Button icon={<CiVideoOn size={20} />} className="border-none"></Button>
-                  </Upload>
+                    onBlur={() => { handleChangInputChatBlur() }}
+                  
+                    onChange={(e:any)=>handleOnchangeData(e)}
 
-
-                  <Upload
-                    beforeUpload={beforeUpload}
-                    className="cursor-pointer mt-3"
-                    fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
-                    name="avatar"
-                    accept=".jpg, .jpeg, .png"
-
-                    multiple // Cho phép người dùng chọn nhiều hình ảnh
-                  >
-                    <Button icon={<CameraOutlined />} className="border-none"></Button>
-                  </Upload>
-
-                  <Upload
-                    beforeUpload={beforeUploaddoc}
-                    className="cursor-pointer h-14"
-                    fileList={[]}
-                    accept=".pdf,.doc,.docx" // Accept PDF, Word (.doc, .docx) files
-                    name="files"
-                  >
-                    <Button
-                      icon={<MdAttachFile />}
-                      type="dashed"
-                      className="h-14 border-none"
-                    ></Button>
-                  </Upload>
-
-                  <AudioRecorderComponentChatBox
-                    className=""
-                    selectedChat={selectedChat}
+                    placeholder='Nhập @, tin nhắn mới ???'
+                    value={inputValue}
+                    className='rounded-none absolute h-14 w-full  placeholder-gray-500 to-black'
                   />
-                </div>
+
+
+                  <div className="right-0 flex absolute gap-1">
+                    <Upload
+                      beforeUpload={beforeUploadvideo}
+                      className="cursor-pointer mt-3"
+                      fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
+                      name="video"
+                      accept=".mp4, .avi, .mov" // Accept video formats (modify as needed)
+                      multiple // Cho phép người dùng chọn nhiều video
+                    >
+                      <Button icon={<CiVideoOn size={20} />} className="border-none"></Button>
+                    </Upload>
+
+
+                    <Upload
+                      beforeUpload={beforeUpload}
+                      className="cursor-pointer mt-3"
+                      fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
+                      name="avatar"
+                      accept=".jpg, .jpeg, .png"
+
+                      multiple // Cho phép người dùng chọn nhiều hình ảnh
+                    >
+                      <Button icon={<CameraOutlined />} className="border-none"></Button>
+                    </Upload>
+
+                    <Upload
+                      beforeUpload={beforeUploaddoc}
+                      className="cursor-pointer h-14"
+                      fileList={[]}
+                      accept=".pdf,.doc,.docx" // Accept PDF, Word (.doc, .docx) files
+                      name="files"
+                    >
+                      <Button
+                        icon={<MdAttachFile />}
+                        type="dashed"
+                        className="h-14 border-none"
+                      ></Button>
+                    </Upload>
+
+                    <AudioRecorderComponentChatBox
+                      className=""
+                      selectedChat={selectedChat}
+                    />
+                  </div>
+                </div>:
+                <>
+                {
+                  channelIdNew?.users.some((users:any) =>
+                    (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
+                      <div className='relative'>
+                        {UserSeachData&&UserSeachData.length>0&&
+                <div className='absolute bg-white rounded-md  left-3 p-2 bottom-1'>
+                 {UserSeachData.map((user:any) => {
+                        return (
+                            <div className='flex gap-2 mt-2 items-center cursor-pointer' onClick={() => PushDataSearch(user)} key={user.id}>
+                                <img src={user.avatar} className='w-8 h-8 rounded-full'/>
+                                <p>{user.name}</p>
+                            </div>
+                        );
+                    })}
+
+                  
+                </div>}
+
+                      <Input
+      
+                        onKeyPress={handleKeyPress}
+                        onFocus={() => { handleChangInputChatFocus() }}
+      
+                        onBlur={() => { handleChangInputChatBlur() }}
+                        onChange={(e:any)=>handleOnchangeData(e)}
+      
+                        placeholder='Nhập @, tin nhắn mới ???'
+                        value={inputValue}
+                        className='rounded-none absolute h-14 w-full  placeholder-gray-500 to-black'
+                      />
+      
+      
+                      <div className="right-0 flex absolute gap-1">
+                        <Upload
+                          beforeUpload={beforeUploadvideo}
+                          className="cursor-pointer mt-3"
+                          fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
+                          name="video"
+                          accept=".mp4, .avi, .mov" // Accept video formats (modify as needed)
+                          multiple // Cho phép người dùng chọn nhiều video
+                        >
+                          <Button icon={<CiVideoOn size={20} />} className="border-none"></Button>
+                        </Upload>
+      
+      
+                        <Upload
+                          beforeUpload={beforeUpload}
+                          className="cursor-pointer mt-3"
+                          fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
+                          name="avatar"
+                          accept=".jpg, .jpeg, .png"
+      
+                          multiple // Cho phép người dùng chọn nhiều hình ảnh
+                        >
+                          <Button icon={<CameraOutlined />} className="border-none"></Button>
+                        </Upload>
+      
+                        <Upload
+                          beforeUpload={beforeUploaddoc}
+                          className="cursor-pointer h-14"
+                          fileList={[]}
+                          accept=".pdf,.doc,.docx" // Accept PDF, Word (.doc, .docx) files
+                          name="files"
+                        >
+                          <Button
+                            icon={<MdAttachFile />}
+                            type="dashed"
+                            className="h-14 border-none"
+                          ></Button>
+                        </Upload>
+      
+                        <AudioRecorderComponentChatBox
+                          className=""
+                          selectedChat={selectedChat}
+                        />
+                      </div>
+                    </div>
+                )}
+                  
+               
+                
+                </>
+}
+
               </div>
             </>}
 

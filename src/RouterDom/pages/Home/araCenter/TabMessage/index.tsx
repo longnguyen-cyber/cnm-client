@@ -17,7 +17,6 @@ import { Socket } from 'engine.io-client';
 
 export default function Tabmessage() {
   const UserContexts = useContext(UserContext);
-
   const LoadingSingle = useSelector((state: any) => state.Chats.loadingSingChat)
   const { state } = UserContexts;
   const [user, setUser] = state.user;
@@ -28,7 +27,9 @@ export default function Tabmessage() {
   const [ListSingleChatnew, setListSingleChatnew] = useState<any>([])
   const [ListChannelnew, setListChannelnew] = useState<any>([])
   const [CloudUser, setCloudUser] = useState<any>(null)
-  console.log(ListSingleChatnew)
+ 
+ console.log('data cloud')
+  console.log(CloudUser)
   // https://help.zalo.me/wp-content/uploads/2023/08/z4650065944256_2971e71cc06a5cfcb0aef41782e5f30e.jpg
 
 
@@ -36,8 +37,6 @@ export default function Tabmessage() {
   useEffect(() => {
     async function UserGetCloud() {
       const data = await UserApi.getMyCloud()
-      console.log('data cloud')
-      console.log(data)
       if (data) {
         setCloudUser(data.data)
       }
@@ -104,6 +103,9 @@ export default function Tabmessage() {
   
   useEffect(() => {
     socket?.on("updatedSendThread", async (data: any) => {
+
+      console.log('data updatedSendThread in dex')
+      console.log(data)
       if(data?.chatId){
         setListSingleChatnew((prev: any) => {
           return prev.map((item: any) => {
@@ -113,6 +115,13 @@ export default function Tabmessage() {
             return item
           })
         })
+      }
+      if(data.type==='cloud'){
+        setCloudUser({...CloudUser,threads:[...CloudUser.threads,data]})
+        console.log('dadta clodu')
+        console.log(data)
+      
+          
       }
       if(data.channelId){
         console.log('data.channelId')
@@ -237,28 +246,11 @@ export default function Tabmessage() {
   }, [socket]);
 
 
+  ///cloud
+  
 
-  // useEffect(() => {
-  //   const handleData = async (data:any) => {
-  //     if (data && data.message === 'Add user to channel success') {
-  //       const {channel}=data.data
-  //       const {lastedThread}=channel
 
-  //       // Cập nhật state bằng cách sử dụng hàm callback để đảm bảo rằng
-  //       // bạn luôn có giá trị mới nhất của state đó
-  //       setListChannelnew((currentListChannelnew:any) => [...currentListChannelnew, data.data]);
-  //       setLoadingchatChannel(false);
-  //       return socket.off('channelWS');
-  //     }
-  //   };
 
-  //   socket?.on('channelWS', handleData);
-
-  //   // Đảm bảo hủy đăng ký sự kiện khi component unmount
-  //   return () => {
-  //     socket.off('channelWS', handleData);
-  //   };
-  // },[])
 
 
 

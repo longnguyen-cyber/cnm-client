@@ -4,7 +4,11 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { format } from 'date-fns';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselectedChats,CloudUser})=> {
- console.log(ListSingleChat)
+ if(CloudUser?.threads>0){
+  console.log(CloudUser.threads[CloudUser.threads.length-1].messages.message)
+ }
+ console.log(CloudUser?.threads[CloudUser.threads.length-1].messages.message)
+  
   return (
     <div className='flex flex-col-reverse gap-3'>
       <div className='flex items-center gap-4 cursor-pointer' onClick={()=>setselectedChats({...CloudUser,type:'cloud' })}>
@@ -14,7 +18,8 @@ export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselec
           <div className='text-gray-500'>
             <div className='flex justify-between'>
               <p className='flex-1' style={{ fontWeight: '450' }}>
-                {" thread message "}
+                {CloudUser?.threads[CloudUser.threads.length-1].messages.message}
+                
               </p>
               {/* <p className='ml-auto mr-2 font-bold text rounded-full text-white bg-red-600 flex items-center justify-center w-4 h-4' style={{ fontSize: "12px" }}>N</p> */}
             </div>

@@ -83,8 +83,6 @@ export const Cloud: FunctionComponent<any> = ({ selectedChat }) => {
   useEffect(() => {
   
     const handleUpdateSendThread = (data: any) => {
-      console.log('co data')
-      console.log(data)
       if (data.typeMsg === 'recall'&&data.type === 'cloud') {
         console.log('data recall')
         console.log(data)
@@ -93,7 +91,6 @@ export const Cloud: FunctionComponent<any> = ({ selectedChat }) => {
           const newThreads = [...chatSingleIdnew.threads]
           newThreads[index]
             = { ...newThreads[index], messages:{...newThreads[index].messages,message:'Tin nhắn đã bị thu hồi'} }
-          console.log('newThreads', newThreads)
           setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads })
           return
         }
@@ -110,11 +107,9 @@ export const Cloud: FunctionComponent<any> = ({ selectedChat }) => {
       
       else {
         if (data && chatSingleIdnew) {
-          console.log('data sendthread', data)
-          console.log('chatSingleIdnew', chatSingleIdnew)
+     
           if(data.cloudId===chatSingleIdnew.id && data.type === 'cloud'){
-            console.log('data chatid array')
-            console.log(data)
+           
             const dataNew = { ...data, emojis: [] }
             const newThreads = [...chatSingleIdnew.threads, dataNew]
             setChatSingleIdNew({ ...chatSingleIdnew, threads: newThreads })
@@ -132,14 +127,11 @@ export const Cloud: FunctionComponent<any> = ({ selectedChat }) => {
 
     ////updatedEmojiThread
     const handleupdatedEmojiThread = (data: any) => {
-      console.log('data emoji chat');
-      console.log(data);
+     
       if (data && data.type === 'chat' && data.typeEmoji === 'add') {
-        console.log('data emoji add');
-        console.log(data);
+      
         const index = chatSingleIdnew.threads.findIndex((item: any) => item.stoneId === data.stoneId);
-        console.log('data emoji index');
-        console.log(index);
+       
         if (index !== -1) {
           //cần tạo một đối tượng mới để không thay đổi trực tiếp state
           const newThreads = [...chatSingleIdnew.threads];
@@ -210,17 +202,13 @@ export const Cloud: FunctionComponent<any> = ({ selectedChat }) => {
       const formData = new FormData();
       fileList.forEach(file => {
         formData.append('files', file);
-        console.log('File', file);
+      
       });
 
       // Gửi FormData chứa tất cả các tệp đến server để xử lý
       const response = await UserApi.userUploadImage(formData); // Modify API endpoint for video uploads
       const { data } = response;
-      console.log('data tra ve sau khi upload');
-      console.log(data);
-
-
-
+    
       const Thread = {
         cloudId:selectedChat.id,
         
@@ -308,11 +296,7 @@ export const Cloud: FunctionComponent<any> = ({ selectedChat }) => {
           messages: {
             message: event.target.value,
           },
-        
-        
           cloudId:selectedChat.id,
-          
-          
         }
 
         console.log('data send thread', Thread)

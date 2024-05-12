@@ -156,6 +156,7 @@ export const ChatBox = () => {
                     selectedChat={selectedChat}
                     user={user}
                     socket={socket}
+                    setselectedChats={setselectedChats}
                   />
                   }
                 </div>

@@ -8,15 +8,15 @@ export const isSameSenderMargin = (messages:any, m:any, i:any, userId:string) =>
 
   if (
     i < messages.length - 1 &&
-    messages[i + 1].user.id === m.user.id&&
-    messages[i].user.id !== userId
+    messages[i + 1]?.user?.id === m?.user?.id&&
+    messages[i]?.user?.id !== userId
   )
     return 33;
   else if (
     (i < messages.length - 1 &&
-      messages[i + 1].user.id !== m.user.id&&
-      messages[i].user.id !== userId) ||
-    (i === messages.length - 1 && messages[i].user.id !== userId)
+      messages[i + 1]?.user?.id !== m?.user?.id&&
+      messages[i]?.user?.id !== userId) ||
+    (i === messages.length - 1 && messages[i]?.user?.id !== userId)
   )
     return 6;
   else return "auto";
@@ -25,20 +25,20 @@ export const isSameSenderMargin = (messages:any, m:any, i:any, userId:string) =>
 export const isSameSender = (messages:any, m:any, i:any, userId:any) => {
   return (
     i < messages.length - 1 &&
-    (messages[i + 1].user.id !== m.user.id||
-      messages[i + 1].user.id=== undefined) &&
-    messages[i].user.id!== userId
+    (messages[i + 1]?.user?.id !== m?.user?.id||
+      messages[i + 1]?.user?.id=== undefined) &&
+    messages[i]?.user?.id!== userId
   );
 };
 
 export const isLastMessage = (messages:any, i:any, userId:any) => {
   return (
     i === messages.length - 1 &&
-    messages[messages.length - 1].user.id !== userId &&
-    messages[messages.length - 1].user.id
+    messages[messages.length - 1]?.user?.id !== userId &&
+    messages[messages.length - 1]?.user?.id
   );
 };
 
 export const isSameUser = (messages:any, m:any, i:any) => {
-  return i > 0 && messages[i - 1].user.id=== m.user.id;
+  return i > 0 && messages[i - 1]?.user?.id=== m?.user?.id;
 };

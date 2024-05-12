@@ -15,7 +15,6 @@ import UserApi from '../../../../../api/user';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 export const SearchUserAddChat: FunctionComponent<any> = ({ searchValue }) => {
-
     const contextUser = useContext(UserContext)
     const { state } = contextUser;
     const [user, setUser] = state.user;

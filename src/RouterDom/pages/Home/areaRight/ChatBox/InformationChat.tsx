@@ -39,7 +39,10 @@ const InformationChat: FunctionComponent<any> = ({
   selectedChat,
   user,
   socket,
+  setselectedChats
 }) => {
+  console.log('day la selected chat')
+  console.log(selectedChat)
   const dispatch = useDispatch();
   const [openModalAddUserToGroup, setModalAddUserToGroup] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -56,10 +59,12 @@ const InformationChat: FunctionComponent<any> = ({
   const [userHavePassRoleAdmin, setUserHavePassRoleAdmin] = useState<any>();
   const [loadingLeaveGroup,setLoadingLeaveGroup]=useState(false)
   const [loadingDeleteGroup,setLoadingDeleteGroup]=useState(false)
+  const [loadingDisableChat,setLoadingDisableChat]=useState(false)
 
   const [loadingLeaveGroupForMembers, setLoadingLeaveGroupForMembers] =
     useState(false);
   // ----------- user current
+  console.log('user information ')
   console.log(selectedChat);
   const HandleOpenModall = () => {
     setModalAddUserToGroup(true);
@@ -71,8 +76,13 @@ const InformationChat: FunctionComponent<any> = ({
         setModalAddUserToGroup(false);
         setLoading(false);
       } else if (data && data.message === "Update channel success") {
+        console.log('data test')
+        console.log(data)
         setLoadingUpdate(false);
         setEditNameGroup(false);
+        setLoadingDisableChat(false)
+        // setselectedChats({...selectedChat,disableThread:data?.data?.channel?.disableThread     })
+
         return () => {
           socket?.off("channelWS");
         };
@@ -97,6 +107,11 @@ const InformationChat: FunctionComponent<any> = ({
 
         setLoadingDeleteGroup(false)
       }
+      if(data&&data.message==='Update channel success'){
+        setLoadingDisableChat(false)
+      }
+
+
     };
     socket?.on("channelWS", handleData);
     return () => {
@@ -270,11 +285,20 @@ const InformationChat: FunctionComponent<any> = ({
   };
   // ----------------DELETE GROUP CHAT-------------------------------------
 
+  const BlockUser = () => {
+    notification["success"]({
+      message: "Thông báo",
+      description: "Chức năng đang phát triển",
+    });
+  }
+
   const PopoverContent = ({ someValue }: { someValue: any }) => {
     return (
-      <div className="flex gap-1">
+      <div className=" gap-1">
         {loadingRoleUser && <Spin />}
-        {valueUserRole.role === "CO-ADMIN" ? (
+        {valueUserRole.role === "CO-ADMIN" ?
+       
+         (
           <p
             className="cursor-pointer"
             onClick={() => {
@@ -293,9 +317,28 @@ const InformationChat: FunctionComponent<any> = ({
             cấp quyền phó nhóm
           </p>
         )}
+       <p onClick={BlockUser} className="cursor-pointer">Chặn <span className="font-medium text-red-500">{valueUserRole?.name}</span> chat </p>
       </div>
     );
   };
+
+   const UpdateChannels=(value:any)=>{
+    setLoadingDisableChat(true)
+    const data=
+    {
+      channelUpdate:{
+          disableThread:value
+      },
+      channelId:selectedChat.id
+  }
+
+  console.log(data)
+    socket.emit('updateChannel',data)
+    return () => {
+      socket?.off("updateChannel");
+    };
+
+   }
 
   const HandleRoleCoAdmin = (value: any) => {
     setLoadingRoleUser(true);
@@ -693,8 +736,18 @@ const InformationChat: FunctionComponent<any> = ({
                 <div className="p-2">
                   <div className=" flex justify-center items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
                     <p className="font-medium text-xl">Tùy chọn </p>
+                    
                   </div>
+                  {selectedChat?.users.some((users:any) =>
+                    (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
+                      <div className="">
+                        <div className="flex gap-2 items-center">
+                        <RiUserAddFill/>   Cấm thành viên chat
+                        </div>
+                        <div>{selectedChat?.disableThread===false? <Button  onClick={()=>UpdateChannels(true)}>{loadingDisableChat&&<Spin/>}Bật Không cho thành viên chat </Button>:<Button  onClick={()=>UpdateChannels(false)}> {loadingDisableChat&&<Spin/>} Cho tất cả chat </Button>}</div>
+                      </div>
 
+                    )}
                  
                   <p className="text-red-600 flex mt-2 mb-2 gap-2 items-center text-lg cursor-pointer mt-2"
                     onClick={()=>handleDeleteGroupChat(selectedChat)}
