@@ -370,9 +370,9 @@ export const ChaxBoxNoMustFriend:FunctionComponent<any>=({selectedChat,setselect
           else{
             if(!chatSingleIdnew||chatSingleIdnew===null){
               if(socket){
+                console.log(selectedChat)
                 const sendReqAddFriend={
-                  receiveId:selectedChat.user.id
-                  
+                  receiveId:selectedChat.id
                   ,
                 }
                 console.log(sendReqAddFriend)
