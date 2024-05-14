@@ -483,7 +483,7 @@ export const ChatSingleSend: FunctionComponent<any> = ({ selectedChat }) => {
         {getSelectUserIsChoose(selectedChat)}
        
       </div>
-      <p className='w-full border bg-white p-2 border-collapse'>
+      <p className='w-full border  absolute top-14 z-50 left-0 right-0 bg-white p-2 border-collapse'>
       <>
         Danh sách ghim ({dataPin && dataPin.length}){' '}
         <span onClick={toggleShowAllMessages} className="cursor-pointer">

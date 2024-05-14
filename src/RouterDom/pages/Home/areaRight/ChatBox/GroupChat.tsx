@@ -605,7 +605,7 @@ const PushDataSearch=(value:any)=>{
       {modalToUnfriend()}
 
       <div className='relative '>
-        <p className='w-full border absolute top-0 left-0 right-0 bg-white p-2 border-collapse'>
+        <p className='w-full border absolute top-0 z-50 left-0 right-0 bg-white p-2 border-collapse'>
           <>
             Danh sách ghim ({dataPin && dataPin.length}){' '}
             <span onClick={toggleShowAllMessages} className="cursor-pointer">

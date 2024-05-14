@@ -90,6 +90,15 @@ export default function InviteFriend() {
     useEffect(()=>{
       console.log('get all chat single bat dau ghe chat send')
         dispatch<any>(UserGetAllSingleChat())
+        async function  getdatawatingFriendAccept(){
+          const data=await UserApi.UserGetAllSingleChatfriendwaitlistFriendAccept()
+          if(data){
+           
+              setwaitlistFriendAccept(data.data)
+          }
+  
+        }
+        getdatawatingFriendAccept()
     },[dataSocket])
 
     const AcceptChat=(item:any)=>{

@@ -439,7 +439,7 @@ const InformationChat: FunctionComponent<any> = ({
                   {selectedChat?.user.name}
                 </p>
 
-                <p> Tat ca File đã gửi </p>
+                {/* <p> Tat ca File đã gửi </p> */}
 
                 <div className="absolute bottom-1 p-2">
                   <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
@@ -449,9 +449,9 @@ const InformationChat: FunctionComponent<any> = ({
                   <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
                     <MdDelete /> Xóa nhóm
                   </p>
-                  <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
+                  {/* <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
                     <IoIosLogOut /> Rời nhóm chat
-                  </p>
+                  </p> */}
                 </div>
               </>
             ) : /// rời nhóm chat xóa nhóm chát xóa lịch sử nhóm chat
