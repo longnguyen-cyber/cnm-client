@@ -1,13 +1,11 @@
 .MainPageHomeRecomend{
-
-max-width: 1400px;
- 
     display: flex;
     flex-direction: column;
-    padding: 20px;
-
     align-items: center;
-
+    width: 100%;
+    max-width: 1000px;
+    padding: 20px;
+    box-sizing: border-box;
 
 }
 .mySwiper{

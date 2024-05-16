@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 const UserContext=createContext<any>(null);
 const tokenLocal:any=localStorage.getItem('tokenUser');
 const userTokenString:any=localStorage.getItem('user');
-
 const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const dispatch=useDispatch()
     const navigate=useNavigate()

@@ -149,7 +149,7 @@ export const ChatBox = () => {
                       </div>
                     )}
                   </div>
-                  {selectedChat?.type!=='cloud'
+                  {selectedChat
                   
                   &&
                   <InformationChat

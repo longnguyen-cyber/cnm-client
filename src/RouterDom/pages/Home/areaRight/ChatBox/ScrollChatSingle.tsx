@@ -64,6 +64,7 @@ export const ScrollChatSingle: FunctionComponent<any> = ({
     }
 
     socket.emit('updateThread',dataPin)
+    setOpenModalUserChat(false)
      return () => { socket.off('updateThread') }
   }
 
@@ -112,6 +113,7 @@ export const ScrollChatSingle: FunctionComponent<any> = ({
 
     if (socket) {
       socket.emit('emoji', dataEmoji)
+      setOpenModalUserChat(false)
 
 
     }
@@ -169,7 +171,8 @@ export const ScrollChatSingle: FunctionComponent<any> = ({
         </div>
 
         <div className='flex items-center justify-center mt-2 gap-2'>
-           <IoPinSharp  size={25} className='cursor-pointer text-red-500'  onClick={handlePinMessage}/>
+        <div className='text-red-500' onClick={handlePinMessage}> <IoPinSharp  size={25} className='cursor-pointer '  /> ghim </div> 
+          
           
         </div>
 

@@ -33,6 +33,7 @@ import {
 import { TbDotsVertical } from "react-icons/tb";
 import { UserLeaveGroup } from "./AddUserToGroup/UserLeaveGroup";
 import { UserContext } from "../../../../../Context/UserContext";
+import UserApi from "../../../../../api/user";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 const InformationChat: FunctionComponent<any> = ({
@@ -41,8 +42,6 @@ const InformationChat: FunctionComponent<any> = ({
   socket,
   setselectedChats
 }) => {
-  console.log('day la selected chat')
-  console.log(selectedChat)
   const dispatch = useDispatch();
   const [openModalAddUserToGroup, setModalAddUserToGroup] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -57,18 +56,56 @@ const InformationChat: FunctionComponent<any> = ({
   const [openModalToPassRole, setOpenModalToPassRole] =
     useState<boolean>(false);
   const [userHavePassRoleAdmin, setUserHavePassRoleAdmin] = useState<any>();
-  const [loadingLeaveGroup,setLoadingLeaveGroup]=useState(false)
-  const [loadingDeleteGroup,setLoadingDeleteGroup]=useState(false)
-  const [loadingDisableChat,setLoadingDisableChat]=useState(false)
-
+  const [loadingLeaveGroup, setLoadingLeaveGroup] = useState(false)
+  const [loadingDeleteGroup, setLoadingDeleteGroup] = useState(false)
+  const [loadingDisableChat, setLoadingDisableChat] = useState(false)
+  const [chatSingleIdnew, setChatSingleIdNew] = useState<any>(null)
   const [loadingLeaveGroupForMembers, setLoadingLeaveGroupForMembers] =
     useState(false);
+  const [channelIdNew, setChatChannelIdNew] = useState<{ id: any, threads: any[], users: any[], name: any, emojis: any[], disableThread: any }>({ id: '', threads: [], users: [], name: String, emojis: [], disableThread: false });
   // ----------- user current
-  console.log('user information ')
-  console.log(selectedChat);
+  console.log(',,....>')
+  console.log(chatSingleIdnew)
+
   const HandleOpenModall = () => {
     setModalAddUserToGroup(true);
   };
+
+
+  useEffect(() => {
+    async function getData() {
+      if (selectedChat) {
+        const data = await dispatch<any>(
+          UserGetChatsSingleById({ id: selectedChat.id })
+        )
+        // console.log("day la data check")
+        if (data.error) {
+          setChatSingleIdNew(null)
+        }
+
+        if (data && data.payload && data.payload.data) {
+          setChatSingleIdNew(data.payload.data)
+        }
+      }
+    }
+    getData()
+  }, [selectedChat])
+
+  useEffect(() => {
+    async function GetChannelById() {
+
+      if (selectedChat.id) {
+        const dataChannels = await UserApi.UserGetChannelById({ id: selectedChat.id });
+
+        if (dataChannels) {
+          setChatChannelIdNew(dataChannels.data)
+
+        }
+      }
+    }
+    GetChannelById();
+  }, [selectedChat.id]);
+
 
   useEffect(() => {
     const handleData = async (data: any) => {
@@ -98,16 +135,16 @@ const InformationChat: FunctionComponent<any> = ({
           socket?.off("updateRoleUserInChannel");
         };
       }
-      if(data&&data.message==='Leave channel success'){
+      if (data && data.message === 'Leave channel success') {
         setLoadingLeaveGroup(false)
         setLoadingLeaveGroupForMembers(false)
         setOpenModalToPassRole(false)
       }
-      if(data&&data.message==='Delete channel success'){
+      if (data && data.message === 'Delete channel success') {
 
         setLoadingDeleteGroup(false)
       }
-      if(data&&data.message==='Update channel success'){
+      if (data && data.message === 'Update channel success') {
         setLoadingDisableChat(false)
       }
 
@@ -220,7 +257,7 @@ const InformationChat: FunctionComponent<any> = ({
 
     return () => {
       socket?.off("leaveChannel");
-     
+
     };
   };
 
@@ -235,7 +272,7 @@ const InformationChat: FunctionComponent<any> = ({
         channelId: selectedChat1.id,
       };
       socket?.emit("leaveChannel", data);
-   
+
       return () => {
         socket?.off("leaveChannel");
         setUserHavePassRoleAdmin(null);
@@ -255,7 +292,7 @@ const InformationChat: FunctionComponent<any> = ({
 
   // ----------------DELETE GROUP CHAT-------------------------------------
   const handleDeleteGroupChat = (selectedChat1: any) => {
-    
+
     Modal.confirm({
       title: "Bạn có chắc chắn muốn xóa nhóm chat?",
       content: "Hành động này không thể hoàn tác.",
@@ -297,48 +334,48 @@ const InformationChat: FunctionComponent<any> = ({
       <div className=" gap-1">
         {loadingRoleUser && <Spin />}
         {valueUserRole.role === "CO-ADMIN" ?
-       
-         (
-          <p
-            className="cursor-pointer"
-            onClick={() => {
-              HandleRoleCoAdmin("MEMBER");
-            }}
-          >
-            Hủy quyền phó nhóm
-          </p>
-        ) : (
-          <p
-            className="cursor-pointer"
-            onClick={() => {
-              HandleRoleCoAdmin("CO-ADMIN");
-            }}
-          >
-            cấp quyền phó nhóm
-          </p>
-        )}
-       <p onClick={BlockUser} className="cursor-pointer">Chặn <span className="font-medium text-red-500">{valueUserRole?.name}</span> chat </p>
+
+          (
+            <p
+              className="cursor-pointer"
+              onClick={() => {
+                HandleRoleCoAdmin("MEMBER");
+              }}
+            >
+              Hủy quyền phó nhóm
+            </p>
+          ) : (
+            <p
+              className="cursor-pointer"
+              onClick={() => {
+                HandleRoleCoAdmin("CO-ADMIN");
+              }}
+            >
+              cấp quyền phó nhóm
+            </p>
+          )}
+        <p onClick={BlockUser} className="cursor-pointer">Chặn <span className="font-medium text-red-500">{valueUserRole?.name}</span> chat </p>
       </div>
     );
   };
 
-   const UpdateChannels=(value:any)=>{
+  const UpdateChannels = (value: any) => {
     setLoadingDisableChat(true)
-    const data=
+    const data =
     {
-      channelUpdate:{
-          disableThread:value
+      channelUpdate: {
+        disableThread: value
       },
-      channelId:selectedChat.id
-  }
+      channelId: selectedChat.id
+    }
 
-  console.log(data)
-    socket.emit('updateChannel',data)
+    console.log(data)
+    socket.emit('updateChannel', data)
     return () => {
       socket?.off("updateChannel");
     };
 
-   }
+  }
 
   const HandleRoleCoAdmin = (value: any) => {
     setLoadingRoleUser(true);
@@ -381,397 +418,520 @@ const InformationChat: FunctionComponent<any> = ({
         <div className="flex justify-center items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
           <p className="font-medium text-xl">Thông tin nhóm </p>
         </div>
-        <div className="border border-gray-200 h-44 w-auto ">
+        <div className=" h-44 w-auto ">
           <div className="flex justify-center items-center ">
             {typeof selectedChat === "object" && selectedChat !== null ? (
               selectedChat?.receiveId ? (
                 <div className="flex gap-3 items-center px-5">
-                  <img
+                  {selectedChat.type !== 'cloud' && <img
                     src={`${selectedChat?.user ? selectedChat?.user.avatar : ""}`}
                     className="w-16 h-16 mt-8 rounded-full"
-                  />
-                  <div></div>
+                  />}
+
                 </div>
               ) : !selectedChat?.receiveId && !selectedChat?.users ? (
                 <div>
                   <div className="flex gap-3 items-center px-5">
-                    <img
+                    {selectedChat.type !== 'cloud' && <img
                       src={`${selectedChat ? selectedChat?.avatar : ""}`}
                       className="w-16 h-16 mt-8 rounded-full"
-                    />
+                    />}
                   </div>
+
                 </div>
+
+
+
               ) :
-              
-            
+
+
+
+
+
+                (
+                  <>
+                    <div className="flex flex-wrap w-24  justify-center mt-8  items-center">
+                      {selectedChat?.users.length > 0 &&
+                        selectedChat?.users
+                          .slice(0, 3)
+                          .map((value: IUser, index: number) => (
+                            <img
+                              className="w-10 h-10 rounded-full "
+                              src={`${value.avatar}`}
+                              alt="Avatar 1"
+                            />
+                          ))}
+                      <p className="rounded-full text-gray-500  flex items-center justify-center  bg-gray-300 w-10 h-10">
+                        {selectedChat?.users.length + 1 > 3 - 3}
+                      </p>
+                    </div>
+                  </>
+                )
+            ) :
+
+              (
+                ""
+              )}
+          </div>
+          <div>
+            {selectedChat?.receiveId || selectedChat?.type === 'cloud' ?
               (
                 <>
-                  <div className="flex flex-wrap w-24  justify-center mt-8  items-center">
-                    {selectedChat?.users.length > 0 &&
-                      selectedChat?.users
-                        .slice(0, 3)
-                        .map((value: IUser, index: number) => (
-                          <img
-                            className="w-10 h-10 rounded-full "
-                            src={`${value.avatar}`}
-                            alt="Avatar 1"
-                          />
-                        ))}
-                    <p className="rounded-full text-gray-500  flex items-center justify-center  bg-gray-300 w-10 h-10">
-                      {selectedChat?.users.length+1 > 3 - 3}
+
+
+                  <p
+                    style={{ fontSize: "25px", fontWeight: "500px" }}
+                    className="text-center mt-2 font-semibold"
+                  >
+                    {selectedChat?.receiveId && selectedChat?.user.name}
+                  </p>
+
+                  <p className="mt-4 mb-2">Danh sách hình ảnh </p>
+                  <div className="flex   overflow-scroll gap-3 p-2 flex-wrap">
+
+                    {selectedChat.type === 'cloud' ? <> {selectedChat?.threads.map((value: any) => {
+                      return (
+                        <div className="flex flex-wrap  gap-2 items-center">
+                          {value.files.length > 0 &&
+                            value.files.map((value: any) => {
+                              const extension = value.filename
+                                .split('.')
+                                .pop()
+                                .toLowerCase()
+                              if (extension === 'jpg' || extension === 'jpeg' || extension === 'png') {
+                                return (
+                                  <div className="border border-gray-400">
+                                    <img
+                                      // onClick={() => openModal(value.path)}
+                                      key={value.filename}
+                                      src={value.path}
+                                      style={{ width: '85px', height: '100px' }}
+                                    />
+                                  </div>
+                                )
+                              }
+                            })
+                          }
+                        </div>
+                      )
+                    })}</>
+
+                      : <>
+
+                        {chatSingleIdnew?.threads.map((value: any) => {
+                          return (
+                            <div className="flex flex-wrap  gap-2 items-center">
+                              {value.files.length > 0 &&
+                                value.files.map((value: any) => {
+                                  const extension = value.filename
+                                    .split('.')
+                                    .pop()
+                                    .toLowerCase()
+                                  if (extension === 'jpg' || extension === 'jpeg' || extension === 'png') {
+                                    return (
+                                      <div className="border border-gray-400">
+                                        <img
+                                          // onClick={() => openModal(value.path)}
+                                          key={value.filename}
+                                          src={value.path}
+                                          style={{ width: '85px', height: '100px' }}
+                                        />
+                                      </div>
+                                    )
+                                  }
+                                })
+
+                              }
+
+
+
+
+                            </div>
+                          )
+
+                        })}</>}
+
+
+                  </div>
+
+
+                  <div>
+
+
+                  </div>
+
+
+
+                  <div className="absolute bottom-1 p-2">
+                    {selectedChat?.type !== 'cloud' && <>
+                      <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
+                        <CiWarning />
+                        Xóa lịch sử nhóm chat{" "}
+                      </p>
+                      <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
+                        <MdDelete /> Xóa nhóm
+                      </p>
+                    </>}
+
+                    {/* <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
+                    <IoIosLogOut /> Rời nhóm chat
+                  </p> */}
+                  </div>
+                </>
+              ) : /// rời nhóm chat xóa nhóm chát xóa lịch sử nhóm chat
+
+              !selectedChat?.receiveId && !selectedChat?.users ? (
+                <>
+                  <p
+                    style={{ fontSize: "25px", fontWeight: "500px" }}
+                    className="text-center mt-2 font-semibold"
+                  >
+                    {selectedChat?.name}
+                  </p>
+                  <div className="absolute bottom-1 p-2">
+                    <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
+                      <CiWarning />
+                      Xóa lịch sử nhóm chat{" "}
+                    </p>
+                    <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
+                      <MdDelete /> Xóa nhóm
+                    </p>
+                    <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
+                      <IoIosLogOut /> Rời nhóm chat
                     </p>
                   </div>
                 </>
-              )
-            ) : 
-            
-            (
-              ""
-            )}
-          </div>
-          <div>
-            {selectedChat?.receiveId ? (
-              <>
-                <p
-                  style={{ fontSize: "25px", fontWeight: "500px" }}
-                  className="text-center mt-2 font-semibold"
-                >
-                  {selectedChat?.user.name}
-                </p>
-
-                {/* <p> Tat ca File đã gửi </p> */}
-
-                <div className="absolute bottom-1 p-2">
-                  <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
-                    <CiWarning />
-                    Xóa lịch sử nhóm chat{" "}
-                  </p>
-                  <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
-                    <MdDelete /> Xóa nhóm
-                  </p>
-                  {/* <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
-                    <IoIosLogOut /> Rời nhóm chat
-                  </p> */}
-                </div>
-              </>
-            ) : /// rời nhóm chat xóa nhóm chát xóa lịch sử nhóm chat
-
-            !selectedChat?.receiveId && !selectedChat?.users ? (
-              <>
-                <p
-                  style={{ fontSize: "25px", fontWeight: "500px" }}
-                  className="text-center mt-2 font-semibold"
-                >
-                  {selectedChat?.name}
-                </p>
-                <div className="absolute bottom-1 p-2">
-                  <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
-                    <CiWarning />
-                    Xóa lịch sử nhóm chat{" "}
-                  </p>
-                  <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
-                    <MdDelete /> Xóa nhóm
-                  </p>
-                  <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
-                    <IoIosLogOut /> Rời nhóm chat
-                  </p>
-                </div>
-              </>
-            ) : (
-              /// thêm thanh viên vào
-              <div>
-                <p
-                  style={{ fontSize: "25px", fontWeight: "500px" }}
-                  className="text-center mt-2  mb-4 font-semibold"
-                >
-                  <div className="flex justify-center gap-2 items-center">
-                  {selectedChat?.name}
-                  {selectedChat?.users.some((users:any) =>
-                    (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
-                        <div>
-                          {!editNameGroup && (
-                            <CiEdit
-                              size={20}
-                              className="cursor-pointer"
-                              onClick={() => setEditNameGroup(true)}
-                            />
-                          )}
-                        </div>
-                      )}
-                  </div>
-                 
-                       {editNameGroup && (
-                    <Form
-                      onFinish={HandleUpdate}
-                      className="flex items-center gap-2"
-                    >
-                      <Form.Item
-                        name="name"
-                        rules={[
-                          { required: true, message: "Vui lòng nhập tên!" },
-                        ]}
-                      >
-                        <Input />
-                      </Form.Item>
-                      <Form.Item>
-                        <Button
-                          type="primary"
-                          className=" bg-blue-500 h-10 w-18"
-                          htmlType="submit"
-                        >
-                          {loadingUpdate && (
-                            <Spin
-                              indicator={antIcon}
-                              className="text-white mr-2"
-                            />
-                          )}{" "}
-                          update
-                        </Button>
-                        <Button
-                          type="primary"
-                          className=" bg-red-500 h-10 w-18"
-                          onClick={() => {
-                            setEditNameGroup(false);
-                          }}
-                        >
-                          Close
-                        </Button>
-                      </Form.Item>
-                    </Form>
-                  )}
-                </p>
-                <div className=" flex justify-center flex-col items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
-                  <p className="font-medium flex gap-2 items-center cursor-pointer text-xl">
-                    Thành viên{" "}
-
-                   
-                  </p>
-
-               
-                </div>
-                <div className="flex justify-center items-center">
-                  <button
-                    className="btn btn-blue bg-gray-200 p-2 flex items-center gap-2 rounded-sm mt-3"
-                    onClick={() => {
-                      setModalAddUserToGroup(true);
-                    }}
+              ) : (
+                /// thêm thanh viên vào
+                <div>
+                  <p
+                    style={{ fontSize: "25px", fontWeight: "500px" }}
+                    className="text-center mt-2  mb-4 font-semibold"
                   >
-                    {" "}
-                    <RiUserAddFill color="gray" /> Thêm thành viên vào nhóm{" "}
-                  </button>
-                </div>
-                <h1 className="font-medium mt-3 mb-3 pl-3">
-                  Danh sách thành viên ({selectedChat?.users?.length}){" "}
-                </h1>
-                <div className="p-2">
-                  <input
-                    className="w-full no-outline border border-gray-300 my-3 rounded-md p-1 mr-7"
-                    placeholder="tìm kiếm thành viên "
-                  />
-                </div>
+                    <div className="flex justify-center gap-2 items-center">
+                      {selectedChat?.name}
+                      {selectedChat?.users.some((users: any) =>
+                        (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
+                          <div>
+                            {!editNameGroup && (
+                              <CiEdit
+                                size={20}
+                                className="cursor-pointer"
+                                onClick={() => setEditNameGroup(true)}
+                              />
+                            )}
+                          </div>
+                        )}
+                    </div>
 
-                {/* danh sách nhóm  */}
-                <div className="h-72 overflow-y-scroll">
-                {selectedChat?.users.some((users:any) =>
-                    (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) ? (
-                        <div>
-                         {selectedChat?.users?.length > 0 &&
-                        selectedChat?.users?.map((value: any, index: number) => {
-                      return (
-                        <div key={index} className="flex items-center p-1">
-                          {value && (
-                            <div className="flex justify-between w-full ">
-                              <div className="flex gap-3 items-center px-5">
-                                <img
-                                  src={`${value.avatar}`}
-                                  className="w-12 h-12 rounded-full"
-                                />
-                                <div>
-                                  <p className="text-xl font-medium ">
-                                    {value.name}
-                                  </p>
-                                  <p>
-                                    {
-                                      <div
-                                        style={{
-                                          fontSize: "12px",
-                                          color: "gray",
-                                        }}
-                                      >
-                                        {value.role === "ADMIN" ? (
-                                          <p>Trưởng nhóm</p>
-                                        ) : value.role === "CO-ADMIN" ? (
-                                          <p>Phó nhóm</p>
-                                        ) : (
-                                          <p>Thành viên </p>
-                                        )}
-                                      </div>
-                                    }
-                                  </p>
-                                </div>
-                              </div>
-
-
-
-                              {value.role === "ADMIN" ||
-                              (value.role === "CO-ADMIN" &&
-                                user.id === value.id) ? (
-                                <></>
-                              ) : (
-                                <div className="flex items-center gap-2">
-                               
-                                   
-                                  <button
-                                    onClick={() => deleteUserInGroupChat(value)}
-                                    className="btn bg-red-500 p-2 rounded-md cursor-pointer text-white font-bold"
-                                  >
-                                    {" "}
-                                   
-                                    <div>
-                                    {loadingDelete &&
-                                      value?.id === valuedelete?.id && (
-                                        <Spin />
-                                      )}{" "}
-                                    <p>Xóa </p>
-                                  </div>
-                                   
-                                  </button>
-
-                                  <button
-                                    onClick={() => addFriendInGroupChat(value)}
-                                    className="btn bg-blue-100 p-2 rounded-md cursor-pointer text-blue-600 font-bold"
-                                  >
-                                    {" "}
-                                    Thêm{" "}
-                                  </button>
+                    {editNameGroup && (
+                      <Form
+                        onFinish={HandleUpdate}
+                        className="flex items-center gap-2"
+                      >
+                        <Form.Item
+                          name="name"
+                          rules={[
+                            { required: true, message: "Vui lòng nhập tên!" },
+                          ]}
+                        >
+                          <Input />
+                        </Form.Item>
+                        <Form.Item>
+                          <Button
+                            type="primary"
+                            className=" bg-blue-500 h-10 w-18"
+                            htmlType="submit"
+                          >
+                            {loadingUpdate && (
+                              <Spin
+                                indicator={antIcon}
+                                className="text-white mr-2"
+                              />
+                            )}{" "}
+                            update
+                          </Button>
+                          <Button
+                            type="primary"
+                            className=" bg-red-500 h-10 w-18"
+                            onClick={() => {
+                              setEditNameGroup(false);
+                            }}
+                          >
+                            Close
+                          </Button>
+                        </Form.Item>
+                      </Form>
+                    )}
+                  </p>
+                  <div className=" flex justify-center flex-col items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
+                    <p className="font-medium flex gap-2 items-center cursor-pointer text-xl">
+                      Thành viên{" "}
 
 
-                                  <Popover
-                                    content={
-                                      <PopoverContent someValue={value} />
-                                    }
-                                    title="Cấp quyền "
-                                    trigger="click"
-                                  >
-                                    <TbDotsVertical
-                                      onClick={() => {
-                                        setValueRoleUser(value);
-                                      }}
-                                      size={30}
-                                      className="cursor-pointer"
-                                    />
-                                  </Popover>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                        </div>
-                      ):<>
-                      <div>
-                         {selectedChat?.users?.length > 0 &&
-                        selectedChat?.users?.map((value: any, index: number) => {
-                      return (
-                        <div key={index} className="flex items-center p-1">
-                          {value && (
-                            <div className="flex justify-between w-full ">
-                              <div className="flex gap-3 items-center px-5">
-                                <img
-                                  src={`${value.avatar}`}
-                                  className="w-12 h-12 rounded-full"
-                                />
-                                <div>
-                                  <p className="text-xl font-medium ">
-                                    {value.name}
-                                  </p>
-                                  <p>
-                                    {
-                                      <div
-                                        style={{
-                                          fontSize: "12px",
-                                          color: "gray",
-                                        }}
-                                      >
-                                        {value.role === "ADMIN" ? (
-                                          <p>Trưởng nhóm</p>
-                                        ) : value.role === "CO-ADMIN" ? (
-                                          <p>Phó nhóm</p>
-                                        ) : (
-                                          <p>Thành viên </p>
-                                        )}
-                                      </div>
-                                    }
-                                  </p>
-                                </div>
-                              </div>
-                              {value.role === "ADMIN" ||
-                              (value.role === "CO-ADMIN" &&
-                                user.id === value.id) ? (
-                                <></>
-                              ) : (
-                                <div className="flex items-center gap-2">
-                                  <button
-                                    onClick={() => addFriendInGroupChat(value)}
-                                    className="btn bg-blue-100 p-2 rounded-md cursor-pointer text-blue-600 font-bold"
-                                  >
-                                    {" "}
-                                    Thêm{" "}
-                                  </button>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                        </div>
-                      
-                      
-                      </>}
+                    </p>
 
-                  
-                </div>
-                <div className="p-2">
-                  <div className=" flex justify-center items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
-                    <p className="font-medium text-xl">Tùy chọn </p>
-                    
+
                   </div>
-                  {selectedChat?.users.some((users:any) =>
-                    (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
-                      <div className="">
-                        <div className="flex gap-2 items-center">
-                        <RiUserAddFill/>   Cấm thành viên chat
-                        </div>
-                        <div>{selectedChat?.disableThread===false? <Button  onClick={()=>UpdateChannels(true)}>{loadingDisableChat&&<Spin/>}Bật Không cho thành viên chat </Button>:<Button  onClick={()=>UpdateChannels(false)}> {loadingDisableChat&&<Spin/>} Cho tất cả chat </Button>}</div>
+                  <div className="flex justify-center items-center">
+                    <button
+                      className="btn btn-blue bg-gray-200 p-2 flex items-center gap-2 rounded-sm mt-3"
+                      onClick={() => {
+                        setModalAddUserToGroup(true);
+                      }}
+                    >
+                      {" "}
+                      <RiUserAddFill color="gray" /> Thêm thành viên vào nhóm{" "}
+                    </button>
+                  </div>
+                  <h1 className="font-medium mt-3 mb-3 pl-3">
+                    Danh sách thành viên ({selectedChat?.users?.length}){" "}
+                  </h1>
+                  <div className="p-2">
+                    <input
+                      className="w-full no-outline border border-gray-300 my-3 rounded-md p-1 mr-7"
+                      placeholder="tìm kiếm thành viên "
+                    />
+                  </div>
+
+                  {/* danh sách nhóm  */}
+                  <div className="h-72 overflow-y-scroll">
+                    {selectedChat?.users.some((users: any) =>
+                      (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) ? (
+                      <div>
+                        {selectedChat?.users?.length > 0 &&
+                          selectedChat?.users?.map((value: any, index: number) => {
+                            return (
+                              <div key={index} className="flex items-center p-1">
+                                {value && (
+                                  <div className="flex justify-between w-full ">
+                                    <div className="flex gap-3 items-center px-5">
+                                      <img
+                                        src={`${value.avatar}`}
+                                        className="w-12 h-12 rounded-full"
+                                      />
+                                      <div>
+                                        <p className="text-xl font-medium ">
+                                          {value.name}
+                                        </p>
+                                        <p>
+                                          {
+                                            <div
+                                              style={{
+                                                fontSize: "12px",
+                                                color: "gray",
+                                              }}
+                                            >
+                                              {value.role === "ADMIN" ? (
+                                                <p>Trưởng nhóm</p>
+                                              ) : value.role === "CO-ADMIN" ? (
+                                                <p>Phó nhóm</p>
+                                              ) : (
+                                                <p>Thành viên </p>
+                                              )}
+                                            </div>
+                                          }
+                                        </p>
+                                      </div>
+                                    </div>
+
+
+
+                                    {value.role === "ADMIN" ||
+                                      (value.role === "CO-ADMIN" &&
+                                        user.id === value.id) ? (
+                                      <></>
+                                    ) : (
+                                      <div className="flex items-center gap-2">
+
+
+                                        <button
+                                          onClick={() => deleteUserInGroupChat(value)}
+                                          className="btn bg-red-500 p-2 rounded-md cursor-pointer text-white font-bold"
+                                        >
+                                          {" "}
+
+                                          <div>
+                                            {loadingDelete &&
+                                              value?.id === valuedelete?.id && (
+                                                <Spin />
+                                              )}{" "}
+                                            <p>Xóa </p>
+                                          </div>
+
+                                        </button>
+
+                                        <button
+                                          onClick={() => addFriendInGroupChat(value)}
+                                          className="btn bg-blue-100 p-2 rounded-md cursor-pointer text-blue-600 font-bold"
+                                        >
+                                          {" "}
+                                          Thêm{" "}
+                                        </button>
+
+
+                                        <Popover
+                                          content={
+                                            <PopoverContent someValue={value} />
+                                          }
+                                          title="Cấp quyền "
+                                          trigger="click"
+                                        >
+                                          <TbDotsVertical
+                                            onClick={() => {
+                                              setValueRoleUser(value);
+                                            }}
+                                            size={30}
+                                            className="cursor-pointer"
+                                          />
+                                        </Popover>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                      </div>
+                    ) : <>
+                      <div>
+                        {selectedChat?.users?.length > 0 &&
+                          selectedChat?.users?.map((value: any, index: number) => {
+                            return (
+                              <div key={index} className="flex items-center p-1">
+                                {value && (
+                                  <div className="flex justify-between w-full ">
+                                    <div className="flex gap-3 items-center px-5">
+                                      <img
+                                        src={`${value.avatar}`}
+                                        className="w-12 h-12 rounded-full"
+                                      />
+                                      <div>
+                                        <p className="text-xl font-medium ">
+                                          {value.name}
+                                        </p>
+                                        <p>
+                                          {
+                                            <div
+                                              style={{
+                                                fontSize: "12px",
+                                                color: "gray",
+                                              }}
+                                            >
+                                              {value.role === "ADMIN" ? (
+                                                <p>Trưởng nhóm</p>
+                                              ) : value.role === "CO-ADMIN" ? (
+                                                <p>Phó nhóm</p>
+                                              ) : (
+                                                <p>Thành viên </p>
+                                              )}
+                                            </div>
+                                          }
+                                        </p>
+                                      </div>
+                                    </div>
+                                    {value.role === "ADMIN" ||
+                                      (value.role === "CO-ADMIN" &&
+                                        user.id === value.id) ? (
+                                      <></>
+                                    ) : (
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          onClick={() => addFriendInGroupChat(value)}
+                                          className="btn bg-blue-100 p-2 rounded-md cursor-pointer text-blue-600 font-bold"
+                                        >
+                                          {" "}
+                                          Thêm{" "}
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                       </div>
 
-                    )}
-                 
-                  <p className="text-red-600 flex mt-2 mb-2 gap-2 items-center text-lg cursor-pointer mt-2"
-                    onClick={()=>handleDeleteGroupChat(selectedChat)}
-                  >
-                     {selectedChat?.users.some((users:any) =>
-                    (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
-                        <div className="flex items-center gap-1">
-                    {loadingDeleteGroup&&<Spin/>}    <MdDelete /> Xóa nhóm
+
+                    </>}
+
+
+                  </div>
+                  <div>
+                    {selectedChat?.users && <>
+
+                      <p className="mt-4 mb-2">Danh sách hình ảnh </p>
+                      <div className="flex   overflow-scroll gap-3 p-2">
+
+                        {<> {channelIdNew?.threads.map((value: any) => {
+                          return (
+                            <div className="flex flex-wrap  gap-2 ">
+                              {value.files.length > 0 &&
+                                value.files.map((value: any) => {
+                                  const extension = value.filename
+                                    .split('.')
+                                    .pop()
+                                    .toLowerCase()
+                                  if (extension === 'jpg' || extension === 'jpeg' || extension === 'png') {
+                                    return (
+                                      <div className="border border-gray-400">
+                                        <img
+                                          // onClick={() => openModal(value.path)}
+                                          key={value.filename}
+                                          src={value.path}
+                                          style={{ width: '85px', height: '100px' }}
+                                        />
+                                      </div>
+                                    )
+                                  }
+                                })
+                              }
+                            </div>
+                          )
+                        })}</>
+                        }
+                      </div>
+                    </>}
+                  </div>
+                  <div className="p-2">
+                    <div className=" flex justify-center items-center h-16 w-auto border border-gray-200 border-l border-gray-200">
+                      <p className="font-medium text-xl">Tùy chọn </p>
+
+                    </div>
+                    {selectedChat?.users.some((users: any) =>
+                      (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
+                        <div className="">
+                          <div className="flex gap-2 items-center">
+                            <RiUserAddFill />   Cấm thành viên chat
+                          </div>
+                          <div>{selectedChat?.disableThread === false ? <Button onClick={() => UpdateChannels(true)}>{loadingDisableChat && <Spin />}Bật Không cho thành viên chat </Button> : <Button onClick={() => UpdateChannels(false)}> {loadingDisableChat && <Spin />} Cho tất cả chat </Button>}</div>
                         </div>
+
                       )}
-                    
-                  </p>
-                  <p
-                    className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2"
-                    // onClick={() => {
-                    //   setOpenLeaveGroup(true);
-                    // }}
-                    onClick={() => handleLeaveGroupChat(selectedChat)}
-                  >
-                    <IoIosLogOut />{loadingLeaveGroupForMembers&&<Spin/>} Rời nhóm chat
-                  </p>
+
+                    <p className="text-red-600 flex mt-2 mb-2 gap-2 items-center text-lg cursor-pointer mt-2"
+                      onClick={() => handleDeleteGroupChat(selectedChat)}
+                    >
+                      {selectedChat?.users.some((users: any) =>
+                        (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
+                          <div className="flex items-center gap-1">
+                            {loadingDeleteGroup && <Spin />}    <MdDelete /> Xóa nhóm
+                          </div>
+                        )}
+
+                    </p>
+                    <p
+                      className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2"
+                      // onClick={() => {
+                      //   setOpenLeaveGroup(true);
+                      // }}
+                      onClick={() => handleLeaveGroupChat(selectedChat)}
+                    >
+                      <IoIosLogOut />{loadingLeaveGroupForMembers && <Spin />} Rời nhóm chat
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       </div>
@@ -789,7 +949,7 @@ const InformationChat: FunctionComponent<any> = ({
               }}
               className="btn bg-red-500 p-2 rounded-md cursor-pointer text-white font-bold"
             >
-            {loadingLeaveGroup&&<Spin/>}  Rời nhóm
+              {loadingLeaveGroup && <Spin />}  Rời nhóm
             </button>
             <button
               onClick={() => {
@@ -803,10 +963,10 @@ const InformationChat: FunctionComponent<any> = ({
         }
       >
         <div className="flex flex-col gap-2">
-        {/* get all user but not include user.role = 'ADMIN' */}
-        
+          {/* get all user but not include user.role = 'ADMIN' */}
 
-          { selectedChat?.users?.map((value: any, index: number) => {
+
+          {selectedChat?.users?.map((value: any, index: number) => {
             if (value.role !== "ADMIN") {
               return (
                 <div
@@ -819,7 +979,7 @@ const InformationChat: FunctionComponent<any> = ({
                   />
                   <p>{value.name}</p>
                   {userHavePassRoleAdmin &&
-                  userHavePassRoleAdmin.id === value.id ? (
+                    userHavePassRoleAdmin.id === value.id ? (
                     <button
                       onClick={() => {
                         handlePassAdmin(value);
@@ -841,7 +1001,7 @@ const InformationChat: FunctionComponent<any> = ({
                 </div>
               );
             }
-          
+
           })}
         </div>
       </Modal>
