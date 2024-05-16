@@ -170,9 +170,6 @@ export default function Tabmessage() {
           // bạn luôn có giá trị mới nhất của state đó
         
           setLoadingchatChannel(false);
-
-      
-     
         return socket.off('channelWS');
       }
       // else {
@@ -244,18 +241,8 @@ export default function Tabmessage() {
       socket.off('channelWS', handleData);
     };
   }, [socket]);
-
-
   ///cloud
   
-
-
-
-
-
-
-
-
 
   return (
     <>

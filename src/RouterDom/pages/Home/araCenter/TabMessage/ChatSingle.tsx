@@ -14,7 +14,7 @@ export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselec
           <div className='text-gray-500'>
             <div className='flex justify-between'>
               <p className='flex-1' style={{ fontWeight: '450' }}>
-                {CloudUser?.threads[CloudUser.threads.length-1].messages.message}
+                {CloudUser?.threads[CloudUser.threads.length-1].messages?CloudUser?.threads[CloudUser.threads.length-1].messages.message:"có file được gửi"}
                 
               </p>
               {/* <p className='ml-auto mr-2 font-bold text rounded-full text-white bg-red-600 flex items-center justify-center w-4 h-4' style={{ fontSize: "12px" }}>N</p> */}
@@ -29,6 +29,7 @@ export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselec
             <div key={index} className="flex items-center pl-1 cursor-pointer" onClick={()=>{setselectedChats(itemChat)}}>
             <div className="flex-shrink-0">
               <div className="flex flex-wrap w-14 justify-center items-center">
+               
                   <img key={index} className="w-14 h-14 rounded-full" src={`${itemChat&&itemChat.user.avatar?itemChat.user.avatar:"https://media.istockphoto.com/id/1354776457/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=w3OW0wX3LyiFRuDHo9A32Q0IUMtD4yjXEvQlqyYk9O4="}`} alt="Avatar 1" />
               </div>
             </div>
