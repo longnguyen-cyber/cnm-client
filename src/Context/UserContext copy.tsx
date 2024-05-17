@@ -8,20 +8,13 @@ import { useNavigate } from 'react-router-dom';
 const UserContext=createContext<any>(null);
 const tokenLocal:any=localStorage.getItem('tokenUser');
 const userTokenString:any=localStorage.getItem('user');
-
 const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const dispatch=useDispatch()
     const navigate=useNavigate()
-    const [user,setUser]=useState<IUser| null>(null);
-    const [idUser,setIdUser]=useState<string>("");
+ 
     const [socket, setSocket] = useState<Socket>(null!);
-    const [token,setToken]=useState<string|null>(null);
-    const [selectedChat, setselectedChats] = useState<any>([]);
-    const [userSelect,setUserSelect]=useState<any>(null);
-    const [checkRender,setScheckRender]=useState<any>(false);
-    const [userInvite,setUserInvite]=useState<any>(null);
-    const [chatReject,setChatReject]=useState<any>(null)
-    
+
+ 
     useEffect(()=>{
       
       async function connectSocket(){
@@ -37,12 +30,8 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
              },
            
           })
-          
           setSocket(newSocket);
-          setUser(UserLogin)
-          if(UserLogin.token){
-            setToken(UserLogin.token)
-          }
+      
         }
        return ()=>socket.close();
     }
@@ -50,15 +39,9 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
       
     },[]);
     const state = {
-      user: [user, setUser],
-      idUser: [idUser, setIdUser],
-      token: [token, setToken],
+     
       socket: socket,
-      selectedChat: [selectedChat, setselectedChats],
-      userSelect:[userSelect,setUserSelect],
-      checkRender:[checkRender,setScheckRender],
-      userInvite:[userInvite,setUserInvite],
-      chatReject:[chatReject,setChatReject]
+    
     };
 
     return (

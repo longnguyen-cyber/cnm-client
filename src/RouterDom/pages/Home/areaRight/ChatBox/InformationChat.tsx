@@ -902,9 +902,9 @@ const InformationChat: FunctionComponent<any> = ({
                       (users.role === "ADMIN" || users.role === "CO-ADMIN") && users.id === user.id) && (
                         <div className="">
                           <div className="flex gap-2 items-center">
-                            <RiUserAddFill />   Cấm thành viên chat
+                            <RiUserAddFill />   Cấm thành viên gửi tin nhắn 
                           </div>
-                          <div>{selectedChat?.disableThread === false ? <Button onClick={() => UpdateChannels(true)}>{loadingDisableChat && <Spin />}Bật Không cho thành viên chat </Button> : <Button onClick={() => UpdateChannels(false)}> {loadingDisableChat && <Spin />} Cho tất cả chat </Button>}</div>
+                          <div>{selectedChat?.disableThread === false ? <Button onClick={() => UpdateChannels(true)}>{loadingDisableChat && <Spin />}Bật Không cho thành viên chát </Button> : <Button onClick={() => UpdateChannels(false)}> {loadingDisableChat && <Spin />} Cho tất cả chát </Button>}</div>
                         </div>
 
                       )}
