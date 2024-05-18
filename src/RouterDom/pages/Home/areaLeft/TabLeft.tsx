@@ -8,19 +8,26 @@ import {
   AiOutlineCloud,
   AiOutlineSetting,
 } from "react-icons/ai";
-import { Button, Modal, Spin, notification } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { Button,Form,Input, Modal, Spin, notification } from "antd";
 import { Navigate, useNavigate } from "react-router";
 import "./TabLeft.css";
 import UserApi from "../../../../api/user";
-import { IRegister } from "../../../../Type";
+import { IRegister, IUser } from "../../../../Type";
 import { useDispatch } from "react-redux";
 import { updateProfile } from "../../../../feature/user/pathApi";
 import Upload from "antd/es/upload/Upload";
 import { set } from "date-fns";
+import axios from 'axios';
+import { RcFile } from "antd/es/upload";
+const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+const userTokenString:any=localStorage.getItem('user');
+
 const TabLeft: FunctionComponent<{
   setTabCurrent: React.Dispatch<React.SetStateAction<string>>;
 }> = ({ setTabCurrent }) => {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false)
   const [openModalImage, setOpenModalImage] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [modalText, setModalText] = useState("Content of the modal");
@@ -31,6 +38,12 @@ const TabLeft: FunctionComponent<{
   const [loadingBlockgest, setLoadingBlockgest] = useState(false);
   const [loadingNotify, setLoadingNotify] = useState(false);
   const [userInfor,setuserInfor]=useState<any>(null)
+  const [ModalUpdatePassword,SetModalUpdatePassword]=useState<any>(false)
+  const UserLogin:IUser=JSON.parse(userTokenString);
+  const [form] = Form.useForm();
+  const [imageUpload,setImageUpload]=useState<any>(null)
+
+  const [LoadingUploadImage,setLoadingUpLoadImage]=useState<any>(false)
   useEffect(() => {
     const fetchUserInfor = async () => {
       const res = await UserApi.getUserById(userInfors.id);
@@ -163,6 +176,100 @@ const TabLeft: FunctionComponent<{
       }
     });
   }, []);
+  const onFineshResetPassword = async (value: any) => {
+    console.log(value)
+    const dataupdate={
+      oldPassword:value.oldPassword,
+      password:value.password
+    
+    }
+    setLoading(true)
+    try{
+      const config = {
+        headers: {
+          Authorization: `Bearer ${UserLogin.token}`,
+          'Content-Type': 'application/json'
+        },
+      };
+
+      const {data}=await axios.put(`${process.env.REACT_APP_API_URL}users/update`,
+      dataupdate,
+      config
+      )
+      console.log(data)
+      if(data){
+        SetModalUpdatePassword(false)
+        form.resetFields();
+        notification["success"]({
+            message: "Thông báo",
+            description: "Cập nhật mật khẩu thành công !",
+          });
+       
+      }         
+
+    }
+    catch(err){
+      console.log('err',err)
+      notification["error"]({
+        message: "Thông báo",
+        description: "Cập nhật mật khẩu thất bại !",
+      });
+    }
+    
+    }
+
+    const beforeUpload = async (file: RcFile, fileList: RcFile[]) => {
+      const formData = new FormData()
+      fileList.forEach(file => {
+        formData.append('files', file);
+        console.log('File', file);
+      }); // Chú ý là "files" nếu server dùng AnyFilesInterceptor()
+      setLoadingUpLoadImage(false)
+      try {
+        const response = await UserApi.userUploadImage(formData)
+        console.log('response', response)
+  
+        const { data } = response
+        console.log('data', data)
+        if (data) {
+          setImageUpload(data)
+
+          const dataupdate={
+            avatar:data[0].path,
+             
+          }
+          const config = {
+            headers: {
+              Authorization: `Bearer ${UserLogin.token}`,
+              'Content-Type': 'application/json'
+            },
+          };
+
+          const dataResponeUpdate=await axios.put(`${process.env.REACT_APP_API_URL}users/update`,
+          dataupdate,
+          config
+          )
+          console.log(dataResponeUpdate)
+
+          if(dataResponeUpdate){
+            console.log('dataResponeUpdate',dataResponeUpdate)
+            notification["success"]({
+              message: "Thông báo",
+              description: "Cập nhật ảnh đại diện thành công !",
+            });
+
+            setLoadingUpLoadImage(true)
+            window.location.reload();
+          }
+    
+        
+
+          // setOpenImage(true)
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    }
   return (
     <>
     {  <>
@@ -306,12 +413,12 @@ const TabLeft: FunctionComponent<{
             <div className="flex flex-col">
               <p className="text-lg font-bold pl-4">{userInfor?.name}</p>
             </div>
-            <div className="pl-6">
+            <div className="pl-6 flex gap-2 cursor-pointer" onClick={()=>{SetModalUpdatePassword(true)}} >
               <FaRegEdit
                 className=" right-0 h-[30px] w-[30px] bottom-0 
                  text-white bg-gray-300 rounded-full p-2 cursor-pointer "
                 // size={36}
-              />
+              />cập nhật mật khẩu 
             </div>
           </div>
           {/* info */}
@@ -323,6 +430,7 @@ const TabLeft: FunctionComponent<{
             <div className="">{loadingBlockgest&&<Spin/>}{userInfor&&userInfor?.setting.blockGuest===true?<Button   onClick={handleOpenBlockGest}>Tắt  </Button>:<Button onClick={handleCloseBlockGest}>Bật  </Button>}</div>
             <p>Không nhận thông báo khi có tin nhắn </p>
             <div className="">{loadingNotify&&<Spin/>}{userInfor?.setting.notify===true?<Button   onClick={handelOpenNotify}>Tắt </Button>:<Button onClick={handelCloseNotify}>Bật</Button>}</div>
+          
           </div>
         </div>
       </Modal>
@@ -334,26 +442,165 @@ const TabLeft: FunctionComponent<{
         confirmLoading={confirmLoading}
         onCancel={handelCancelImage}
       >
-        <Upload
-          name="avatar"
-          action="/your-upload-url"
-          listType="picture"
-          onChange={handleUpload}
-          // You may customize additional props as per your requirements
-        >
-          <Button icon={<UploadOutlined />}>Click to Upload</Button>
-        </Upload>
-        {/* Display uploaded image preview */}
-        {imageUrl && (
-          <div style={{ width: "200px", height: "200px" }}>
+         {imageUpload&&imageUpload.length>0 && (
+          <div >
             <h2>Preview:</h2>
             <img
-              src={imageUrl}
+              src={imageUpload[0].path}
               alt="Uploaded Avatar"
-              style={{ minWidth: "200px", minHeight: "200px" }}
+              className="w-20 h-20 rounded-full mt-2 mb-2 m-auto"
+             
             />
           </div>
         )}
+         <Upload
+                    beforeUpload={beforeUpload}
+                    className="cursor-pointer mt-3"
+                    fileList={[]} // fileList không có giá trị, hình ảnh sẽ không được hiển thị trước khi tải lên
+                    name="avatar"
+                    accept=".jpg, .jpeg, .png"
+
+                    multiple // Cho phép người dùng chọn nhiều hình ảnh
+                  >
+                  <div className="w-full m-auto">
+                   <Button className="ml-28 flex justify-center items-center m-auto"  >{LoadingUploadImage&&<div> <Spin/><p>Đang upload ảnh  </p></div>} {!LoadingUploadImage&&<p>Chọn File Upload</p> }  </Button>
+                  </div>
+       
+        </Upload>
+        {/* Display uploaded image preview */}
+       
+      </Modal>
+
+      <Modal
+        width={400}
+
+        open={ModalUpdatePassword}
+        onOk={()=>{SetModalUpdatePassword(false)}}
+        confirmLoading={confirmLoading}
+        onCancel={()=>{SetModalUpdatePassword(false)}}
+      >
+        <Form  form={form} onFinish={onFineshResetPassword}
+                 layout="vertical"
+                >
+
+                 <Form.Item
+                        style={{ marginTop: "-20px" }}
+                        label="Mật khẩu Cũ  "
+                        name="oldPassword"
+                        rules={[
+                            { required: true, message: "Vui lòng nhập mật khẩu!" },
+                            {
+                                validator: (_, value) => {
+                                    if (!value || value.length < 6) {
+                                        return Promise.reject(
+                                            new Error("Mật khẩu phải có ít nhất 6 ký tự!")
+                                        );
+                                    }
+                                    if (!/(?=.*[A-Z])/.test(value)) {
+                                        return Promise.reject(
+                                            new Error("Mật khẩu phải có ít nhất 1 chữ cái viết hoa!")
+                                        );
+                                    }
+                                    if (!/(?=.*\d)/.test(value)) {
+                                        return Promise.reject(
+                                            new Error("Mật khẩu phải có ít nhất 1 chữ số!")
+                                        );
+                                    }
+                                    if (!/(?=.*[!@#$%^&*])/.test(value)) {
+                                        return Promise.reject(
+                                            new Error("Mật khẩu phải có ít nhất 1 ký tự đặc biệt!")
+                                        );
+                                    }
+                                    return Promise.resolve();
+                                },
+                            },
+                        ]}
+                        validateTrigger="onBlur"
+                    >
+                        <Input.Password />
+                    </Form.Item>
+
+
+
+                    <Form.Item
+                        style={{ marginTop: "-20px" }}
+                        label="Mật khẩu mới "
+                        name="password"
+                        rules={[
+                            { required: true, message: "Vui lòng nhập mật khẩu!" },
+                            {
+                                validator: (_, value) => {
+                                    if (!value || value.length < 6) {
+                                        return Promise.reject(
+                                            new Error("Mật khẩu phải có ít nhất 6 ký tự!")
+                                        );
+                                    }
+                                    if (!/(?=.*[A-Z])/.test(value)) {
+                                        return Promise.reject(
+                                            new Error("Mật khẩu phải có ít nhất 1 chữ cái viết hoa!")
+                                        );
+                                    }
+                                    if (!/(?=.*\d)/.test(value)) {
+                                        return Promise.reject(
+                                            new Error("Mật khẩu phải có ít nhất 1 chữ số!")
+                                        );
+                                    }
+                                    if (!/(?=.*[!@#$%^&*])/.test(value)) {
+                                        return Promise.reject(
+                                            new Error("Mật khẩu phải có ít nhất 1 ký tự đặc biệt!")
+                                        );
+                                    }
+                                    return Promise.resolve();
+                                },
+                            },
+                        ]}
+                        validateTrigger="onBlur"
+                    >
+                        <Input.Password />
+                    </Form.Item>
+
+
+                    <Form.Item
+                        name="confirmPassword"
+                        label="Xác nhận mật khẩu"
+                        dependencies={["password"]}
+                        hasFeedback
+                        rules={[
+                            {
+                                required: true,
+                                message: "Vui lòng xác nhận lại mật khẩu!",
+                            },
+                            ({ getFieldValue }) => ({
+                                validator(rule, value) {
+                                    if (!value || getFieldValue("password") === value) {
+                                        return Promise.resolve();
+                                    }
+
+                                    return Promise.reject(
+                                        "The two passwords that you entered do not match!"
+                                    );
+                                },
+                            }),
+                        ]}
+                    >
+                        <Input.Password />
+                    </Form.Item>
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            className="w-full bg-blue-500 h-12 "
+                            htmlType="submit"
+                        >
+                            {loading && (
+                                <Spin indicator={antIcon} className="text-white mr-3" />
+                            )}{" "}
+                            Đặt lại mật khẩu 
+                        </Button>
+
+                    </Form.Item>
+
+                </Form>
+       
       </Modal>
     </>}
     </>

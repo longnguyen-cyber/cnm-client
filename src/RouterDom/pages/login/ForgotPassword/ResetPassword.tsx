@@ -137,7 +137,7 @@ export default function ResetPassword() {
                             {loading && (
                                 <Spin indicator={antIcon} className="text-white mr-3" />
                             )}{" "}
-                            Đăng ký
+                            Đặt lại mật khẩu 
                         </Button>
 
                     </Form.Item>

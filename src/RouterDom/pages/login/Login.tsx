@@ -258,14 +258,14 @@ export default function Login() {
             {/* <Button type="primary" className='w-full mt-4 mb-2 border-r h-12 border-gray-200' ghost>
             Gửi yêu cầu để đăng nhập
           </Button> */}
-            {/* <Button
+            <Button
             type="primary"
             className="w-full mt-4 mb-2 border-r h-12 border-gray-200"
             onClick={() => setOpen2FaForm(true)}
             ghost
           >
             Tạo xác thực 2FA
-          </Button> */}
+          </Button>
             <Button
               type="primary"
               className="w-full mt-4 mb-2 border-r h-12 border-gray-200"
