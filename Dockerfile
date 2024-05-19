@@ -1,23 +1,23 @@
-FROM node:18-alpine AS builder
+FROM node:21-alpine3.18 AS builder
 # Add a work directory
 ENV NODE_ENV production
 
 WORKDIR /app
 # Cache and Install dependencies
 COPY package.json .
-COPY package-lock.json .
+COPY yarn.lock .
 
-RUN npm install --force --production
+RUN yarn install --production
+
 # Copy app files
 COPY . .
 # Build the app
-RUN npm run build
+RUN yarn build
 
 FROM caddy:2.4.5-alpine AS production
 # Bundle static assets with caddy
 COPY --from=builder /app/build /usr/share/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
-
 
 # Expose port
 EXPOSE 80
