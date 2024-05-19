@@ -21,7 +21,16 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const [checkRender,setScheckRender]=useState<any>(false);
     const [userInvite,setUserInvite]=useState<any>(null);
     const [chatReject,setChatReject]=useState<any>(null)
-    
+
+    useEffect(()=>{
+      const UserLogin:IUser=JSON.parse(userTokenString);
+      console.log(UserLogin)
+      if(UserLogin===null){
+        navigate('/login')
+
+      }
+    },[])
+
     useEffect(()=>{
       
       async function connectSocket(){

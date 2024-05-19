@@ -13,6 +13,13 @@ const UserContextProvider=({children}: {children: React.ReactNode})=>{
     const navigate=useNavigate()
  
     const [socket, setSocket] = useState<Socket>(null!);
+    useEffect(()=>{
+      const UserLogin:IUser=JSON.parse(userTokenString);
+      if(!UserLogin.token){
+        navigate('/login')
+
+      }
+    },[])
 
  
     useEffect(()=>{
