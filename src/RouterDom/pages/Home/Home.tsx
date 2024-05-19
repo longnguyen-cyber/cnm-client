@@ -8,9 +8,22 @@ import TabLeft from "./areaLeft/TabLeft";
 import AreaRight from "./areaRight/AreaRight";
 import { SearchPage } from "./araCenter/Search/Search";
 import SearchUserAddChat from "./araCenter/Search/SearchUserAddSingleChat";
+import { IUser } from "../../../Type";
+import { useNavigate } from "react-router-dom";
 const userTokenString:any=localStorage.getItem('user');
 
 export default function Home() {
+  
+ 
+
+  const navigate=useNavigate()
+  useEffect(()=>{
+    const UserLogin:IUser=JSON.parse(userTokenString);
+    console.log(UserLogin)
+    if(UserLogin===null){
+      navigate('/login')
+    }
+  },[userTokenString])
   const dispatch = useDispatch();
   const [tabCurrent, setTabCurrent] = useState("measages");
   const [SearchHand,setSeachHandle]=useState(false);
