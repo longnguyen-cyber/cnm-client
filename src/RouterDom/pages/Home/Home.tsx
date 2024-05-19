@@ -13,10 +13,19 @@ import { useNavigate } from "react-router-dom";
 import UserApi from "../../../api/user";
 const userTokenString:any=localStorage.getItem('user');
 
+const tokenUser:any=localStorage.getItem('tokenUser');
 export default function Home() {
   const UserLogin:IUser=JSON.parse(userTokenString);
   console.log(userTokenString)
   const navigate=useNavigate()
+  console.log('day la token user')
+  console.log(tokenUser)
+  if(tokenUser==null){
+    navigate('/login')
+  }
+  if(UserLogin===null){
+    navigate('/login')
+  }
   useEffect(()=>{
  
     console.log(UserLogin)
@@ -36,7 +45,10 @@ export default function Home() {
            localStorage.removeItem("tokenUser");
         }
       } catch (err) {
-        alert(err);
+       
+        navigate('/login')
+        localStorage.removeItem("user");
+        localStorage.removeItem("tokenUser");
       }
      
       // if(res){
@@ -58,7 +70,9 @@ export default function Home() {
   // lay cai mang userSlide
   const ListUsers = useSelector((state: any) => state.Users.UserSlice);
   return (
-    <div className="ContentHomeChat">
+    // {}
+    <div>
+ {tokenUser&&<><div className="ContentHomeChat">
       {/* này là thanh tabbar màu xanh bên trái giống zalo */}
       <div className="areaLeft bg-blue-500">
         <TabLeft setTabCurrent={setTabCurrent}/>
@@ -81,6 +95,9 @@ export default function Home() {
         <AreaRight/>
       </div>
    
+    </div></>}
     </div>
+   
+    
   );
 }
