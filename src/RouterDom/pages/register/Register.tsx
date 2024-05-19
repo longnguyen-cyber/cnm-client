@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getAllUser, userRegister } from "../../../feature/user/pathApi";
-import { IRegister, IUser } from "../../../Type";
-import { Button, Checkbox, Form, Input, Select, Spin, notification } from "antd";
+import { IRegister } from "../../../Type";
+import { Button, Checkbox, Form, Input, Spin, notification } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
-import { Upload } from "antd";
-import ImgCrop from "antd-img-crop";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 import UserApi from "../../../api/user";
 import { useNavigate } from "react-router-dom";
-import { on } from "events";
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 type FieldType = {
@@ -24,43 +20,17 @@ type FieldType = {
 };
 
 export default function Register() {
-  const dispatch = useDispatch();
-  const loading = useSelector((state: any) => state.Users.loading);
-  const navigate = useNavigate();
   const [loadingmail,setLoadingmail]=useState(false);
   console.log(loadingmail)
 
   const [fileAvatar, setFileAvatar] = useState<UploadFile | undefined>();
   // change file avatar
-  const onChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
-    setFileAvatar(newFileList[0]);
-  };
+ 
 
   //on preview image
-  const onPreview = async (file: UploadFile) => {
-    let src = file.url as string;
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj as RcFile);
-        reader.onload = () => resolve(reader.result as string);
-      });
-    }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
-  };
-  // normFile is a function that you need to define to normalize the value of the Upload component.
-  const normFile = (e: any) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e && e.fileList;
-  };
-  useEffect(() => {
 
-  },[loadingmail])
+  // normFile is a function that you need to define to normalize the value of the Upload component.
+
 
   const handleRegister = async (values: IRegister) => {
     // delete values.confirmPassword;

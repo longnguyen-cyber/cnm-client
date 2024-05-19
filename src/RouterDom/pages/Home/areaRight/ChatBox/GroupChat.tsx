@@ -563,28 +563,28 @@ export const GroupChat: FunctionComponent<any> = ({ }) => {
   const handleOnchangeData = (event:any) => {
     const inputValue = event.target.value;
     setInputValue(inputValue); 
-    const ListUser = [...selectedChat.users];
-    const userLogin = user.id; 
-    if (inputValue.includes('@') && inputValue.length > 1) {
-        const searchTerm = inputValue.substring(inputValue.indexOf('@') + 1);
-        const filteredUsers = ListUser.filter(user => 
-            user.name.includes(searchTerm) && user.id !== userLogin
-        );
-        if(filteredUsers.length > 0){
+    // const ListUser = [...selectedChat.users];
+    // const userLogin = user.id; 
+    // if (inputValue.includes('@') && inputValue.length > 1) {
+    //     const searchTerm = inputValue.substring(inputValue.indexOf('@') + 1);
+    //     const filteredUsers = ListUser.filter(user => 
+    //         user.name.includes(searchTerm) && user.id !== userLogin
+    //     );
+    //     if(filteredUsers.length > 0){
           
-          SetUserSeachData(filteredUsers);
-        } else {
+    //       SetUserSeachData(filteredUsers);
+    //     } else {
            
-          SetUserSeachData([]);
-        }
-    } else if (inputValue === '@') {
-        const filteredUsers = ListUser.filter(user => user.id !== userLogin);
+    //       SetUserSeachData([]);
+    //     }
+    // } else if (inputValue === '@') {
+    //     const filteredUsers = ListUser.filter(user => user.id !== userLogin);
        
-        SetUserSeachData(filteredUsers);
-    }
-    else {
-      SetUserSeachData([]);
-    }
+    //     SetUserSeachData(filteredUsers);
+    // }
+    // else {
+    //   SetUserSeachData([]);
+    // }
 }
 
 const PushDataSearch=(value:any)=>{
@@ -749,7 +749,7 @@ const PushDataSearch=(value:any)=>{
                         onFocus={() => { handleChangInputChatFocus() }}
       
                         onBlur={() => { handleChangInputChatBlur() }}
-                        onChange={(e:any)=>handleOnchangeData(e)}
+                        onChange={(e:any)=> setInputValue(e.target.value)}
       
                         placeholder='Nhập @, tin nhắn mới ???'
                         value={inputValue}
