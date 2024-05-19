@@ -13,9 +13,12 @@ export const ChatSingle:FunctionComponent<any>=({ListSingleChat,Loading,setselec
           <h4 className='text-lg font-medium'>Cloud của tôi </h4>
           <div className='text-gray-500'>
             <div className='flex justify-between'>
-              <p className='flex-1' style={{ fontWeight: '450' }}>
-                {CloudUser?.threads[CloudUser.threads.length-1].messages?CloudUser?.threads[CloudUser.threads.length-1].messages.message:"có file được gửi"}
-                
+            <p className="flex-1" style={{ fontWeight: '450' }}>
+                {CloudUser?.threads.length > 0 &&
+                CloudUser?.threads[CloudUser.threads.length - 1].messages
+                  ? CloudUser?.threads[CloudUser.threads.length - 1].messages
+                      .message
+                  : 'có file được gửi'}
               </p>
               {/* <p className='ml-auto mr-2 font-bold text rounded-full text-white bg-red-600 flex items-center justify-center w-4 h-4' style={{ fontSize: "12px" }}>N</p> */}
             </div>
