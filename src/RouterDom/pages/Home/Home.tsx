@@ -10,31 +10,53 @@ import { SearchPage } from "./araCenter/Search/Search";
 import SearchUserAddChat from "./araCenter/Search/SearchUserAddSingleChat";
 import { IUser } from "../../../Type";
 import { useNavigate } from "react-router-dom";
+import UserApi from "../../../api/user";
 const userTokenString:any=localStorage.getItem('user');
 
 export default function Home() {
-  
- 
-
+  const UserLogin:IUser=JSON.parse(userTokenString);
+  console.log(userTokenString)
   const navigate=useNavigate()
   useEffect(()=>{
-    const UserLogin:IUser=JSON.parse(userTokenString);
+ 
     console.log(UserLogin)
     if(UserLogin===null){
       navigate('/login')
     }
   },[userTokenString])
+
+  useEffect(() => {
+    const fetchUserInfor = async () => {
+      try {
+        const res = await UserApi.getUserById(UserLogin?.id);
+        console.log(res.data);
+        if(res.data===undefined){
+          navigate('/login')
+          localStorage.removeItem("user");
+           localStorage.removeItem("tokenUser");
+        }
+      } catch (err) {
+        alert(err);
+      }
+     
+      // if(res){
+      //   console.log('res',res)
+      //   if(res.errors.message){
+
+      //   }
+      //   // setuserInfor(res.data)
+      // }
+    }
+    fetchUserInfor()
+  }, [])
+
+
   const dispatch = useDispatch();
   const [tabCurrent, setTabCurrent] = useState("measages");
   const [SearchHand,setSeachHandle]=useState(false);
   const [searchValue,setSearchValue]=useState('');
-
-
   // lay cai mang userSlide
   const ListUsers = useSelector((state: any) => state.Users.UserSlice);
- 
-
-
   return (
     <div className="ContentHomeChat">
       {/* này là thanh tabbar màu xanh bên trái giống zalo */}
