@@ -565,11 +565,11 @@ const InformationChat: FunctionComponent<any> = ({
                   <div className="absolute bottom-1 p-2">
                     {selectedChat?.type !== 'cloud' && <>
                       <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
-                        <CiWarning />
+                        {/* <CiWarning />
                         Xóa lịch sử nhóm chat{" "}
                       </p>
                       <p className="text-red-600 flex gap-2 items-center text-lg cursor-pointer mt-2">
-                        <MdDelete /> Xóa nhóm
+                        <MdDelete /> Xóa nhóm */}
                       </p>
                     </>}
 
